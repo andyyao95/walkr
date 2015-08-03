@@ -9,7 +9,7 @@ Author:  as.person(c(
               ))
 Maintainer:  David Kane <dave.kane@gmail.com>, Andy Yao <ay3@williams.edu>
 Suggests:    testthat
-Imports:     hitandrun, limSolve, rcdd, MASS, miscTools, Rcpp, inline, RcppEigen
+Imports:     hitandrun, limSolve, MASS
 Description: Samples from the intersection of the n-simplex and m hyperplanes using MCMC methods. Specifically, 
              the sampling space is described by the underdetermined matrix Ax = b, such that every element in x 
              must be non-negative and must sum to 1. The current MCMC methods supported are Dikin Walk and Hit-and-Run. 

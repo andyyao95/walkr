@@ -47,7 +47,7 @@ test_that("Testing Starting Points - 3D simplex", {
  
 })
 
-test_that("Testing Dikin Starting Points - 20D with constraints", {
+test_that("Testing Starting Points - 20D with constraints", {
   
   ## Initialize 3D Simplex
   
