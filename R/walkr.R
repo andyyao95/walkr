@@ -60,7 +60,14 @@ walkr <- function(A, b, n, method) {
   
   else if (method == "hit-and-run") {
     
-    stop("not yet implemented!")
+    constr <- list(constr = new_A, rhs = new_b, dir = rep("<=", nrow(new_A)))
+    
+    
+    
+    alphas <- t(hitandrun::har(start.point, constr, N = n, 
+                              thin = 1, )$samples)
+    answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
+    return(answer)
   }
   
   
