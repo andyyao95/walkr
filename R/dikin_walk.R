@@ -33,44 +33,44 @@ dikin_walk <- function(A,
   
   ## H(x) is the Hessian of the Log-barrier function at x
   
-  H_x <- function(x) {
-    
-    ## making the D^2 matrix
-    ## the lambda function is \frac{1}{b_i - a_i * x} , where a_i * x is the dot product of those two
-    ## applying it to every row and then diag
-    this.length <- ncol(A)
-    D <- apply(A_b, 1, function(row) {1 / (tail(row, 1) - sum(row[1: (this.length)] * x))})
-    
-    ## diagonalize it
-    ## still need to becareful of handling the case where 
-    ## D = 0, so diag(0) returns an empty matrix 
-    ## actually, probably can prove this: det(D) will never be zero in the case that 
-    ## Ax <= b is bounded  ...?
-    
-    D_squared <- diag(D^2)
-    
-    ## this is the H(x) operator   
-    
-    return(t(A) %*% D_squared %*% A)  
-    
-  }
+#   H_x <- function(x) {
+#     
+#     ## making the D^2 matrix
+#     ## the lambda function is \frac{1}{b_i - a_i * x} , where a_i * x is the dot product of those two
+#     ## applying it to every row and then diag
+#     this.length <- ncol(A)
+#     D <- apply(A_b, 1, function(row) {1 / (tail(row, 1) - sum(row[1: (this.length)] * x))})
+#     
+#     ## diagonalize it
+#     ## still need to becareful of handling the case where 
+#     ## D = 0, so diag(0) returns an empty matrix 
+#     ## actually, probably can prove this: det(D) will never be zero in the case that 
+#     ## Ax <= b is bounded  ...?
+#     
+#     D_squared <- diag(D^2)
+#     
+#     ## this is the H(x) operator   
+#     
+#     return(t(A) %*% D_squared %*% A)  
+#     
+#   }
   
-  ## D(x) is the diagonalized matrix of the log-barrier function of Ax <= b
+  ## D(x) is the diagonalized matrix of 1 over the log-barrier function of Ax <= b
   
-  D_x <- function(x) {
-    
-    D <- apply(A_b, 1, function(row) {1 / (tail(row, 1) - sum(row[1: (length(row) - 1)] * x))})
-    return(diag(D))
-  }
+#   D_x <- function(x) {
+#     
+#     D <- apply(A_b, 1, function(row) {1 / (tail(row, 1) - sum(row[1: (length(row) - 1)] * x))})
+#     return(diag(D))
+#   }
   
   ## helper function:
   ## checks whether a point z is in Ellip(x)
   
-  ellipsoid <- function(z, x) {
-    
-    return( sum(  (z-x) * ((H_x(x) %*% (z-x)))  ) <= r^2      )
-    
-  }
+#   ellipsoid <- function(z, x) {
+#     
+#     return( sum(  (z-x) * ((H_x(x) %*% (z-x)))  ) <= r^2      )
+#     
+#   }
   
   ###### THE LINES ABOVE FINISH DEFINING THE ELLIPSOID
   ## now the sampling
@@ -97,37 +97,44 @@ dikin_walk <- function(A,
     ## and then compute lhs as a m-vector
     
     zeta <- r * zeta / sqrt(sum(zeta * zeta))
-    rhs <- t(A) %*% (D_x(current.point) %*% zeta )
+    #rhs <- t(A) %*% (D_x(current.point) %*% zeta )
+    rhs <- t(A) %*% (diag_logbarrier(A = A, b = b, x = current.point) %*% zeta )
     ## 
     
     #print(H_x(current.point))
-    y <- solve(H_x(current.point), rhs)
+    #y <- solve(H_x(current.point), rhs)
+    y <- solve(hessian_logbarrier(A = A, b = b, x = current.point), rhs)
     y <- y + current.point
 
    ## 2. Check whether x_0 is in Ellip(y)
    ## 3. Keep on trying y until condition satisfied
  
-    while(!ellipsoid(current.point, y)) {
-  #while(!dikin_ellipsoid(A = A, b = b, x0 = current.point, z = y, r = r)) {
+    #while(!ellipsoid(current.point, y)) {
+  while(!dikin_ellipsoid(A = A, b = b, x0 = y, z = current.point, r = r)) {
      zeta <- rnorm(length(b), 0, 1)
       
       ## normalise to be on the m- unit sphere
       ## and then compute lhs as a m-vector
       zeta <- r * zeta / sqrt(sum(zeta * zeta))
-      rhs <- t(A) %*% D_x(current.point) %*% zeta 
+      #rhs <- t(A) %*% D_x(current.point) %*% zeta 
+      rhs <- t(A) %*% (diag_logbarrier(A = A, b = b, x = current.point) %*% zeta )
      
       ##
       #print(H_x(current.point))
-      y <- solve(H_x(current.point), rhs)  ##THIS IS THE STEP THAT IS TAKING THE LONGEST
+      #y <- solve(H_x(current.point), rhs)  ##THIS IS THE STEP THAT IS TAKING THE LONGEST
+      y <- solve(hessian_logbarrier(A = A, b = b, x = current.point), rhs)
       y <- y + current.point
 
-      if(ellipsoid(current.point, y)) {
-      #if(dikin_ellipsoid(A = A, b = b, x0 = current.point, z = y, r =r )) {  
+      #if(ellipsoid(current.point, y)) {
+      if(dikin_ellipsoid(A = A, b = b, x0 = y, z = current.point, r = r)) {  
 
         ## det(A) / det(B) = 
         ## det(inv(B) %*% A)
         
-        probability <- min(1, sqrt (det( solve(H_x(current.point)) %*% H_x(y))))
+        #probability <- min(1, sqrt (det( solve(H_x(current.point)) %*% H_x(y))))
+        probability <- min(1, sqrt (det( solve(hessian_logbarrier(A = A,
+                                                                  b = b, x = current.point)) %*% 
+                                                                  hessian_logbarrier(A = A, b = b, x = y))))
     
         bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
         if(bool) {
@@ -139,7 +146,7 @@ dikin_walk <- function(A,
         } 
       }
    }
-
+  
   result[ , i+1] <- y
   current.point <- y
     
@@ -152,6 +159,7 @@ dikin_walk <- function(A,
   
   cols <- which(!is.na(result[1,]))
   result <- result[,cols]
+  print('wonderful')
   return(result)
 
 }

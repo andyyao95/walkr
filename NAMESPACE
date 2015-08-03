@@ -2,6 +2,7 @@
 
 export(Dikin_Walk)
 export(complete_solution)
+export(diag_logbarrier)
 export(dikin_ellipsoid)
 export(dikin_walk)
 export(hessian_logbarrier)
