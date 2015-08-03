@@ -159,7 +159,7 @@ dikin_walk <- function(A,
   
   cols <- which(!is.na(result[1,]))
   result <- result[,cols]
-  print('wonderful')
+  
   return(result)
 
 }

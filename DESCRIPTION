@@ -1,6 +1,6 @@
 Package: walkr
 Type:    Package
-Title:   Creates random vectors fulfilling constraints
+Title:   Walkr -- Sampling from the intersection of the n-simplex with hyperplanes.
 Version: 0.3-2
 Date:    2015-06-30
 Author:  as.person(c(
