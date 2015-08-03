@@ -1,0 +1,725 @@
+\documentclass{article}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{subfig}
+\usepackage{csquotes}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+\MakeOuterQuote{"}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\title{Project Kmatching}
+\date{}
+\maketitle
+\vspace{-10ex}
+
+This document summarizes everything there is to know about our efforts and resources on kmatching.
+
+\section{Problem Statement}
+
+\textbf{Definition:} The $N$-dimensional unit simplex is described by:
+
+$$w_1 + w_2 + w_3 + ... + w_n = 1$$
+$$w_i \geq 0$$
+
+\noindent \textbf{Problem Statement:} \\
+
+Given $Aw=b$, where $A$ is a $M \times N$ matrix, generally with $N \gg M$ 
+(many more columns than rows; approximately, $M=100$, $N=10000$). We want to uniformly sample $w$, 
+subject to: 
+
+\begin{itemize}
+
+  \item{$w_1 + w_2 + w_3 + ... + w_n = 1$}
+  \item{$w_i \geq 0$}
+
+\end{itemize}
+
+Thus, we are sampling from the \textbf{intersection} of the complete solution to $Aw=b$ (defined as all
+possible $w$ that satisfy $Aw=b$) and the $N$-dimensional unit simplex.
+
+\subsection{Nomenclature, Matrix Representation}
+
+Let us begin with a simple case. We have the following system of equations:
+
+$$w_1+w_2+w_3=1$$
+$$w_2+2w_3=0.5$$
+
+$$w_1, w_2, w_3 \geq 0$$
+
+To be easy, we can express the system of equations in a matrix format. Define all the variables as a vector $w$:
+
+$$w = 
+\begin{bmatrix}
+w_1 \\
+w_2 \\
+w_3
+\end{bmatrix}
+$$
+
+$A$ and $b$ represent the system of equations that we have above. Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), and $b$ is a $M \times 1$ vector. For example, for the 3-variable, 2-equation system described in section 1.1, we have:
+
+$$
+A = 
+\begin{bmatrix}
+1 & 1 & 1  \\
+0 & 1 & 2 \\
+\end{bmatrix},
+\quad
+b = 
+\begin{bmatrix}
+1\\
+0.5
+\end{bmatrix}
+$$
+
+And thus the whole system of linear equations can be expressed as the product of matrixes:
+$$Aw=b$$
+
+Since we have 3 variables and only 2 equations, we know this describes a line in $\mathbb{R}^3$. In fact, it is a 
+line segment because of the non-negativity constraints ($w_i \geq 0$). Our goal is to sample $w$ uniformly from 
+this line segment, which represents all possible $w$'s. 
+
+\section{Solution Space}
+
+In this section, we try to fully understand what the space we are sampling from looks like.
+
+\subsection{3D case}
+
+Let's start from the intersection of a 3D simplex $(w_1+w_2+w_3=1)$ and a plane $(w_1+w_3=0.5)$ in the 3D space : 
+
+$$
+w_1+w_2+w_3=1
+$$
+$$
+w_1+w_3=0.5
+$$
+
+If we write the equations in matrix form, we have:
+
+$$
+A=
+\begin{bmatrix}
+1 & 0 & 1
+\end{bmatrix}
+, \quad
+b=
+\begin{bmatrix}
+0.5
+\end{bmatrix}
+$$
+
+$$\sum w_i = 1$$
+$$w_i \geq 0$$
+
+In the following graph we draw the intersection of the two. The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) is the red line segment, which is what we're interested in. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 5in, height = 4in]{img/stan/michael4.png}
+\caption[caption]{Intersection of Simplex and 2D hyperplane living in 3D space}
+\end{figure}
+
+In general, if we intersect the 3D-simplex with 1 linear constraint (if 2 constraints, they only meet at a point), 
+the resulting object will be a line segment. 
+
+\subsection{4D space}
+
+It is difficult to visualize a 4D simplex because we are living in 3D space. However, we can still visualize the 4D simplex if we choose the correct 3D frame. \\
+
+Let's first go back to the 3D simplex. We cannot easily put a 3D simplex in a 2D coordiate system because these two are of different dimensions. However, since the 3D simplex is itself a plane, which is 2D, we can construct a coordinate system "on" the 3D simplex. That is, we put the 3D simplex on a 2D space that overlaps with the 3D simplex perfectly. In this case, we can put the 3D simplex in a 2D space, and the result is a equilateral triangle on a 2D plane. We construct the two axes along the two edges of the triangle, and the common vertex of these two edges is the origin of the space.\\
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/3_D_simplex_vis.png}
+\caption[caption]{3D Simplex Can Live in 2D Space}
+\end{figure}
+
+Now we can do the same trick with the 4D simplex. A 4D simplex is itself a 3D object in a 4D space, 
+and we can visualize the 4D simplex if we choose a correct 3D coordinate system, which should perfectly 
+overlap with the 4D simplex. After we do the trick, we get a tetrahedron in the 3D space, and the tetrahedron 
+we get is the 4D simplex. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/4_D_simplex_vis.png}
+\caption[caption]{4D Simplex Can Live in 3D Space}
+\end{figure}
+
+Now we are going to imagine the intersection of a 4D simplex and one hyperplane in 4D (1 equation, or 1 row in $A$).
+The intersection in the 4D space can be represented in a 3D space as the intersection of a tetrahedron and a plane.
+That's because we selected a specific 3D space so that such space perfectly overlap with the 4D simplex, but 
+the hyperplane that intersects the simplex is a 3D object 
+in another set of 3D coordiates. In the following graphs, the blue plane represents the intersection of the 4D 
+simplex (tetrahedron) and a hyperplane. \textbf{Note:} In our conversation with Michael Betancourt (see Section 5),
+he states that our solution space is always a simplex. However, we've found a case in which it does not seem like a simplex (see picture below).
+
+Once we are clear with the visualization of a 4D simplex, we can go on and explore the solution space produced by a 4D simplex and a 4D hyperplane. Define constraints
+
+$$
+A = 
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+22 & 2 & 2 & 37\\
+\end{bmatrix},
+\quad
+b = 
+\begin{bmatrix}
+1\\
+16
+\end{bmatrix}
+$$
+
+In order to visualize the intersection of a 4D simplex and a 4D hyperplane in a 3D space, we first calculate the
+coordinates of all vertexes and then plot all those intersection points, with reference to the 4 vertexes of the
+tetrahedron. We only have two equations in the systen with 4 variables, and we need to set all the variables in $w$
+to be zero except for two of the variables. We repeat the calculation for each pair of variables we can pick from $w$,
+and select the points that do not contain negative values. All these points are the vertexes of the intersection.
+These points in this case are
+
+$$(0.7, 0.3, 0, 0)$$
+$$(0.7, 0, 0.3, 0)$$
+$$(0, 0.6, 0, 0.4)$$
+$$(0, 0, 0.6, 0.4)$$
+
+We can plot all these points on the 4D simplex and visualize the intersection in our 3D space
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 7in, height = 4in]{img/4_D_non_simplex_intersection.png}
+\caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
+\end{figure}
+
+In higher dimensions, the same logic applies. Each row in $Aw=b$ is a hyperplane living in $\mathbb{R}^n$ (given $n$
+variables). Thus, geometrically, the solution space to our problem statement is: \textbf{the intersection of hyperplanes
+with the $N$-dimensional unit simplex}. 
+
+\section{Sampling}
+
+Recall: we want to sample $w$ uniformly from the intersection of the complete solution space
+of $Aw=b$ and the unit simplex. This solution space is a convex polytope. \\
+
+\subsection{Hit-and-run}
+
+The hit-and-run algorithm starts from a single point in the solution space, and then jumps to another point, and then
+jumps again, and so on. Each jump only depends on the current point that the algorithm is at, not on the history of 
+prior jumps. We used the \texttt{hitandrun} package on CRAN which does the "dirty computational work" for
+us in C++. The package can be found at: \url{https://github.com/gertvv/hitandrun})\\
+
+Right now, there are two ways of generating starting points. \\
+
+The first way is to use hitandrun package's 
+internal function to generate starting points. However, this approach is too slow. The reason for this is that 
+this part of the code is actually written in R, and has many many complicated function calls to linear programming
+. We looked at the code,
+and saw that on a whole, it is the same approach as in our second option (see paragraph below). It is just very
+poorly implemented. \\
+
+The second, and currently used option is to generate starting points
+ourselves. To do this, we take advantage of linear programming and another external package \texttt{limSolve}. 
+We first generate a random function (called Objective Function) using all the variables. Then, we use the boundaries of
+the solution space as constraints, and use linear programming to maximize the value of the objective function. However,
+these random starting points are not truly random in the solution space, but lie at the boundaries or very special
+regions. Actually, think about it. If it were, why bother using MCMC, just take those points as our sample. (to read
+more about this approach, see the linear programming section). \\
+
+The algorithm is as follows:
+
+\begin{itemize}
+  
+  \item{Take $k$ randomly generated, different starting points (from above). 
+        These starting points form $k$ "chains". For each chain:}
+  \item{Set starting point as current point}
+  \item{Generate a random direction. If we are in $n$ dimensions, then this random direction will be a vector of $n$
+        components. Each component is generated from the Uniform distribution in [$-1,1$]}
+  \item{Find the \textbf{chord} between the current point and the boundaries along the direction (there
+        are two boundaries, corresponding to positive direction and negative direction)}
+\end{itemize}
+
+
+Let's call the current point $x_0$ and a direction $d$. Also, the $w_i \geq 0$ inequalities
+, which could be rewritten as $Wx_0 \leq z$ (written this way just so we could think of the inequalities as rows of a
+matrix). \\
+
+$$Wx_0 \leq z$$
+
+We want to parametrize the \textbf{chord} along the direction $d$ (both positive and negative, 
+so there are actually 2 directions in total). This corresponds to finding $t_{positive}, t_{negative}$, 
+such that 
+
+$$W(x_0 + td) \leq z$$ 
+
+Or equivalently
+
+$$t * Wd \leq z - Wx_0$$
+
+Then, by going through $W$ row by row, we could analytically find a range for $t$ by setting each 
+inequality to equality (corresponding to the surface in both directions). After going through every row
+in $W$, we have found the \textbf{end points} of the chord \texttt{l[1]} and \texttt{l[0]}. Then, we could
+pick a random point along this chord for the algorithm.\\
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 4in]{img/chord.jpg}
+\caption[caption]{How hitandrun picks its next point}
+\end{figure}
+ 
+\begin{itemize}        
+        
+  \item{Pick a random point along this chord, move there, and that will be our new starting point.}
+  \item{Repeat Algorithm above until we've reached the desired number of points.}
+
+\end{itemize}
+
+\subsection{Translating $Aw=b$ intersecting the simplex into just $Ax \leq b$}
+
+Since the $Ax \geq b$ is the common nomenclature in the math literature to describe a convex polytope. We'll stick
+with that in this section. It is important to note that the $A$ and $b$ in $Aw=b$ is NOT equal to those in $Ax \leq b$. In
+fact, the $w$ and $x$ are on completely different coordinate systems and represent different things. 
+
+
+
+
+
+\subsection{Hit-and-run in \texttt{R}}
+
+We have written a function called \texttt{hitandrun} which uses the \texttt{hitandrun} package.
+
+
+\begin{verbatim}
+
+## Initialize A, b
+
+A <- matrix(c(1,1,1), ncol = 3, nrow = 1)
+b <- 1
+
+## the hitandrun function in our package takes care of the non-negativity constraint by itself 
+## running a single chain
+
+answer <- hitandrun(A = A, b = b, n = 100, thin = 1, burn = 30)[[1]]
+
+for (i in 1:9) {
+
+  ## running 9 more chains
+  ## so we have 10 chains in total
+  answer <- cbind(answer, hitandrun(A = A, b = b, n = 100, thin = 1, burn = 30)[[1]])
+
+}
+
+## answer is the matrix of sampled points
+## every column represents a sampled point in order
+
+Let's just look at the 2D projection:
+
+plot(answer[1,], answer[2,], pch = 19)
+
+\end{verbatim}
+
+\subsection{Examining MCMC Performance -- shinyStan}
+
+One may be wondering. In lower dimensions, surely we could eyeball the sampling. But how do we quantify whether a 
+sampling scheme is uniform, and how do we do that in even higher dimensions? Well, in the specific case of MCMC sampling,
+Stan has a set of tools that could examine how "convergent" or "good" our MCMC sampling scheme is. This is all
+wrapped up in a very nice external package \texttt{shinyStan}, and in our own package, we have the function
+\texttt{vis\_sampling} (see documentation for details) that allows us to call \texttt{shinyStan}. \\
+
+There are two main tests right now that test the "convergence" property of the Markov Chain (read: \url{
+http://www.people.fas.harvard.edu/~plam/teaching/methods/convergence/convergence_print.pdf
+} the section on Traceplot and $\hat{R}$). First, the traceplot is just the plot of a certain dimension, say $w_{52}$, 
+for every point in our chain. In a good traceplot we would see the value oscillate up and down very frequently. In a 
+bad traceplot we would see the cooridnate getting stuck around 1 value for a while, suddenly jump to another value,
+and so on. Second, the $\hat{R}$ is a diagnostic statistic developed by Gelman and Rubin in their influential paper. Essentially, if $\hat{R}$ for any coordinate is greater than $1.1$, then we need to sample more points (thin more).\\
+
+\subsection{Visualizing hitandrun in 4D case}
+
+Using the sampled points above, we could look at the samples from a 4D space. The code is as follows:
+
+\begin{verbatim}
+
+##### linear constraints  -- Initializing A and b
+
+A <- matrix(c(1,1,1,1,22,2,2,37), nrow = 2, byrow = T)
+b <- c(1, 16)
+
+## Throw in the constraints and use the "hitandrun" function directly to sample inside the 
+## solution space
+
+samples <- kmatching::hitandrun(A = A, b = b, n = 300, thin = 300)[[1]]
+
+for (i in 1:4) {
+  samples <- cbind(samples, kmatching::hitandrun(A = A, b = b, n = 300, thin = 300)[[1]])
+}
+
+## Use shinyStan to visualize the distribution of points in different dimensions, and test if
+## different chains of points converge
+
+vis_sampling(x = samples, chains = 5)
+
+\end{verbatim}
+
+The following graphs are screenshots of the output of the Shiny interface when different chains converge 
+and distributions are normal. The first one is a 3D scatterplot of the sampled points. Since we can only plot 
+3 dimensions at one time, we can only select 3 dimensions in the interface. But that's good enough. Notice 
+that the distribution of points has a somewhat trepezoid shape. That is what we found in the "4D space, 
+what does the solution space look like" section.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/visual/4D_scatter.png}
+\caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
+\end{figure}
+
+We can see that in the following graph, the trace of each chain's values in each dimension has
+roughly the same distribution. That means that each chain does not stay in a small area around its starting
+point and goes all over the polytope.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/visual/4D_1const.png}
+\caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
+\end{figure}
+
+The graph below gives a more symbolic representation of the distribution. We mainly look at the "Rhat" values
+and the number of dimensions that do not pass the "Rhat" test. A low "Rhat" means that different Markov Chains starting from different points actually have similar distribution inside the polytope. Therefore,
+a low "Rhat" signifies normality in the distribution.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/visual/4D_1const_Rhat.png}
+\caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
+\end{figure}
+
+\section{Hitandrun in Higher Dimensions -- where the problems occur}
+
+Here, we add 3 linear constraints to a 50 Dimensional simplex. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/stan/NEWLinearConst50D1.png}
+\caption[caption]{50D with linear constraints}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/stan/NEWLinearConst50D2.png}
+\caption[caption]{50D with linear constraints}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/stan/NEWLinearConst50D3.png}
+\caption[caption]{50D with linear constraints}
+\end{figure}
+
+What's interesting here is that, after we've added the constraints, it seems like certain dimensions
+are "trapped" by these constraints. The "mixing" becomes affected as well as the $\hat{R}$ values. 
+Note that the above performance indicates fairly bad mixing. However, if we let the chains run for a longer
+period of time (i.e. let the thinning factor increase given the same number of final points), we can
+improve the mixing to be eventually satisfied. (For 50D, at most 30 minutes is needed).\\
+
+\subsection{Summary}
+
+To summarise, it is not that hitandrun actually never converges, it just does not converge fast enough. In fact, there is a theoretical 
+upper bound for MCMC algorithms to reach uniformity in the sample space -- a run-time complexity $O(n^3)$, 
+$n$ referring to the number of dimensions. In the 500-D case, 
+to obtain a desirable chain, our algorithm would have to run for several hours. Therefore, if we believe that the run-time scales up 
+cubically, then for our end goal of 10000 dimensions, MCMC definitely encounters a very major problem with runtime.
+
+\section{What might one do + Resources}
+
+In this section, we mainly list our the resources there are to kmatching. We also include short comments/thoughts
+on each of the points we are about to list.
+
+\subsection{Articles}
+
+  \begin{itemize}
+  
+    \item{Randomized interior point methods for sampling and optimization}
+      \subitem{--This is a slightly altered version of hitandrun, and could be tried}
+      \subitem{--\url{http://faculty.washington.edu/harin/Dikin2.pdf}}
+      \subitem{--Random walks on polytopes and an affine interior point method for linear programming
+              (\url{http://faculty.washington.edu/harin/Dikin.pdf})}
+      \subitem{--perhaps, this is useful also: \url{http://www.mit.edu/~har/regret_by_sampling.pdf}}
+  
+    \item {Cruising The Simplex:  Hamiltonian Monte Carlo and the Dirichlet Distribution}
+      \subitem{--\url{http://arxiv.org/pdf/1010.3436v4.pdf}}
+      \subitem{--This is Michael Betancourt's paper}
+      \subitem{--sampling from unit-simplex is equivalent to sampling from dirchlet distribution, and 
+               then normalizing}
+      \subitem{--the core of this paper is a series of transformations that transform sampling from the simplex
+               into a much easier sampling scheme from the unit-ball. We really don't care about this, but
+               the only things to be paid attention to here is how he transforms in between spaces and 
+               how he takes care of the Dirchlet with the change of variables}
+      \subitem{Michael Betancourt initially thought our solution space was a simplex in lower-dimensional space.
+               However, it turned out that this is not the case, and we've abandoned that approach.}
+
+    \item{Sampling Uniformly from the Unit Simplex}
+      \subitem{\url{--http://www.cs.cmu.edu/~nasmith/papers/smith+tromble.tr04.pdf}}
+      \subitem{--We emailed this professor, and his suggestion was to find a linear mapping from
+               our solution space onto a lower-dimensional simplex. Sample from the simplex and then
+               map back.}
+  \end{itemize}
+
+\subsection{Conversation with Stan / Using Stan}
+
+\textbf{Summary}: Stan initially suggests solving the system algebraically (through pseudo-inverse, which we believe is the exact equivalent to our 
+basis approach (particular + homogeneous)), and then sample $\alpha$ (essentially, take any linear combination of basis vectors) from unconstrained
+$\alpha \in$ [$-\inf$, $\inf$]. And then, we would reject all the $\alpha$ that don't meet the negativity constraint. Seems like a very bad idea, as the 
+dimension grows larger, we would be rejecting more and more of our samples. Stan people say they don't believe NUTS is better than hitandrun.
+
+\begin{itemize}
+  \item{2 Stan developers discussing Yuanchu's problem(Stan-Dev)}
+     \subitem{--\url{https://groups.google.com/forum/#!msg/stan-dev/Sc5PwZaE8fQ/Gsue505VfMcJ}}
+
+  \item{Yuanchu's post}
+     \subitem{--\url{https://groups.google.com/forum/#!msg/stan-users/YCCOuUO4jgc/yVyyLDiGfnsJ}}
+     \subitem{--theres a \texttt{convex.polytope.R} file which helps trying to learn stan code}    
+    
+  \item{Yuanchu's update post}
+     \subitem{--\url{https://groups.google.com/forum/#!msg/stan-users/tofbP4Yg5s8/5cH1DB8E9BAJ}}
+     \subitem{--again, Michael Betancourt emphasizes analytically solving the system}
+
+  \end{itemize}
+
+\subsection{Stack/Math Overflow Useful Question/Comments}
+
+  \begin{itemize}
+  
+    \item{Delaunay Triangulation on Convex Polytopes -- Uniform Sampling}
+      \subitem{--the person says the best that academia can do for approximately uniform is $O$($n^3$) for 
+               general $Gw \leq h$}
+      \subitem{--\url{http://cs.stackexchange.com/questions/44029/delaunay-
+                      }}
+      \subitem{\url{triangulation-on-convex-polytopes-uniform-sampling}}
+      
+    \item{Trying to Understand the Dirchlet Distribution}
+      \subitem{--\url{http://stats.stackexchange.com/questions/14059/
+               }}
+      \subitem{\url{generate-uniformly-distributed-weights-that-sum-to-unity}}
+      \subitem{--The answers include a pretty good explaination of how the Dirchlet connects to the simplex}
+      \subitem{--"linear transformations preserve uniformity of distributions, 
+                the uniformity of x implies the uniformity of w on the n-1 simplex." This is GREAT to hear, but
+                there must be certain pre-conditions that need to be satisfied in order for this claim to be 
+                true}
+    
+  \end{itemize}
+
+\subsection{Email Exchanges with Professors}
+
+  \begin{itemize}
+
+    \item{The author of the hitandrun package suggests that since we only have equality constraints, we
+    perform some type of scaling/transformation to sample from the unit-simplex}
+    \item{Michael Betancourt also suggests "analytically solving the system" and then using 
+    transformation}
+    \item{Professor Smith of JHU who wrote a paper about sampling from the unit-simplex suggests the
+    same}
+        
+  \end{itemize}
+  
+\subsection{Finance Related}
+
+  Recall that the bigger picture of the project is to generate random portfolios to serve as benchmarks for a certain
+  portfolio manager's portfolio given the same set of exposures. 
+  
+  \begin{itemize}
+  
+    \item{Portfolio ANalytics is a package that can do portfolio optimization and analytics}
+      \subitem{--\url{https://cran.r-project.org/web/packages/PortfolioAnalytics/index.html}}
+      \subitem{--here is a good vignette: \url{https://cran.r-project.org/web/packages/}}
+      \subitem{\url{PortfolioAnalytics/vignettes/portfolio_vignette.pdf}}
+  
+    \item{A paper about Monte Carlo Portfolio Optimization by William T. Shaw}
+      \subitem{\url{http://arxiv.org/abs/1008.3718}}
+  
+  \end{itemize}
+  
+  
+  
+\newpage
+
+\section{Other Sampling Algorithms}
+
+In this section, we summarize the other sampling algorithms. 
+
+\subsection{The Grid Walk}
+
+We call the convex polytope we are trying to sample $K$, which is a subspace of the $N$ dimensional
+Euclidean space, $\mathbb{R}^N$, where our $N$ simplex and hyperplanes are defined. 
+
+The search space for the grid walk is restricted to a discrete subset of $K$. This means that, 
+the "grids" are defined as integer multiples of a parameter which we can control -- $\delta$. 
+Thus, the grid walk uses the grid defined in the neighborhood of the current point $x_0$, and 
+moves randomly to search for points that are in the convex polytope $K$. 
+
+\begin{itemize}
+
+  \item{Pick a grid point y from the neighbors of the current point x}
+  \item{If y is in the solution space, then go to y. If not, pick a new y}
+
+\end{itemize}
+
+\subsection{Ball Walk}
+
+Similar to the grid walk, the ball walk also searches the "neighborhood" of 
+the current point. For every point $x_0$, we can define a ball of radius $\delta$ around the point,
+and then uniformly sample from that ball. If it belongs to polytope $K$, then we move there 
+as our new point.
+
+\begin{itemize}
+
+  \item{Pick a random point in the ball around current point, with radius $\delta$}
+  \item{If the random point is in the solution space, then move there. If not, repeat}
+
+\end{itemize}
+
+\noindent These two algorithms above involve large amounts of rejection sampling. Thus, for higher dimensional
+polytopes with sharp corners, the sampling becomes extremely inefficient. \newpage
+
+\section{Dikin Walk}
+
+Hit-and-run does not mix well. So here, we propose another MCMC algorithm -- Dikin.
+According to the authors of the Dikin Walk papers, this algorithm mixes "strongly in polynomial time" and mixes
+especially well if the chain begins at an analytic center of the polytope.
+
+\subsection{Mathematical Background}
+
+Recall, our convex polytope, $K$, can be defined as $Aw \leq b$ (
+see hit-and-run subsection on how to transform a system of
+equalities with the simplex constraint into the general $Aw \leq b$ case). \\
+
+For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent the $i^{th}$ element of $x$ and $b$.
+Also recall that $A$ is a $M \times N$ matrix. \\
+
+\noindent \textbf{Log Barrier Function $\phi$:} 
+
+$$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
+
+\noindent With some calculus and algebraic tricks, we can compute and simplify the Hessian of the Log Barrier:\\
+
+\noindent \textbf{Hessian of Log Barrier $H_x$:} 
+
+$$H_x = \nabla ^2 \phi(x) = ... = A^T D^2 A$$
+$$D = diag(\frac{1}{b_i - a_i^Tx})$$
+
+For theoretical reasons we won't get into (and don't fully understand), $\phi$ and $H(x)$ is very important, 
+as they have nice properties in the context of constrained sampling and optimization. \textbf{Note:} $H_x$ is 
+a linear operator. Specifically, it is a $N \times N$ matrix. $D$ is a diagonal matrix.\\
+
+\noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
+
+$D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
+
+\begin{center}
+\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} , where $y$ is a point in the Ellipsoid. 
+\end{center}
+
+\noindent A important point to note here is that the shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
+In other words, if we think in terms of running a MCMC chain within our polytope $K$, the Dikin Ellipsoid is able to 
+reshape itself accordingly as it surveys through the polytope.
+
+\subsection{Algorithm \texttt{Dikin}}
+
+\begin{enumerate}
+
+  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
+  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
+  \item{Pick a random point $y$ from $D_{x_0}$}
+  \item{If $x_0 \notin D_{y}$, then reject $y$ (this condition is counter-intuitive, read it closely)}
+  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
+        (the big picture is that the ratio of the determinants are equal
+         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, the geometric argument would be that 
+         this way the Dikin walk can avoid extreme corners of the region)}
+  \item{repeat until obtained number of desired points}
+
+\end{enumerate}
+
+\subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
+
+Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. Sampling from the ellipsoid
+is mathematically equivalent to generating a Standard Gaussian vector, projecting that vector on the unit ball,
+and then solving for a matrix equation with an unique solution. The exact algorithm is as follows: 
+
+\begin{enumerate}
+
+  \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
+  \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
+    \subitem{$\zeta = <x_1,x_2,...,x_n> \qquad \rightarrow \qquad <\frac{rx_1}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
+            \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ... , 
+            \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}$}
+  \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
+        of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
+  \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
+
+\end{enumerate}
+
+\subsection{Important Theorem and Findings}
+
+With the algorithm, there is no mention of what happens if the point $y$ we accept is outside of our polytope $K$. 
+Luckily, there is no need to worry about that because of this theorem: \\
+
+\noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, if our starting point $x_0$ is in 
+our polytope $K$, then the Dikin Ellipsoid centered at $x_0$ with radius $1$ will always be contained in $K$. \\
+
+This is important because this way, we know for sure that if we set $r=1$, then our algorithm will never sample points
+from outside the polytope $K$. Although there are still two rejection components to the algorithm (see above), the
+rejection rate is much higher than expected because of this theorem. \\
+
+\noindent \textbf{Key points about the Dikin Algorithm}
+
+\begin{itemize}
+
+  \item{Dikin algorithm does not produce an uniform sample asymptotically. According to the authors of the original
+        paper, the sampling is "nearly uniform" in $K$. It is unclear to us on how "nearly" they mean. We are
+        looking for papers that quantify this. Either way, it doesn't look that bad in a lower dimensional 
+        case (see plot in section below)}
+  \item{We cannot start Dikin at $x_0 \notin K$ or on the boundary of $K$. This will cause the Hessian, 
+        log-barrier, and determinants to blow to infinity.}
+  \item{Dikin mixes "strongly in polynomial start" only if we begin at an "analytical center". It is not very clear
+        to us what exactly the authors mean by an "analytical center", but so far we've tried to compute an average 
+        of the vertices. However, this problem doesn't scale well. This is because according to the author who 
+        came up with the implementation to find the vertices, the run-time complexity is $O(n^2dv)$, where
+        $d$ is the dimension of the polytope, $n$ is the number of hyperplanes, and $v$ is the number of vertices. We
+        have some evidence that the number of vertices grow combinatorially as we increase $d$.}
+  \item{we know any $r \leq 1$ guarantees that our ellipsoids are bounded within $K$. However, from trials it seems 
+        like we could increase $r$ up to a certain value for each polytope. The virtue of doing so would be to
+        "cover more space", thus probably mixing even better}
+
+\end{itemize}
+
+\subsection{Lower Dimensional Results}
+
+For example, here is a plot of the \texttt{Dikin} Algorithm in the volume under the $3$D simplex. As we can see, 
+there is concentration towards the center of the polytope (note the scale on the axes too).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 5in, height = 4in]{img/Dikin/underthesimplex1.png}
+\caption[caption]{Volume under the 3D simplex}
+\end{figure}
+
+To see the good mixing of Dikin, here is the $50$D simplex intersected with $3$ hyperplanes. We ran $10$ chains, each
+with $10000$ iterations. No points were thinned out (as opposed to hit-and-run's $10^3$ to $10^5$ 
+in this specific case). 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 4in, height = 2.5in]{img/Dikin/50D10000points1.png}
+\caption[caption]{50D simplex, 3 hyperplanes}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 5in, height = 4in]{img/Dikin/50D10000points2.png}
+\caption[caption]{50D simplex, 3 hyperplanes}
+\end{figure}
+
+\end{document}
+
+
