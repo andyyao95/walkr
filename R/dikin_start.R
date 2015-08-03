@@ -1,4 +1,4 @@
-#' Dikin Start
+#' start point
 #' 
 #' Given \eqn{Ax <= b}, which defines a convex
 #' polytope, this function picks n random
@@ -15,7 +15,7 @@
 #' @export
 
 
-dikin_start <- function(A, 
+start_point <- function(A, 
                         b, 
                         n = 1, 
                         average = 10) {

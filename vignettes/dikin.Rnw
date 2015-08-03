@@ -1,0 +1,101 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+n <- 300
+A <- matrix(rep(1,n), ncol = n, nrow = 1)
+A <- rbind(A, sample(c(1,0), n, replace = T))
+A <- rbind(A, sample(c(1,0), n, replace = T))
+A <- rbind(A, sample(c(1,0), n, replace = T))
+b <- c(1, 0.7, 0.2, 0.05)
+
+z <- complete_solution(A,b, randomize = T)
+
+particular  <- z$particular
+homogeneous <- z$homogeneous
+
+new_A <- -homogeneous
+new_b <- particular
+
+## can find x0 by calling Dikin start 
+x0 <- dikin_start(A = new_A, b = new_b, n = 1, average = 20)
+my.center <- as.vector(x0)
+
+Rprof(filename = "Dikin1012.out")
+z <- Dikin_Walk(A = new_A, b = new_b, n = 9999, r = 1, x0 = my.center, analytic_center = F)
+Rprof(NULL)
+summaryRprof(file = "Dikin1012.out")
+
+for (i in 1:2) {
+  x0 <- dikin_start(A = new_A, b = new_b, n = 1, average = 30)
+  my.center <- as.vector(x0)
+  z <- cbind(z, Dikin_Walk(A = new_A, b = new_b, n = 19999, r = 1, x0 = my.center, analytic_center = F))
+}
+Rprof(NULL)
+
+answer <- apply( z, 2, function(x) { homogeneous %*% x + particular  })
+vis_sampling(answer, 2)
+
+
+
+###################
+thins <- 1:6000
+thins <- thins*10
+answer <- answer[,thins]
+vis_sampling(answer, 3)
+
+## just to see we're sampling from the right simplex
+apply(solution, 2, sum)
+
+
+#####
+## Good direction on picking points from Dikin Ellipsoid
+
+\url{http://mipt.ru/dcam/upload/06c/Seminar_MFTI-arpgzsi04lf.pdf}
+
+## Important link for finding the analytic center 
+## Seems to be a linear programming question, but how to deal with the sum and log? 
+## (perhaps we could try optimx...? Doesn't look that bad)
+\url{http://theory.stanford.edu/~megiddo/pdf/kmm4fin.pdf}
+
+### NORMAL VERSUS UNIFORM DISTRIBUTION
+
+## Observing the Difference in sampling from 
+## 1) 1-D standard Gaussian
+## 2) Uniform Distribution in [-1, 1]
+
+
+##3D sphere -- Normal
+
+normal <- matrix(ncol = 50000, nrow = 3)
+
+for (i in 1:50000) {
+  z1 <- rnorm(3, 0, 1)
+  z1 <- z1 / sqrt(sum(z1*z1))
+  normal[ ,i] <- z1
+}
+
+##3D sphere -- Normal
+
+uniform <- matrix(ncol = 50000, nrow = 3)
+
+for (i in 1:50000) {
+  z1 <- runif(3, -1, 1)
+  z1 <- z1 / sqrt(sum(z1*z1))
+  uniform[ ,i] <- z1
+}
+
+## obvious difference
+
+hist(normal[1,])
+hist(normal[2,])
+
+## not uniform
+
+hist(uniform[1,])
+hist(uniform[2,])
+
+
+\end{document}
+

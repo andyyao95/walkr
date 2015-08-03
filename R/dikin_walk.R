@@ -10,8 +10,6 @@
 #'@param x0 is the starting point
 #'@param r is the radius of the ellipsoid (1 by default)
 #'@param n is the number of points we want
-#'@param analytic_center is a boolean indicating whether we want to 
-#'       start at the analytic center of the polytope
 #'
 #'@return a number of sampled points that satisfy Ax <= b (matrix object, 
 #'columns the points)
@@ -23,8 +21,7 @@ dikin_walk <- function(A,
                        b, 
                        x0 = NULL, 
                        n, 
-                       r = 1,
-                       analytic_center = T) {
+                       r = 1) {
   
   ## assuming A is m * n matrix
   ## reference is here: http://mipt.ru/dcam/upload/06c/Seminar_MFTI-arpgzsi04lf.pdf

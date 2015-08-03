@@ -14,10 +14,5 @@
 #' 
 
 hit_and_run <- function(A, b, x0, n) {
-  
-  
-  
-  
-  
   return(0)
 }
