@@ -29,15 +29,33 @@
 \maketitle      
 
 \abstract{
-hi
+The \texttt{walkr} package samples points using random walks from the intersection of 
+the $N$ simplex with $M$ hyperplanes. Mathematically, the sampling space is all vectors $x$ 
+that satisfy $Ax=b$, $\sum x = 1$, and $x_i \geq 0$. The sampling algorithms implemented 
+are hit-and-run and Dikin walk, both of which are MCMC (Monte-Carlo Markov Chain) random 
+walks. \texttt{walkr} also provide tools to examine and visualize the convergence
+properties of the random walks.
+
 }
 
 \section{Introduction} 
-hi
 
+\section{Sampling space: simple 3D case}
+
+\section{Random Walks}
+
+\subsection{Starting Points}
+
+\subsection{Hit-and-run}
+
+\subsection{Dikin Walk}
+
+\section{Using \texttt{walkr}}
+
+\section{Examining/Visualizing Results}
 
 \section{Conclusion}
-hi
+
 \section{Authors}
 
 \address{David Kane\\
