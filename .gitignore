@@ -1,0 +1,15 @@
+.Rcheck
+.Rproj.user
+.Rhistory
+.RData
+*.Rproj
+pkg/.Rbuildignore
+pkg/*.Rproj
+pkg/vignettes/*log
+pkg/vignettes/*gz
+pkg/vignettes/*tex
+pkg/vignettes/*sty
+pkg/vignettes/*aux
+pkg/vignettes/*toc
+pkg/vignettes/figure/*
+pkg/vignettes/cache/*
