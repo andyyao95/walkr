@@ -40,7 +40,104 @@ properties of the random walks.
 
 \section{Introduction} 
 
-\section{Sampling space: simple 3D case}
+$A$ and $b$ represent the system of equations that we have above. Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), and $b$ is a $M \times 1$ vector.
+
+\section{Mathematical Background of Sampling Space}
+
+In this section, we go through the mathematical background needed to understand the space from which 
+we are sampling. Specifically, we go through a few examples as well as some linear algebra 
+tricks. The reader does not need to read this section in order to use our package or understand
+our sampling algorithms. However, this section should help the reader understand better what 
+the sample space is both geometrically and mathematically. \\
+
+\noindent \textbf{Definition:} The $N$-dimensional unit simplex is described by:
+
+$$x_1 + x_2 + x_3 + ... + x_n = 1$$
+$$x_i \geq 0$$
+
+\subsection{Sampling space: simple 3D case}
+
+Let's begin with the simplest case -- one linear constraint in 3 dimensional space.
+
+$$x_1 + x_3 = 0.5$$
+
+We can express this in terms of matrix equation $Ax=b$, where:
+
+$$
+A = 
+\begin{bmatrix}
+1 & 0 & 1 \\
+\end{bmatrix},
+\quad
+b = 0.5,
+\quad
+x = 
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+x_3 \\
+\end{bmatrix}
+$$ 
+
+In addition, we require the solution space to be intersected with the $3$D simplex: 
+
+$$\sum x_i = 1$$
+$$x_i \geq 0$$
+
+In the following graph, we draw the intersection of the two. The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) is the red line segment, which is our sampling space.
+
+% should probably replace this figure with a better one
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
+\caption[caption]{Intersection (red line) of Simplex and 2D hyperplane living in 3D space}
+\end{figure}
+
+\subsection{Matrix Representation of Hyperplanes}
+
+Every hyperplane is described by one linear equation. Thus, a system of linear equations is the intersection
+of hyperplanes. In general, if we have $M$ linear equations and $N$ variables, then $Ax=b$ would look like:
+
+$$
+A = 
+\underbrace{
+  \begin{bmatrix}
+   & & & & & & \\
+   & & & ... & & & \\
+   & & & & & & \\
+%    &  & . & . & . &  & \\
+%    &  & . & . & . &  & \\
+%    &  & . & . & . &  & \\
+%    & & & & & & \\
+  \end{bmatrix}
+}_\text{N columns (variables)}
+\Bigg\}\text{{M rows (constraints)}}
+$$
+
+
+
+
+\subsection{Going from $Ax=b$ and the unit-simplex to $Ax \leq b$}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \section{Random Walks}
 
