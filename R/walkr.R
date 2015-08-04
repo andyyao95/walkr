@@ -1,9 +1,35 @@
 #' walkr 
 #' 
-#' Given Ax = b, sample points from the intersection of Ax = b 
-#' with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The
-#' current MCMC sampling methods supported are "hit-and-run" and 
-#' "dikin"
+#' Given \eqn{Ax = b}, \code{walkr} samples points from the intersection of 
+#' \eqn{Ax = b} with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The 
+#' Ax = b must be underdetermined, otherwise there is an unique solution
+#' and there will be no sampling. 
+#' 
+#' Before the sampling, walkr internally performs the affine transformation
+#' which takes the complete solution of \eqn{Ax = b} and that intersected
+#' with the unit simplex into a space parametrized by coefficients, which 
+#' we call the "alpha-space". The specific set of procedures taken is 
+#' written in detail in the vignette. Essentially, the space is transformed,
+#' the sampling takes place in the transformed space, and in the end 
+#' \code{walkr} transforms back into the original coordinate system 
+#' and returns the result. This transformation is affine, so the uniformity 
+#' and mixing properties of the MCMC algorithms are not affected. 
+#' 
+#' The current MCMC sampling methods supported are "hit-and-run", 
+#' "dikin" and "optimized-dikin" (a Rcpp boosted version for speed). 
+#' 1) Hit-and-run is computationally less expensive and also 
+#' guarantees uniformity asympotically with complexity of O(n^3)
+#' points with respect to dimension n. However, in real practice, 
+#' as dimensions ramp up, the mixing of hit-and-run is poor compared 
+#' to Dikin. Thus, a lot of thinning would be needed as dimension
+#' ramps up.
+#' 
+#' 2) Dikin Walk is a nearly uniform method known for its very strong 
+#' mixing properties. However, each Dikin step is much more 
+#' computationally expensive than hit-and-run, so it takes more time 
+#' to sample every point. Thus, there is a "optimized-dikin" method
+#' in which we use RcppEigen to speed up the core computationally 
+#' expensive operations in the algorithm.
 #' 
 #' @param A is the lhs of the matrix equation A
 #' @param b is the rhs of the matrix equation b
