@@ -7,6 +7,7 @@
 \usepackage{float}
 \usepackage{Sweave}
 \usepackage[parfill]{parskip}
+\usepackage[round]{natbib}
 
 %\VignetteEngine{Sweave}
 %\VignetteIndexEntry{walkr}
@@ -44,7 +45,7 @@ Consider all possible $x$'s that satisfy the underdetermined matrix equation $Ax
 we require that every componenet of $x$ be $\geq 0$ and $\sum x = 1$. The \texttt{walkr} package
 provides tools to sample such $x$'s. Our sampling methods are two types of MCMC random walks -- hit-and
 -run and Dikin Walk. Hit-and-run asympotically guarantees uniform sampling, while Dikin is nearly uniform
-but indicates stronger mixing. \texttt{walkr} furthermore provides statistical diagnostics of 
+but indicates much stronger mixing. \texttt{walkr} provides statistical diagnostics of 
 the mixing and convergence of the sampled points. 
 
 \section{Mathematical Background of Sampling Space}
@@ -55,8 +56,8 @@ hyperplanes. $Ax = b$ represent a system of $M$ equations with $N$ variables ($M
 Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), and $b$ is a 
 $M \times 1$ vector. \\
 
-We go through a few examples as well as some linear algebra 
-tricks. The reader does not need to read this section in order to use our package or understand
+We will go through one simple example and an important linear transformation. 
+The reader does not need to read this section in order to use our package or understand
 our sampling algorithms. However, this section should help the reader understand better what 
 the sample space is both geometrically and mathematically. \\
 
@@ -127,14 +128,14 @@ $$
 
 $b$ is a $M \times 1$ vector, and $x$ is a $N \times 1$ vector.
 
-\subsection{Going from $Ax=b$ and the unit-simplex to $Ax \leq b$}
+\subsection{From $Ax=b$ and the unit-simplex to $Ax \leq b$}
 
 Our sampling space is represented by equalities $Ax = b$, $\sum x = 1$, and non-negativity constraint
-$x_i \geq 0$. Because of the inequality, our sampling space is bounded (i.e. has finite volume in 
-$\mathbb{R}^N$). More formally, our sampling space known as a \textbf{convex-polytope} 
-in $\mathbb{R}^N$, which
-could be described by a generic $Ax \leq b$. Here, we describe a transformation which takes us 
-from the intersection of $Ax=b$ and the unit-simplex to a large matrix inequality of the form
+$x_i \geq 0$. Our sampling space is bounded (i.e. has finite volume in 
+$\mathbb{R}^N$). More formally, our sampling space is known as a \textbf{convex-polytope} 
+in $\mathbb{R}^N$. Convex-polytopes are commonly 
+described in the literature by a generic $Ax \leq b$. Here, we present a simple linear transformation 
+which transforms the intersection of $Ax=b$ and the unit-simplex to the form
 $Ax \leq b$. \\
 
 First, note that the equality part of the simplex constraint could be added as an extra row 
@@ -146,7 +147,7 @@ A =
    & & ...... & & & \\
    & & ......  & & & \\
    & & ...... & & & \\
-   & & & & & \\
+   & & ...... & & & \\
    1 & 1 & ...... & 1 & 1 \\
 
   \end{bmatrix}, 
@@ -154,7 +155,7 @@ A =
 b = 
   \begin{bmatrix}
     \\
-   \\
+  ... \\
   ... \\
    \\
   1 \\
@@ -163,7 +164,8 @@ $$
 
 Second, to find the complete solution to the new $Ax = b$ (i.e. the set of all possible $x$'s that satisfy
 $Ax=b$), we must find the Null Space Basis of $A$, the set of all possible $x$'s that satisfy $Ax=0$, 
-then add on a particular solution to $Ax = b$. \\
+then add on a particular solution to $Ax = b$ (The specifics can be found in any 
+Linear Algebra textbook). \\
 
 Mathematically, if the original $A$ was $M \times N$, then after adding on the extra row from the simplex, 
 the set of basis vectors which span the Null Space of our new $A$ will be: 
@@ -174,7 +176,7 @@ v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{M-(N+1)}
 \Bigg\}
 $$
 
-\noindent Third, using any particular solution, $v_{particular}$, the complete solution to the new $Ax=b$
+\noindent Using any particular solution, $v_{particular}$, the complete solution to the new $Ax=b$
 will be 
 
 $$
@@ -222,16 +224,15 @@ v_{M-(N+1)} \\
 \end{bmatrix}
 $$
 
-\noindent And finally, we obtain the mathematical description of our sampling space 
-in the form $Ax \leq b$.
+\noindent And finally, we arrive at the form $Ax \leq b$.
 
 $$
 -V\alpha \leq v_{particular}
 $$
 
-Note that we have performed a \textbf{transformation} from "$x$-space" (
-coordinates described by $x_1, x_2, ..., x_N$) to "$\alpha$-space" (coordinates described 
-by $\alpha_1, \alpha_2, ...$). However, the geometric object described is still the same one. In
+We have performed a \textbf{transformation} from "$x$-space" (
+coordinates described by $x_1, x_2, ...$) to "$\alpha$-space" (coordinates described 
+by $\alpha_1, \alpha_2, ...$). The geometric object described is still the same one. In
 fact, in \texttt{walkr}, when the user inputs $A$ and $b$ for $Ax = b$, the package internally
 performs this transformation, samples the $\alpha$'s, maps them back to "$x$-space, and then
 returns the sampled points. \\
@@ -241,14 +242,14 @@ or mixing properties of our MCMC sampling algorithms. This is because the transf
 above is an affine transformation, which preserves uniformity.
 Simply put, sampling in either space is equivalent. \\
 
-Now that we've understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, and 
-that we could describe the polytope with $Ax \leq b$, we are ready to dive into the core of \texttt{walkr}
+Having understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, 
+we are ready to dive into the core of \texttt{walkr}
 -- MCMC random walks.
 
 \section{Random Walks: How to pick starting points?}
 
 MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
-currently generates starting points using a linear programming method implemented by \texttt{limSolve}.
+generates starting points using linear programming.
 Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which:
 
 $$\text{minimizes} \quad |Cx-d|^2$$
@@ -330,7 +331,8 @@ the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through 
   \item{If $x_0 \notin D_{y}$, then reject $y$ (this condition is counter-intuitive, read it closely)}
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
         (the big picture is that the ratio of the determinants are equal
-         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, the geometric argument would be that 
+         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
+         the geometric argument would be that 
          this way the Dikin walk can avoid extreme corners of the region)}
   \item{repeat until obtained number of desired points}
 
@@ -358,41 +360,53 @@ Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radiu
 With the algorithm, there is no mention of what happens if the point $y$ we accept is outside 
 of our polytope $K$. Luckily, there is no need to worry about that because of this theorem: \\
 
-\noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, if our starting point $x_0$ is in 
-our polytope $K$, then the Dikin Ellipsoid centered at $x_0$ with radius $1$ will always be contained in $K$. \\
+\noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
+if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
+at $x_0$ with radius $1$ will always be contained in $K$. \\
 
-This is important because this way, we know for sure that if we set $r=1$, then our algorithm will never sample points
-from outside the polytope $K$. Although there are still two rejection components to the algorithm (see above), the
-rejection rate is much higher than expected because of this theorem. \\
-
-\noindent \textbf{Key points about the Dikin Algorithm}
-
-\begin{itemize}
-
-  \item{Dikin algorithm does not produce an uniform sample asymptotically. According to the authors of the original
-        paper, the sampling is "nearly uniform" in $K$. It is unclear to us on how "nearly" they mean. We are
-        looking for papers that quantify this. Either way, it doesn't look that bad in a lower dimensional 
-        case (see plot in section below)}
-  \item{We cannot start Dikin at $x_0 \notin K$ or on the boundary of $K$. This will cause the Hessian, 
-        log-barrier, and determinants to blow to infinity.}
-  \item{Dikin mixes "strongly in polynomial start" only if we begin at an "analytical center". It is not very clear
-        to us what exactly the authors mean by an "analytical center", but so far we've tried to compute an average 
-        of the vertices. However, this problem doesn't scale well. This is because according to the author who 
-        came up with the implementation to find the vertices, the run-time complexity is $O(n^2dv)$, where
-        $d$ is the dimension of the polytope, $n$ is the number of hyperplanes, and $v$ is the number of vertices. We
-        have some evidence that the number of vertices grow combinatorially as we increase $d$.}
-  \item{we know any $r \leq 1$ guarantees that our ellipsoids are bounded within $K$. However, from trials it seems 
-        like we could increase $r$ up to a certain value for each polytope. The virtue of doing so would be to
-        "cover more space", thus probably mixing even better}
-
-\end{itemize}
+This is important because this way, we know for sure that if we set $r=1$, then our algorithm 
+will never sample points from outside the polytope $K$. Although there are still two rejection 
+components to the algorithm (see above), the rejection rate is much higher than expected 
+because of this theorem. \\
 
 \section{Using \texttt{walkr} to sample points}
 
 \texttt{walkr} has one main function \code{walkr} which makes it very easy for the user to 
-sample points. 
+sample points. \\
+
+For example, define $A$ and $b$ as follows:
+
+<<eval = FALSE>>=
+A <- matrix(c(1, 0, 1, 0, 1), ncol = 3)
+b <- 0.5
+@
+
+Then, the sampling could be simply ran with \texttt{walkr}:
+
+<<eval = FALSE>>=
+## n is the number of points sampled
+## method is the sampling method
+
+hitandrun <- walkr(A = A, b = b, n = 1000, method = "hit-and-run")
+dikin <- walkr(A = A, b = b, n = 1000, method = "dikin")
+optimized_dikin <- walkr(A = A, b = b, n = 1000, method = "optimized-dikin")
+
+## see some of the sampled points
+
+hitandrun[ , 10:15]
+dikin[ , 10:15]
+optimized_dikin[ , 10:15]
+@
 
 \section{Using \texttt{walkr} to examine MCMC random walks}
+
+We could visualize/diagnose the MCMC chains by: 
+
+<<eval = FALSE>>=
+vis_sampling(hitandrun, chains = 1)
+optimized_dikin(hitandrun, chains = 1)
+@
+
 
 \section{Conclusion}
 
@@ -409,6 +423,12 @@ Mathematics and Physics\\
 Williams College \\
 Williamstown, MA, USA\\}
 \email{ay3@williams.edu}
+
+\bibliography{walkr}
+\cite{backtest}
+
+
+
 
 \end{article}
 \end{document}
