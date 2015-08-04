@@ -49,7 +49,7 @@ test_that("Testing Starting Points - 3D simplex", {
 
 test_that("Testing Starting Points - 20D with constraints", {
   
-  ## Initialize 3D Simplex
+  ## Initialize 20D Simplex
   
   n <- 20
   A <- matrix(rep(1,n), ncol = n, nrow = 1)
@@ -94,7 +94,7 @@ test_that("Testing Starting Points - 20D with constraints", {
   expect_true(all(sum1 - 1 <= 1e-10))
   expect_true(all(sum2 - 1 <= 1e-10))
   
-  ## CONSTRAINT: 
+  ## CONSTRAINT: all satisfied 
   
   expect_true(all(apply(answer1, 2, function(x) { A %*% x - b < 1e-10  })))
   

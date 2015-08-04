@@ -28,7 +28,4 @@ test_that("Testing Hessian of Log Barrier", {
   expect_true(det(hess) != 0)
   
   
-  
-  
-  
 })

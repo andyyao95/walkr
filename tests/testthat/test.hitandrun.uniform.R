@@ -47,4 +47,4 @@ test_that("Testing hit-and-run uniformity", {
   expect_true(sum1-sum2 >= conf_interval.95[1])
   expect_true(sum1-sum2 <= conf_interval.95[2])
    
-}
+})
