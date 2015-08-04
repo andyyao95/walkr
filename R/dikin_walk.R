@@ -16,7 +16,6 @@
 #'@return a number of sampled points that satisfy Ax <= b (matrix object, 
 #'columns the points)
 #'
-#'@export
 
 
 dikin_walk <- function(A, 

@@ -13,8 +13,6 @@
 #'
 #'@return a boolean indicating whether z is in the ellipsoid
 #'
-#'@export 
-#'
 
 dikin_ellipsoid <- function(A, b, x0, r, z) {
     

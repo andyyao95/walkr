@@ -9,8 +9,6 @@
 #'
 #'@return a diagonalized matrix of 1/logbarrier function
 #'
-#'@export 
-#'
 
 diag_logbarrier <- function(A, b, x) {
   

@@ -16,8 +16,7 @@
 #' @importFrom limSolve lsei
 #' @importFrom MASS Null
 #' 
-#' @export
-#'         
+        
 
 complete_solution <- function(A, b) {
   

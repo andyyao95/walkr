@@ -9,7 +9,6 @@
 #'@param x is the current point we're at
 #'
 #'@return the Hessian matrix for the specific parameters
-#'@export 
 
 hessian_logbarrier <- function(A, b, x) {
   

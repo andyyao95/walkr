@@ -16,7 +16,6 @@
 #'@return a number of sampled points that satisfy Ax <= b (matrix object, 
 #'columns the points)
 #'
-#'@export
 
 
 optim_dikin_walk <- function(A, 
@@ -32,6 +31,7 @@ optim_dikin_walk <- function(A,
   ## the package
   
   #############################
+  ## f stands for fast! 
   
   #1. fprod(A, B) = A %*% b 
   #2. fcrossprod(A, B) = t(A) %*% B

@@ -4,16 +4,12 @@
 \alias{complete_solution}
 \title{Complete Solution}
 \usage{
-complete_solution(A, b, randomize = FALSE)
+complete_solution(A, b)
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation \eqn{Ax=b}}
 
 \item{b}{is the rhs of the matrix equation \eqn{Ax=b}}
-
-\item{randomize}{is the boolean indicating whether to
-       randomize the particular solution (i.e. randomize
-       obj. fxn with which it is generated)}
 }
 \value{
 a list object, with the first element($particular) as the particular solution

@@ -13,7 +13,8 @@ walkr(A, b, n, method = "dikin")
 
 \item{n}{is the number of points we want to sample}
 
-\item{method}{is the MCMC sampling method. Please enter "hit-and-run" or "dikin"}
+\item{method}{is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
+       optimized-dikin"}
 }
 \value{
 A matrix with its columns as the sampled

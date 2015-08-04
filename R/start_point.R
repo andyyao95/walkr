@@ -13,7 +13,6 @@
 #' @return a matrix, with each column as a point
 #' 
 #' @importFrom limSolve lsei
-#' @export
 
 
 start_point <- function(A, 
@@ -70,6 +69,16 @@ start_point <- function(A,
  
   }
   
+  ## if user only wants 1 point
+  ## then we should return the result as a vector for 
+  ## the user's convenience
   
-  return(result)
+  if(n == 1) {
+    return(as.vector(result))
+  }
+  
+  else {
+    return(result)
+  }
+  
 }
