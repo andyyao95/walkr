@@ -44,7 +44,7 @@ test_that("Testing hit-and-run uniformity", {
   
   conf_interval.99 <- qnorm(p = c(0.01, 0.99), mean = 0, sd = sqrt(5000*0.5*0.5))
   
-  expect_true(sum1-sum2 >= conf_interval.95[1])
-  expect_true(sum1-sum2 <= conf_interval.95[2])
+  expect_true(sum1-sum2 >= conf_interval.99[1])
+  expect_true(sum1-sum2 <= conf_interval.99[2])
    
 })
