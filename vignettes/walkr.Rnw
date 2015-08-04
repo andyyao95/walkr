@@ -234,15 +234,169 @@ Simply put, sampling in either space is equivalent.
 
 \section{Random Walks}
 
-Now that we've understood 
+Now that we've understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, and 
+that we could describe the polytope with $Ax \leq b$, we are ready to dive into the core of \texttt{walkr}
+-- MCMC random walks.
 
 \subsection{Starting Points}
 
-MCMC algorithms need a starting point, $x_0$, in the interior of the convex polytope. 
+MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
+currently generates starting points using a linear programming method implemented by \texttt{limSolve}.
+Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which:
+
+$$\text{minimizes} \quad |Cx-d|^2$$
+$$\text{subject to} \quad Ax \leq b$$
+
+Thus, we randomly generate $C$ and $d$ obtaining $x$ which satisfy $Ax \leq b$. We discovered that 
+the $x$'s generated this way fall randomly on the boundaries of our convex polytope, due to 
+the minimizing property of linear programming. Thus, we repeat this for say,
+10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
 
 \subsection{Hit-and-run}
 
+The hit-and-run algorithm is as follows:
+
+\begin{enumerate}
+  
+  \item{Set starting point $x_0$ as current point}
+  \item{Generate a random direction $\vec{d}$. If we are in $N$ dimensions, then this random direction will 
+        be a vector of $N$ components. Specifically, this random direction is a uniformly generated 
+        vector on the $N$ dimensional unit-sphere}
+  \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$. Specifically, 
+        we find can find end points $s_1$ and $s_2$ of the chord by going through the rows 
+        of $Ax_0 \leq b$ individually, setting the inequality to equality (so we hit the surface). 
+        Then, we can parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
+  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}}
+  \item{Set $x_1$ as current point}
+  \item{Repeat algorithm until number of desired points sampled}
+        
+\end{enumerate}
+
+Here is a picture of the hit-and-run algorithm: 
+
+
+%probably also want to discuss important facts about the algorithm here.
+
 \subsection{Dikin Walk}
+
+\subsection{Preliminary Definitions}
+
+Recall, our solution space is a convex polytope. Let's call this 
+polytope $K$, which we know can be described in the form $Ax \leq b$. \\
+
+For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
+the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matrix. \\
+
+\noindent \textbf{Log Barrier Function $\phi$:} 
+
+$$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
+
+\noindent With some calculus and algebraic tricks, we can compute and simplify the Hessian of the Log Barrier:\\
+
+\noindent \textbf{Hessian of Log Barrier $H_x$:} 
+
+$$H_x = \nabla ^2 \phi(x) = ... = A^T D^2 A$$
+$$D = diag(\frac{1}{b_i - a_i^Tx})$$
+
+For theoretical reasons we won't get into (and don't fully understand), $\phi$ and $H(x)$ is very important, 
+as they have nice properties in the context of constrained sampling and optimization. \textbf{Note:} $H_x$ is 
+a linear operator. Specifically, it is a $N \times N$ matrix. $D$ is a diagonal matrix.\\
+
+\noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
+
+$D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
+
+\begin{center}
+\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} , where $y$ is a point in the Ellipsoid. 
+\end{center}
+
+\noindent A important point to note here is that the shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
+In other words, if we think in terms of running a MCMC chain within our polytope $K$, the Dikin Ellipsoid is able to 
+reshape itself accordingly as it surveys through the polytope.
+
+\subsection{Algorithm \texttt{Dikin}}
+
+\begin{enumerate}
+
+  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
+  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
+  \item{Pick a random point $y$ from $D_{x_0}$}
+  \item{If $x_0 \notin D_{y}$, then reject $y$ (this condition is counter-intuitive, read it closely)}
+  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
+        (the big picture is that the ratio of the determinants are equal
+         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, the geometric argument would be that 
+         this way the Dikin walk can avoid extreme corners of the region)}
+  \item{repeat until obtained number of desired points}
+
+\end{enumerate}
+
+\subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
+
+Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. Sampling from the ellipsoid
+is mathematically equivalent to generating a Standard Gaussian vector, projecting that vector on the unit ball,
+and then solving for a matrix equation with an unique solution. The exact algorithm is as follows: 
+
+\begin{enumerate}
+
+  \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
+  \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
+    \subitem{$\zeta = <x_1,x_2,...,x_n> \qquad \rightarrow \qquad <\frac{rx_1}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
+            \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ... , 
+            \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}$}
+  \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
+        of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
+  \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
+
+\end{enumerate}
+
+\subsection{Important Theorem and Findings}
+
+With the algorithm, there is no mention of what happens if the point $y$ we accept is outside of our polytope $K$. 
+Luckily, there is no need to worry about that because of this theorem: \\
+
+\noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, if our starting point $x_0$ is in 
+our polytope $K$, then the Dikin Ellipsoid centered at $x_0$ with radius $1$ will always be contained in $K$. \\
+
+This is important because this way, we know for sure that if we set $r=1$, then our algorithm will never sample points
+from outside the polytope $K$. Although there are still two rejection components to the algorithm (see above), the
+rejection rate is much higher than expected because of this theorem. \\
+
+\noindent \textbf{Key points about the Dikin Algorithm}
+
+\begin{itemize}
+
+  \item{Dikin algorithm does not produce an uniform sample asymptotically. According to the authors of the original
+        paper, the sampling is "nearly uniform" in $K$. It is unclear to us on how "nearly" they mean. We are
+        looking for papers that quantify this. Either way, it doesn't look that bad in a lower dimensional 
+        case (see plot in section below)}
+  \item{We cannot start Dikin at $x_0 \notin K$ or on the boundary of $K$. This will cause the Hessian, 
+        log-barrier, and determinants to blow to infinity.}
+  \item{Dikin mixes "strongly in polynomial start" only if we begin at an "analytical center". It is not very clear
+        to us what exactly the authors mean by an "analytical center", but so far we've tried to compute an average 
+        of the vertices. However, this problem doesn't scale well. This is because according to the author who 
+        came up with the implementation to find the vertices, the run-time complexity is $O(n^2dv)$, where
+        $d$ is the dimension of the polytope, $n$ is the number of hyperplanes, and $v$ is the number of vertices. We
+        have some evidence that the number of vertices grow combinatorially as we increase $d$.}
+  \item{we know any $r \leq 1$ guarantees that our ellipsoids are bounded within $K$. However, from trials it seems 
+        like we could increase $r$ up to a certain value for each polytope. The virtue of doing so would be to
+        "cover more space", thus probably mixing even better}
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \section{Using \texttt{walkr}}
 
