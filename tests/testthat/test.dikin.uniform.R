@@ -12,19 +12,23 @@ test_that("Testing dikin uniformity", {
   ## is 1/3 
   
   ## construct confidence interval
-  
-  conf <- qnorm(p = c(0.01, 0.99), mean = 1/3, sd = sqrt(0.5*0.5/1000))
+  ## standard error divided by sample size
   
   z <- walkr(A = A, b = b, n = 1000, method = "dikin")
   
+  conf1 <- qnorm(p = c(0.01, 0.99), mean = 1/3, sd = sqrt(sd(z[1,])/1000))
+  conf2 <- qnorm(p = c(0.01, 0.99), mean = 1/3, sd = sqrt(sd(z[2,])/1000))
+  conf3 <- qnorm(p = c(0.01, 0.99), mean = 1/3, sd = sqrt(sd(z[3,])/1000))
+  
+  
   ## all should fall within confidence interval
   
-  expect_true(mean(z[1,]) <= conf[2])
-  expect_true(mean(z[1,]) >= conf[1])
-  expect_true(mean(z[2,]) <= conf[2])
-  expect_true(mean(z[2,]) >= conf[1])
-  expect_true(mean(z[3,]) <= conf[2])
-  expect_true(mean(z[3,]) >= conf[1])
+  expect_true(mean(z[1,]) <= conf1[2])
+  expect_true(mean(z[1,]) >= conf1[1])
+  expect_true(mean(z[2,]) <= conf2[2])
+  expect_true(mean(z[2,]) >= conf2[1])
+  expect_true(mean(z[3,]) <= conf3[2])
+  expect_true(mean(z[3,]) >= conf3[1])
   
   
   
