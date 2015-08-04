@@ -1,17 +1,18 @@
 #' start point
 #' 
-#' Given \eqn{Ax <= b}, which defines a convex
+#' Given \eqn{Ax \le b}, which defines a convex
 #' polytope, this function picks n random
 #' starting "center" points using linear programming. 
 #' 
-#' @param A is the lhs of \eqn{Ax <= b}
-#' @param b is the rhs of \eqn{Ax <= b}
+#' @param A is the lhs of \eqn{Ax \le b}
+#' @param b is the rhs of \eqn{Ax \le b}
 #' @param n is the number of points we want to return
 #' @param average is the number of boundary points we want 
 #'        to take the average of
 #' 
 #' @return a matrix, with each column as a point
 #' 
+#' @importFrom limSolve lsei
 #' @export
 
 
@@ -40,20 +41,23 @@ start_point <- function(A,
     
     for(j in 1:average) {
         
-        ## these two lines randomize 
+        ## these two lines randomize the objective function
         
         objfunc <- matrix(sample(runif(1,-1, 1), ncol(A), replace = TRUE),
                           nrow = 1, ncol = ncol(A))
         const <- runif(1, -1, 1)
         
         ## suppresswarnings because we don't specific a equality constraint,
-        ## we only care about Ax <= b 
+        ## we only care about Ax <= b (lsei gives a warning, but it's fine)
         
         ## in terms of the lsei, it actually takes in Gx >= h
         ## thus, we pass in -Ax >= -b , which is equivalent to Ax <= b
         
         new_x0 <- rbind(new_x0, tryCatch (    
           suppressWarnings(
+            
+            ## + 0.00001 to avoid the optimization not starting
+            
             limSolve::lsei(A = objfunc, B = const, G = -1* A, H = -1 * b + 0.000001)[[1]]),
           error = function(c) stop("The inequality constraints cannot be all satisfied!
                                    Sampling in this solution space is not possible!")

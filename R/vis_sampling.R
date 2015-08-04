@@ -1,13 +1,19 @@
 #' Visualise Sampling
 #' 
-#' This function takes in a set of sample points and diagnoses them. The final
-#' results are displayed in a Shiny app. The app contains the confidence
+#' This function takes in a set of sample points and diagnoses them using
+#' the shinyStan interface. The app contains the confidence
 #' interval of each dimension's coordiates across the whole sets of points,
-#' and draws a graph about the distribution of all points.
-#' @param x is the set of points sampled 
+#' Gelman-Rubin statistics, trace-plots, and other diagnostic tools for
+#' examining convergence.
 #' 
-#' @return a shiny interface that display the set of sampled points
+#' @param x is the set of points sampled, with its columns as the sampled points.
+#'        If multiple chains are present, then the columns should be ordered
+#'        such that each chain follow each other. 
+#' @param chains is the number of chains that x contains
+#' 
+#' @return a shiny interface that display the diagnostics of the MCMC random walk
 #' @export
+#' @importFrom shinyStan launch_shinystan as.shinystan
 #' 
 
 vis_sampling <- function(x, chains) {
@@ -16,7 +22,7 @@ vis_sampling <- function(x, chains) {
       stopifnot(is.matrix(x))
       
       ## create local copy since we are performing side-effects
-      
+  
       this.df <- x
       
       ## iterations is the number of points in hitandrun

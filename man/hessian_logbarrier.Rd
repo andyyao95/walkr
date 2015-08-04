@@ -7,9 +7,9 @@
 hessian_logbarrier(A, b, x)
 }
 \arguments{
-\item{A}{is the lhs of \eqn{Ax <= b}}
+\item{A}{is the lhs of \eqn{Ax \le b}}
 
-\item{b}{is the rhs of \eqn{Ax <= b}}
+\item{b}{is the rhs of \eqn{Ax \le b}}
 
 \item{x}{is the current point we're at}
 }
@@ -19,6 +19,6 @@ the Hessian matrix for the specific parameters
 \description{
 At point x0, this function computes the Hessian
 of the log barrier function for the
-convex polytope that is defined by \eqn{Ax <= b}.
+convex polytope that is defined by \eqn{Ax \le b}.
 }
 

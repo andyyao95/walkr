@@ -7,15 +7,20 @@
 vis_sampling(x, chains)
 }
 \arguments{
-\item{x}{is the set of points sampled}
+\item{x}{is the set of points sampled, with its columns as the sampled points.
+If multiple chains are present, then the columns should be ordered
+such that each chain follow each other.}
+
+\item{chains}{is the number of chains that x contains}
 }
 \value{
-a shiny interface that display the set of sampled points
+a shiny interface that display the diagnostics of the MCMC random walk
 }
 \description{
-This function takes in a set of sample points and diagnoses them. The final
-results are displayed in a Shiny app. The app contains the confidence
+This function takes in a set of sample points and diagnoses them using
+the shinyStan interface. The app contains the confidence
 interval of each dimension's coordiates across the whole sets of points,
-and draws a graph about the distribution of all points.
+Gelman-Rubin statistics, trace-plots, and other diagnostic tools for
+examining convergence.
 }
 

@@ -15,7 +15,10 @@
 #' @return a list object, with the first element($particular) as the particular solution
 #'         and the the second element as a matrix with its columns containing
 #'         the basis of the null space($homogeneous)
-#'         
+#'
+#' @importFrom limSolve lsei
+#' @importFrom MASS Null
+#' 
 #' @export
 #'         
 

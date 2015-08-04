@@ -2,10 +2,10 @@
 #'
 #'At point x0, this function computes the Hessian
 #'of the log barrier function for the 
-#'convex polytope that is defined by \eqn{Ax <= b}.
+#'convex polytope that is defined by \eqn{Ax \le b}.
 #'
-#'@param A is the lhs of \eqn{Ax <= b}
-#'@param b is the rhs of \eqn{Ax <= b}
+#'@param A is the lhs of \eqn{Ax \le b}
+#'@param b is the rhs of \eqn{Ax \le b}
 #'@param x is the current point we're at
 #'
 #'@return the Hessian matrix for the specific parameters
@@ -26,10 +26,7 @@ hessian_logbarrier <- function(A, b, x) {
   
   ## diagonalize it
   ## still need to becareful of handling the case where 
-  ## D = 0, so diag(0) returns an empty matrix (perhaps throw error, but I'm afraid
-  ## it will hinder performance, so leave it for now..?)
-  ## actually, probably can prove this using linear algebra, det(D) will never be zero in the case that 
-  ## Ax <= b is bounded  ...?
+  ## D = 0, so diag(0) returns an empty matrix 
   
   D_squared <- diag(D^2)
   

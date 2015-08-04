@@ -7,9 +7,9 @@
 start_point(A, b, n = 1, average = 10)
 }
 \arguments{
-\item{A}{is the lhs of \eqn{Ax <= b}}
+\item{A}{is the lhs of \eqn{Ax \le b}}
 
-\item{b}{is the rhs of \eqn{Ax <= b}}
+\item{b}{is the rhs of \eqn{Ax \le b}}
 
 \item{n}{is the number of points we want to return}
 
@@ -20,7 +20,7 @@ start_point(A, b, n = 1, average = 10)
 a matrix, with each column as a point
 }
 \description{
-Given \eqn{Ax <= b}, which defines a convex
+Given \eqn{Ax \le b}, which defines a convex
 polytope, this function picks n random
 starting "center" points using linear programming.
 }

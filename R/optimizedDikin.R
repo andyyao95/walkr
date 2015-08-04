@@ -1,4 +1,4 @@
-#'Dikin Walk
+#'Optimized Dikin Walk
 #'
 #'This function implements the Dikin Walk using the Hessian 
 #'of the Log barrier function. Note that a $r$ of 1 guarantees
@@ -19,12 +19,25 @@
 #'@export
 
 
-Dikin_Walk <- function(A, 
+optim_dikin_walk <- function(A, 
                        b, 
                        x0 = NULL, 
                        n, 
                        r = 1,
                        analytic_center = T) {
+  
+  
+  ## This function uses RcppEigen for optimization The source code for the C
+  ## functions is ready (in src folder), but is yet to be linked and included in
+  ## the package
+  
+  #############################
+  
+  #1. fprod(A, B) = A %*% b 
+  #2. fcrossprod(A, B) = t(A) %*% B
+  #3. ftcrossprod(A, B) = A %*% t(B)
+  #4. fsolve(A) = inverse of A   (solve(A))
+  
   
   ## first, augment A | b 
   A_b <- cbind (b, A)
@@ -35,8 +48,6 @@ Dikin_Walk <- function(A,
   H_x <- function(x) {
     
     ## making the D^2 matrix
-    ## the lambda function is \frac{1}{b_i - a_i * x} , where a_i * x is the dot product of those two
-    ## applying it to every row and then diag
 
     D <- as.vector(1/(A_b[,1] - fprod(A_b[,-1], x)))
 
@@ -44,46 +55,55 @@ Dikin_Walk <- function(A,
     
     return(fcrossprod(A, fprod(diag(D^2), A)))
     
-  } ##DONE
+  } 
   
-  ## D(x) is the diagonalized matrix of the log-barrier function of Ax <= b
+  ## D(x) is the diagonalized matrix of 1 over the log-barrier function of Ax <= b
   
   D_x <- function(x) {
 
-    #D <- as.vector(1/(A_b[,1] - fprod(A_b[,-1], x)))
     return(diag(as.vector(1/(A_b[,1] - fprod(A_b[,-1], x)))))
   } 
   
-  ## helper function:
-  ## checks whether a point z is in Ellip(x)
+  ## checks whether a point z is in Dikin Ellip centered at x
   
   ellipsoid <- function(z, x) {
     
     ## as.numeric converts the expression into an atom, so we get boolean
+    ## it's just checking (z-x)^T %*% H_x %*% (z-x) <= r^2  
+  
     return( as.numeric(fcrossprod(z-x, fprod(H_x(x), (z-x)))) <= r^2)
     
   } 
   
   ###### THE LINES ABOVE FINISH DEFINING THE ELLIPSOID
   ## now the sampling
+  
+  ## initialize return matrix
+  ## set the starting point as the current point
+  
   result <- matrix(ncol = n+1, nrow = ncol(A))
   result[ , 1] <- x0
   current.point <- x0
   this.length <- length(b)
   
   for (i in 1:n) {
-    if(i %% 100 == 0) {print(i)}
+    
     ## 1. Generate random point y in Ellip(x)
-    ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, I DONT KNOW WHY BUT RUNIF BLOWS THINGS UP
+    ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, RUNIF IS NOT UNIFORM AFTER TRANSFORMATION
+    ## see vignette for details
     
     zeta <- rnorm(this.length, 0, 1)
     
     ## normalise to be on the m- unit sphere
     ## and then compute lhs as a m-vector
     
+    ## essentially: Hd = t(A) %*% D^2 %*% zeta
+    ## solving for d gives us a uniformly random vector in the ellipsoid centered at x 
+    ## the y = x_0 + d is the new point 
+    
     zeta <- r * zeta / sqrt(as.numeric(fcrossprod(zeta,zeta)))
     rhs <- fcrossprod(A, fprod(D_x(current.point), zeta))
-    #print(H_x(current.point))
+    
     y <- fprod(fsolve(H_x(current.point)), rhs) + current.point 
     
 
@@ -91,27 +111,34 @@ Dikin_Walk <- function(A,
     ## 3. Keep on trying y until condition satisfied
     
     while(!ellipsoid(current.point, y)) {
-      #print("inwhile")
+      
+      ## exact same set of procedures as above
+      
       zeta <- rnorm(this.length, 0, 1)
       zeta <- r * zeta / sqrt(sum(zeta * zeta))
       rhs <- fcrossprod(A, fprod(D_x(current.point), zeta))
-      #print(H_x(current.point))
       y <- fprod(fsolve(H_x(current.point)), rhs) + current.point 
       
       if(ellipsoid(current.point, y)) {
         
-        ## genius.... det(A)/det(B) = det(B^-1 A)
+        ## det(A)/det(B) = det(B^-1 A)
+        ## acceptance rate according to probability formula. see paper for detail
         
         probability <- min(1, sqrt (fdet( fprod(fsolve(H_x(current.point)),H_x(y)))))
         
         bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
         
         if(bool) {
+          
+          ## perhaps, there is a better way to handle break here?
+          
           break
         } 
         
       }
     }
+    
+    ## appending on the result
     
     result[ , i+1] <- y
     current.point <- y
@@ -120,10 +147,13 @@ Dikin_Walk <- function(A,
   }
   
   
-  ## get rid of the columns which we don't sample
+  ## get rid of the columns which we don't sample (or fail to sample?)
+  ## for safety
   
-  #cols <- which(!is.na(result[1,]))
-  #result <- result[,cols]
+  cols <- which(!is.na(result[1,]))
+  result <- result[,cols]
+  
+  
   return(result)
   
 }

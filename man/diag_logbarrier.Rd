@@ -2,7 +2,7 @@
 % Please edit documentation in R/diag_logbarrier.R
 \name{diag_logbarrier}
 \alias{diag_logbarrier}
-\title{diag log-barrier (reciprocated)}
+\title{diagonalized log-barrier}
 \usage{
 diag_logbarrier(A, b, x)
 }

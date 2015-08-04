@@ -4,7 +4,7 @@
 \alias{walkr}
 \title{walkr}
 \usage{
-walkr(A, b, n, method)
+walkr(A, b, n, method = "dikin")
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation A}
@@ -16,12 +16,12 @@ walkr(A, b, n, method)
 \item{method}{is the MCMC sampling method. Please enter "hit-and-run" or "dikin"}
 }
 \value{
-a list object. The first element is a matrix with its columns as the sampled
-        points. The second element is the diagnostics of the MCMC sampling.
+A matrix with its columns as the sampled
+        points.
 }
 \description{
 Given Ax = b, sample points from the intersection of Ax = b
-with the n-simplex (\eqn{\sum(x) == 1}, \eqn{x_i >= 0}). The
+with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The
 current MCMC sampling methods supported are "hit-and-run" and
 "dikin"
 }
