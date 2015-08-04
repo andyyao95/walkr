@@ -40,13 +40,22 @@ properties of the random walks.
 
 \section{Introduction} 
 
-$A$ and $b$ represent the system of equations that we have above. Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), and $b$ is a $M \times 1$ vector.
+Consider all possible $x$'s that satisfy the underdetermined matrix equation $Ax=b$. Furthermore, 
+we require that every componenet of $x$ be $\geq 0$ and $\sum x = 1$. The \texttt{walkr} package
+provides tools to sample such $x$'s. Our sampling methods are two types of MCMC random walks -- hit-and
+-run and Dikin Walk. Hit-and-run asympotically guarantees uniform sampling, while Dikin is nearly uniform
+but indicates stronger mixing. \texttt{walkr} furthermore provides statistical diagnostics of 
+the mixing and convergence of the sampled points. 
 
 \section{Mathematical Background of Sampling Space}
 
 In this section, we go through the mathematical background needed to understand the space from which 
 we are sampling -- the intersection of the $N$ simplex and 
-hyperplanes. Specifically, we go through a few examples as well as some linear algebra 
+hyperplanes. $Ax = b$ represent a system of $M$ equations with $N$ variables ($M \ll N$). 
+Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), and $b$ is a 
+$M \times 1$ vector. \\
+
+We go through a few examples as well as some linear algebra 
 tricks. The reader does not need to read this section in order to use our package or understand
 our sampling algorithms. However, this section should help the reader understand better what 
 the sample space is both geometrically and mathematically. \\
@@ -116,11 +125,7 @@ A_{M \times N} =
 \Bigg\}\text{{M rows (constraints)}}
 $$
 
-$$
-b = b_{M \times 1}, 
-\quad
-x = x_{N \times 1}
-$$
+$b$ is a $M \times 1$ vector, and $x$ is a $N \times 1$ vector.
 
 \subsection{Going from $Ax=b$ and the unit-simplex to $Ax \leq b$}
 
@@ -163,7 +168,11 @@ then add on a particular solution to $Ax = b$. \\
 Mathematically, if the original $A$ was $M \times N$, then after adding on the extra row from the simplex, 
 the set of basis vectors which span the Null Space of our new $A$ will be: 
 
-$$v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{M-(N+1)}$$
+$$
+\Bigg\{
+v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{M-(N+1)}
+\Bigg\}
+$$
 
 \noindent Third, using any particular solution, $v_{particular}$, the complete solution to the new $Ax=b$
 will be 
@@ -230,15 +239,13 @@ returns the sampled points. \\
 The reader need not be concerned with this transformation affecting the uniformity 
 or mixing properties of our MCMC sampling algorithms. This is because the transformation
 above is an affine transformation, which preserves uniformity.
-Simply put, sampling in either space is equivalent. 
-
-\section{Random Walks}
+Simply put, sampling in either space is equivalent. \\
 
 Now that we've understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, and 
 that we could describe the polytope with $Ax \leq b$, we are ready to dive into the core of \texttt{walkr}
 -- MCMC random walks.
 
-\subsection{Starting Points}
+\section{Random Walks: How to pick starting points?}
 
 MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
 currently generates starting points using a linear programming method implemented by \texttt{limSolve}.
@@ -252,7 +259,7 @@ the $x$'s generated this way fall randomly on the boundaries of our convex polyt
 the minimizing property of linear programming. Thus, we repeat this for say,
 10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
 
-\subsection{Hit-and-run}
+\section{Hit-and-run}
 
 The hit-and-run algorithm is as follows:
 
@@ -277,12 +284,12 @@ Here is a picture of the hit-and-run algorithm:
 
 %probably also want to discuss important facts about the algorithm here.
 
-\subsection{Dikin Walk}
+\section{Dikin Walk}
 
 \subsection{Preliminary Definitions}
 
-Recall, our solution space is a convex polytope. Let's call this 
-polytope $K$, which we know can be described in the form $Ax \leq b$. \\
+Recall, our solution space is a convex polytope. We call this convex 
+polytope $K$, which can be described in the form $Ax \leq b$. \\
 
 For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
 the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matrix. \\
@@ -291,28 +298,27 @@ the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matr
 
 $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 
-\noindent With some calculus and algebraic tricks, we can compute and simplify the Hessian of the Log Barrier:\\
+\noindent We can compute and simplify the Hessian of the Log Barrier:\\
 
 \noindent \textbf{Hessian of Log Barrier $H_x$:} 
 
-$$H_x = \nabla ^2 \phi(x) = ... = A^T D^2 A$$
+$$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A \quad , \quad \text{where:}$$
 $$D = diag(\frac{1}{b_i - a_i^Tx})$$
 
-For theoretical reasons we won't get into (and don't fully understand), $\phi$ and $H(x)$ is very important, 
-as they have nice properties in the context of constrained sampling and optimization. \textbf{Note:} $H_x$ is 
-a linear operator. Specifically, it is a $N \times N$ matrix. $D$ is a diagonal matrix.\\
+\textbf{Note:} $H_x$ is a linear operator. 
+Specifically, it is a $N \times N$ matrix. $D$ is a $M \times M$ diagonal matrix.\\
 
 \noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
 
 $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
 
 \begin{center}
-\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} , where $y$ is a point in the Ellipsoid. 
+$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} 
 \end{center}
 
-\noindent A important point to note here is that the shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
-In other words, if we think in terms of running a MCMC chain within our polytope $K$, the Dikin Ellipsoid is able to 
-reshape itself accordingly as it surveys through the polytope.
+\noindent The shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
+In other words, if we think in terms of running a MCMC chain within our polytope $K$, 
+the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through the polytope.
 
 \subsection{Algorithm \texttt{Dikin}}
 
@@ -332,9 +338,7 @@ reshape itself accordingly as it surveys through the polytope.
 
 \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
 
-Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. Sampling from the ellipsoid
-is mathematically equivalent to generating a Standard Gaussian vector, projecting that vector on the unit ball,
-and then solving for a matrix equation with an unique solution. The exact algorithm is as follows: 
+Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
 
 \begin{enumerate}
 
@@ -349,10 +353,10 @@ and then solving for a matrix equation with an unique solution. The exact algori
 
 \end{enumerate}
 
-\subsection{Important Theorem and Findings}
+\subsection{Important Theorem}
 
-With the algorithm, there is no mention of what happens if the point $y$ we accept is outside of our polytope $K$. 
-Luckily, there is no need to worry about that because of this theorem: \\
+With the algorithm, there is no mention of what happens if the point $y$ we accept is outside 
+of our polytope $K$. Luckily, there is no need to worry about that because of this theorem: \\
 
 \noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, if our starting point $x_0$ is in 
 our polytope $K$, then the Dikin Ellipsoid centered at $x_0$ with radius $1$ will always be contained in $K$. \\
@@ -383,24 +387,12 @@ rejection rate is much higher than expected because of this theorem. \\
 
 \end{itemize}
 
+\section{Using \texttt{walkr} to sample points}
 
+\texttt{walkr} has one main function \code{walkr} which makes it very easy for the user to 
+sample points. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section{Using \texttt{walkr}}
-
-\section{Examining/Visualizing Results}
+\section{Using \texttt{walkr} to examine MCMC random walks}
 
 \section{Conclusion}
 
