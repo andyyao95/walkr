@@ -47,7 +47,9 @@
 walkr <- function(A, 
                   b, 
                   n, 
-                  method = "dikin") {
+                  method = "dikin",
+                  thin = 1,
+                  burn = 0) {
   
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
@@ -131,7 +133,7 @@ walkr <- function(A,
     ## sampling in alpha space
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
     
-    alphas <- dikin_walk(A = new_A, b = new_b, n = n-1, r = 1, x0 = x0)
+    alphas <- dikin_walk(A = new_A, b = new_b, points = n, r = 1, x0 = x0, thin = thin, burn = burn)
     
     ## convert back into x-space
     
@@ -155,24 +157,11 @@ walkr <- function(A,
     return(answer)
   }
   
-  else if(method == "optimized-dikin") {
-    
-    ## sampling in alpha space
-    ## n = n - 1 because dikin takes starting point as the 1st sampled point
-    
-    alphas <- optim_dikin_walk(A = new_A, b = new_b, n = n-1, r = 1, x0 = x0)
-    
-    ## convert back into x-space
-    
-    answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
-    
-    return(answer)
-  }
     
   ## for safety
   
   else{
-    stop("Sampling method must be \"hitandrun\" or \"dikin\" or \"optimized-dikin\".")
+    stop("Sampling method must be \"hitandrun\" or \"dikin\".")
   }
   
   ## function should never hit here
