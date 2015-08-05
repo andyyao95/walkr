@@ -6,49 +6,6 @@
 
 using namespace Rcpp;
 
-// rcppeigen_hello_world
-Eigen::MatrixXd rcppeigen_hello_world();
-RcppExport SEXP walkr_rcppeigen_hello_world() {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    __result = Rcpp::wrap(rcppeigen_hello_world());
-    return __result;
-END_RCPP
-}
-// rcppeigen_outerproduct
-Eigen::MatrixXd rcppeigen_outerproduct(const Eigen::VectorXd& x);
-RcppExport SEXP walkr_rcppeigen_outerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    __result = Rcpp::wrap(rcppeigen_outerproduct(x));
-    return __result;
-END_RCPP
-}
-// rcppeigen_innerproduct
-double rcppeigen_innerproduct(const Eigen::VectorXd& x);
-RcppExport SEXP walkr_rcppeigen_innerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    __result = Rcpp::wrap(rcppeigen_innerproduct(x));
-    return __result;
-END_RCPP
-}
-// rcppeigen_bothproducts
-Rcpp::List rcppeigen_bothproducts(const Eigen::VectorXd& x);
-RcppExport SEXP walkr_rcppeigen_bothproducts(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    __result = Rcpp::wrap(rcppeigen_bothproducts(x));
-    return __result;
-END_RCPP
-}
 // rcppeigen_ftrans
 Eigen::MatrixXd rcppeigen_ftrans(const Eigen::MatrixXd& A);
 RcppExport SEXP walkr_rcppeigen_ftrans(SEXP ASEXP) {
@@ -79,6 +36,42 @@ BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
     __result = Rcpp::wrap(rcppeigen_fdet(A));
+    return __result;
+END_RCPP
+}
+// rcppeigen_fprod
+Eigen::MatrixXd rcppeigen_fprod(const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::MatrixXd>& B);
+RcppExport SEXP walkr_rcppeigen_fprod(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type B(BSEXP);
+    __result = Rcpp::wrap(rcppeigen_fprod(A, B));
+    return __result;
+END_RCPP
+}
+// rcppeigen_fcrossprod
+Eigen::MatrixXd rcppeigen_fcrossprod(const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::MatrixXd>& B);
+RcppExport SEXP walkr_rcppeigen_fcrossprod(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type B(BSEXP);
+    __result = Rcpp::wrap(rcppeigen_fcrossprod(A, B));
+    return __result;
+END_RCPP
+}
+// rcppeigen_ftcrossprod
+Eigen::MatrixXd rcppeigen_ftcrossprod(const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::MatrixXd>& B);
+RcppExport SEXP walkr_rcppeigen_ftcrossprod(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type B(BSEXP);
+    __result = Rcpp::wrap(rcppeigen_ftcrossprod(A, B));
     return __result;
 END_RCPP
 }

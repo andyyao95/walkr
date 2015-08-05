@@ -49,13 +49,6 @@ walkr <- function(A,
                   n, 
                   method = "dikin") {
   
-  A <- matrix(rnorm(9,0,1), ncol = 3, nrow = 3)
-  print(rcppeigen_fdet(A))
-  print(rcppeigen_fsolve(A))
-  
-  #print(rcppeigen_ftrans(A))
-  return(0)
-  
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
     stop("A needs to be a matrix")
@@ -110,7 +103,7 @@ walkr <- function(A,
   ## Homogeneous %*% alpha >= -vp
   ## -Homogeneous %*% alpha <= vp    (Ax <= b form)
   
-  z <- complete_solution(aug_A, aug_b, randomize = TRUE)
+  z <- complete_solution(A = aug_A, b = aug_b)
   
   ## need the particular and homogeneous because in the end 
   ## we want to transform back in to "x-space"
@@ -138,7 +131,7 @@ walkr <- function(A,
     ## sampling in alpha space
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
     
-    alphas <- dikin_walk(A = new_A, b = new_b, n = n-1, r = 1, x0 = start.point)
+    alphas <- dikin_walk(A = new_A, b = new_b, n = n-1, r = 1, x0 = x0)
     
     ## convert back into x-space
     
@@ -167,7 +160,7 @@ walkr <- function(A,
     ## sampling in alpha space
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
     
-    alphas <- optimized_dikin_walk(A = new_A, b = new_b, n = n-1, r = 1, x0 = start.point)
+    alphas <- optim_dikin_walk(A = new_A, b = new_b, n = n-1, r = 1, x0 = x0)
     
     ## convert back into x-space
     

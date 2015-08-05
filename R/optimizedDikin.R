@@ -26,18 +26,14 @@ optim_dikin_walk <- function(A,
                        analytic_center = T) {
   
   
-  ## This function uses RcppEigen for optimization The source code for the C
-  ## functions is ready (in src folder), but is yet to be linked and included in
-  ## the package
-  
   #############################
   ## f stands for fast! 
   
-  #1. fprod(A, B) = A %*% b 
-  #2. fcrossprod(A, B) = t(A) %*% B
-  #3. ftcrossprod(A, B) = A %*% t(B)
-  #4. fsolve(A) = inverse of A   (solve(A))
-  
+  #1. rcppeigen_fprod(A, B) = A %*% b 
+  #2. rcppeigen_fcrossprod(A, B) = t(A) %*% B
+  #3. rcppeigen_ftcrossprod(A, B) = A %*% t(B)
+  #4. rcppeigen_fsolve(A) = inverse of A   (solve(A))
+  #5. rcppeigen_fdet(A) = determinant(A)
   
   ## first, augment A | b 
   A_b <- cbind (b, A)
@@ -49,11 +45,11 @@ optim_dikin_walk <- function(A,
     
     ## making the D^2 matrix
 
-    D <- as.vector(1/(A_b[,1] - fprod(A_b[,-1], x)))
+    D <- as.vector(1/(A_b[,1] - rcppeigen_fprod(A_b[,-1], x)))
 
     ## t(A) %*% (D^2 %*% A)
     
-    return(fcrossprod(A, fprod(diag(D^2), A)))
+    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)))
     
   } 
   
@@ -61,7 +57,7 @@ optim_dikin_walk <- function(A,
   
   D_x <- function(x) {
 
-    return(diag(as.vector(1/(A_b[,1] - fprod(A_b[,-1], x)))))
+    return(diag(as.vector(1/(A_b[,1] - rcppeigen_fprod(A_b[,-1], x)))))
   } 
   
   ## checks whether a point z is in Dikin Ellip centered at x
@@ -71,7 +67,7 @@ optim_dikin_walk <- function(A,
     ## as.numeric converts the expression into an atom, so we get boolean
     ## it's just checking (z-x)^T %*% H_x %*% (z-x) <= r^2  
   
-    return( as.numeric(fcrossprod(z-x, fprod(H_x(x), (z-x)))) <= r^2)
+    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x), (z-x)))) <= r^2)
     
   } 
   
@@ -101,10 +97,10 @@ optim_dikin_walk <- function(A,
     ## solving for d gives us a uniformly random vector in the ellipsoid centered at x 
     ## the y = x_0 + d is the new point 
     
-    zeta <- r * zeta / sqrt(as.numeric(fcrossprod(zeta,zeta)))
-    rhs <- fcrossprod(A, fprod(D_x(current.point), zeta))
+    zeta <- r * zeta / sqrt(as.numeric(rcppeigen_fcrossprod(zeta,zeta)))
+    rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
     
-    y <- fprod(fsolve(H_x(current.point)), rhs) + current.point 
+    y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
     
 
     ## 2. Check whether x_0 is in Ellip(y)
@@ -116,15 +112,16 @@ optim_dikin_walk <- function(A,
       
       zeta <- rnorm(this.length, 0, 1)
       zeta <- r * zeta / sqrt(sum(zeta * zeta))
-      rhs <- fcrossprod(A, fprod(D_x(current.point), zeta))
-      y <- fprod(fsolve(H_x(current.point)), rhs) + current.point 
+      rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
+      y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
       
       if(ellipsoid(current.point, y)) {
         
         ## det(A)/det(B) = det(B^-1 A)
         ## acceptance rate according to probability formula. see paper for detail
         
-        probability <- min(1, sqrt (fdet( fprod(fsolve(H_x(current.point)),H_x(y)))))
+        probability <- min(1, sqrt (rcppeigen_fdet( rcppeigen_fprod(
+          rcppeigen_fsolve(H_x(current.point)),H_x(y)))))
         
         bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
         
