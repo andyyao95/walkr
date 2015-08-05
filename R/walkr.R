@@ -74,6 +74,10 @@ walkr <- function(A,
     stop("Method must be hit-and-run, dikin, or optimized-dikin")
   } 
   
+  ## augment the simplex constraints 
+  
+  aug_A <- rbind(A, matrix(1, ncol = ncol(A), nrow = 1))
+  aug_b <- c(b, 1)
   
   ## 1. regardless of method, we need to perform the affine transformation which
   ## takes us from x-space (Ax = b) into the alpha-space in which the polytope
@@ -99,7 +103,7 @@ walkr <- function(A,
   ## Homogeneous %*% alpha >= -vp
   ## -Homogeneous %*% alpha <= vp    (Ax <= b form)
   
-  z <- complete_solution(A, b, randomize = TRUE)
+  z <- complete_solution(aug_A, aug_b, randomize = TRUE)
   
   ## need the particular and homogeneous because in the end 
   ## we want to transform back in to "x-space"
