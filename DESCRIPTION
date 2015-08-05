@@ -12,10 +12,12 @@ Suggests:    testthat
 Imports:     hitandrun, 
              limSolve, 
              MASS,
-             shinyStan
+             shinyStan,
+             Rcpp (>= 0.11.6), RcppEigen (>= 0.3.2.5.0)
 Description: Samples from the intersection of the n-simplex and m hyperplanes using MCMC random walks. 
              Specifically, the sampling space is described by the underdetermined matrix Ax = b, 
              such that every element of x must be non-negative and sum to 1. 
              The current MCMC methods supported are Dikin Walk and Hit-and-Run. The package also provide
              tools to examine and visualize the convergence properties of the random walks.
 License:     GPL-3
+LinkingTo:   Rcpp, RcppEigen

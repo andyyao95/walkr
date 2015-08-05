@@ -13,8 +13,8 @@ start_point(A, b, n = 1, average = 10)
 
 \item{n}{is the number of points we want to return}
 
-\item{average}{is the number of boundary points we want
-       to take the average of}
+\item{average}{is the number of boundary points we want to take the average
+  of}
 }
 \value{
 a matrix, with each column as a point

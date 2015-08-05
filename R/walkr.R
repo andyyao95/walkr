@@ -49,6 +49,13 @@ walkr <- function(A,
                   n, 
                   method = "dikin") {
   
+  A <- matrix(rnorm(9,0,1), ncol = 3, nrow = 3)
+  print(rcppeigen_fdet(A))
+  print(rcppeigen_fsolve(A))
+  
+  #print(rcppeigen_ftrans(A))
+  return(0)
+  
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
     stop("A needs to be a matrix")

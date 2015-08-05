@@ -427,6 +427,7 @@ Williamstown, MA, USA\\}
 \bibliography{walkr}
 \cite{kannan}
 \cite{hitandrun}
+\cite{rcpp}
 
 \end{article}
 \end{document}
