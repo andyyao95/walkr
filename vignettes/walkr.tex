@@ -41,29 +41,35 @@ properties of the random walks.
 
 \section{Introduction} 
 
-Consider all possible $x$'s that satisfy the underdetermined matrix equation $Ax=b$. Furthermore, 
-we require that every componenet of $x$ be $\geq 0$ and $\sum x = 1$. The \texttt{walkr} package
-provides tools to sample such $x$'s. Our sampling methods are two types of MCMC random walks -- hit-and
--run and Dikin Walk. Hit-and-run asympotically guarantees uniform sampling, while Dikin is nearly uniform
-but indicates much stronger mixing. \texttt{walkr} provides statistical diagnostics of 
-the mixing and convergence of the sampled points. 
+Consider all possible vectors $x$ that satisfy the underdetermined matrix equation $Ax=b$, such that 
+every component of $x$ is $\geq 0$ and sum to $1$. How do we generate a diverse sample of such 
+$x$'s? The \texttt{walkr} package uses MCMC (Monte-Carlo Markov Chain) random walks to generate 
+such a sample.
+
+\texttt{walkr} contains two MCMC random walks. Our first random walk is hit-and-run. 
+Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
+but mixes slower and slower as the dimensions of $A$ increase. Our second random walk is the 
+Dikin Walk. Dikin Walk generates a nearly uniform sample and exhibits much stronger mixing. 
+
+\texttt{walkr} also provides statistical diagnostics of the mixing and convergence
+properties of a MCMC random walk. 
 
 \section{Mathematical Background of Sampling Space}
 
-In this section, we go through the mathematical background needed to understand the space from which 
-we are sampling -- the intersection of the $N$ simplex and 
-hyperplanes. $Ax = b$ represent a system of $M$ equations with $N$ variables ($M \ll N$). 
-Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), and $b$ is a 
-$M \times 1$ vector. \\
+In this section, we go through the mathematical background of the space from which 
+we are sampling -- the intersection of the $N$ simplex and hyperplanes. The reader does not need to 
+read this section in order to use our package or understand the sampling algorithms. 
+However, this section should provide the reader a better sense of what the sample space 
+is geometrically and mathematically. 
 
-We will go through one simple example and an important linear transformation. 
-The reader does not need to read this section in order to use our package or understand
-our sampling algorithms. However, this section should help the reader understand better what 
-the sample space is both geometrically and mathematically. \\
+\textbf{1) } $\mathbf{Ax = b}$ represent a system of $M$ linear equations with $N$ variables ($M \ll N$). 
+Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), $x$ is 
+a $N \times 1$ vector, and $b$ is a $M \times 1$ vector. Every row in $A$ represents a hyperplane
+in $\mathbb{R}^N$.
 
-\noindent \textbf{Definition:} The $N$-dimensional unit simplex is described by:
+\textbf{2) The $\mathbf{N}$-dimensional unit simplex} is described by:
 
-$$x_1 + x_2 + x_3 + ... + x_n = 1$$
+$$x_1 + x_2 + x_3 + ... + x_N = 1$$
 $$x_i \geq 0$$
 
 \subsection{Sampling space: simple 3D case}
@@ -126,7 +132,7 @@ A_{M \times N} =
 \Bigg\}\text{{M rows (constraints)}}
 $$
 
-$b$ is a $M \times 1$ vector, and $x$ is a $N \times 1$ vector.
+Again, $b$ is a $M \times 1$ vector, and $x$ is a $N \times 1$ vector.
 
 \subsection{From $Ax=b$ and the unit-simplex to $Ax \leq b$}
 
