@@ -7,8 +7,8 @@
 #' @param A is the lhs of \eqn{Ax \le b}
 #' @param b is the rhs of \eqn{Ax \le b}
 #' @param n is the number of points we want to return
-#' @param average is the number of boundary points we want 
-#'        to take the average of
+#' @param average is the number of boundary points we want to take the average
+#'   of
 #' 
 #' @return a matrix, with each column as a point
 #' 
@@ -35,8 +35,22 @@ start_point <- function(A,
     new_x0 <- numeric()
   
     ## average is the number of boundary points we want to take the average of 
-    ## the higher this number is, the more likely our n points will be closer to each other
-    ## 
+    ## the higher this number is, the more likely our n points will be closer to
+    ## each other
+    
+    ## the basic idea for having "average" number of points is that the linear
+    ## programming method we use below in general finds points that randomly lie
+    ## at the bounds of our convex polytope. And thus, if the take "average"
+    ## number of points, and then take the average of the boundary points, we
+    ## can get a good approximation of the "analytic center" of the space 
+    ## however, I am unsure of how many points to average is good
+    
+    ## it is true that the more points we take, the closer it will be to the 
+    ## true mean of whatever distribution this linear programming algorithm 
+    ## draws from however, if we want a diversified sample of starting points,
+    ## it's probably a good idea to have the "average" on the lower side, so
+    ## that they are not close to each other. Also, this number should increase
+    ## as the dimension of the problem increases (i.e. number of rows in A)
     
     for(j in 1:average) {
         
