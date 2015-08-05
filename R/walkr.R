@@ -78,7 +78,7 @@ walkr <- function(A,
   
   aug_A <- rbind(A, matrix(1, ncol = ncol(A), nrow = 1))
   aug_b <- c(b, 1)
-  
+
   ## 1. regardless of method, we need to perform the affine transformation which
   ## takes us from x-space (Ax = b) into the alpha-space in which the polytope
   ## described is Ax <= b (denoted below as new_A, new_b)

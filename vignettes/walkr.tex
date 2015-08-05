@@ -366,7 +366,7 @@ at $x_0$ with radius $1$ will always be contained in $K$. \\
 
 This is important because this way, we know for sure that if we set $r=1$, then our algorithm 
 will never sample points from outside the polytope $K$. Although there are still two rejection 
-components to the algorithm (see above), the rejection rate is much higher than expected 
+components to the algorithm (see above), the rejection rate is much lower than expected 
 because of this theorem. \\
 
 \section{Using \texttt{walkr} to sample points}
@@ -400,6 +400,25 @@ Then, the sampling could be simply ran with \texttt{walkr}:
 > optimized_dikin[ , 10:15]
 \end{Sinput}
 \end{Schunk}
+
+To see the difference in performance between Dikin in R and Optimized Dikin using Rcpp:
+
+\begin{Schunk}
+\begin{Sinput}
+> A <- matrix(c(1,0,1,0,1), ncol = 5)
+> b <- 0.5
+> unoptimized <- function() {walkr(A = A, b = b, n = 5000, method = "dikin")}
+> optimized <- function() {walkr(A = A, b = b, n = 5000, method = "optimized-dikin")}
+> microbenchmark(
++   
++   unoptimized(),
++   optimized(),
++   times = 20
++ )
+> 
+\end{Sinput}
+\end{Schunk}
+
 
 \section{Using \texttt{walkr} to examine MCMC random walks}
 

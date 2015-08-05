@@ -15,6 +15,9 @@
 // available from R
 //
 
+// ONLY WRITE C CODE / RCPP FUNCTIONS IN THIS FILE BELOW
+// USE THIS RCPP MAGIC TO DEAL WITH EVERYTHING ELSE =====> Rcpp::compileAttributes()
+
 // 1. The transpose of a matrix
 //
 // [[Rcpp::export]]
