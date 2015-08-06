@@ -138,7 +138,7 @@ walkr <- function(A,
     ## convert back into x-space
     
     answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
-    
+    #vis_sampling(answer, 1)
     return(answer)
   }
   
@@ -150,7 +150,7 @@ walkr <- function(A,
      
     ##again, sampling alphas
     
-    alphas <- t(hitandrun::har(start.point, constr, N = n, 
+    alphas <- t(hitandrun::har(x0, constr, N = n, 
                               thin = 1, )$samples)
     answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
     

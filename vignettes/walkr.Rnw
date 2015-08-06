@@ -57,17 +57,17 @@ properties of a MCMC random walk.
 \section{Mathematical Background of Sampling Space}
 
 In this section, we go through the mathematical background of the space from which 
-we are sampling -- the intersection of the $N$ simplex and hyperplanes. The reader does not need to 
+we are sampling -- the intersection of the $N$-simplex and hyperplanes. The reader does not need to 
 read this section in order to use our package or understand the sampling algorithms. 
 However, this section should provide the reader a better sense of what the sample space 
 is geometrically and mathematically. 
 
 \textbf{1) } $\mathbf{Ax = b}$ represent a system of $M$ linear equations with $N$ variables ($M \ll N$). 
-Specifically, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), $x$ is 
+Hence, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), $x$ is 
 a $N \times 1$ vector, and $b$ is a $M \times 1$ vector. Every row in $A$ represents a hyperplane
 in $\mathbb{R}^N$.
 
-\textbf{2) The $\mathbf{N}$-dimensional unit simplex} is described by:
+\textbf{2) The $\mathbf{N}$-dimensional unit simplex ($\mathbf{N}$-Simplex)} is described by:
 
 $$x_1 + x_2 + x_3 + ... + x_N = 1$$
 $$x_i \geq 0$$
@@ -101,17 +101,21 @@ In addition, we require the solution space to be intersected with the $3$D simpl
 $$\sum x_i = 1$$
 $$x_i \geq 0$$
 
-In the following graph, we draw the intersection of the two. The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) is the red line segment, which is our sampling space.
+In the following graph, we draw the intersection of the two. 
+The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents 
+the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) 
+is the red line segment, which is our sampling space.
 
-% should probably replace this figure with a better one
+% The figure below should be replaced with one that is better drawn
 
 \begin{figure}[H]
 \centering
 \includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
-\caption[caption]{Intersection (red line) of Simplex and 2D hyperplane living in 3D space}
+\caption[caption]{The sampling space is the line segment (red), which is the intersection
+                  of the 3D simplex (orange) and a hyperplane (blue)}
 \end{figure}
 
-\subsection{Matrix Representation of Hyperplanes}
+\subsection{Matrix Representation of Multiple Hyperplanes}
 
 Every hyperplane is described by one linear equation. Thus, a system of linear equations is the intersection
 of hyperplanes. In general, if we have $M$ linear equations and $N$ variables, then $Ax=b$ would look like:
@@ -134,14 +138,57 @@ $$
 
 Again, $b$ is a $M \times 1$ vector, and $x$ is a $N \times 1$ vector.
 
-\subsection{From $Ax=b$ and the unit-simplex to $Ax \leq b$}
+\subsection{$4$D space}
 
-Our sampling space is represented by equalities $Ax = b$, $\sum x = 1$, and non-negativity constraint
-$x_i \geq 0$. Our sampling space is bounded (i.e. has finite volume in 
+Just like how the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simplex 
+(i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) could be viewed as a $3$D object. Specifically,
+the $4$D simplex is the following tetradhedron when viewed from $3$D space, with 
+verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.\\
+
+% Figure needs to be replaced
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 6in, height = 3in]{img/4_D_simplex_vis.png}
+\caption[caption]{4D Simplex Can Live in 3D Space}
+\end{figure}
+
+Now imagine the intersection of the $4$D simplex with one hyperplane in $4$D (1 equation,
+or 1 row in $Ax=b$). For a specific $A$ and $b$, we demonstrate the intersection 
+in the figure below. The resulting shape is a trapezoid in $4$D space. 
+
+$$
+A = 
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+22 & 2 & 2 & 37\\
+\end{bmatrix},
+\quad
+b = 
+\begin{bmatrix}
+1\\
+16
+\end{bmatrix}
+$$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 7in, height = 4in]{img/4_D_non_simplex_intersection.png}
+\caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
+\end{figure}
+
+In higher dimensions, the same logic applies. 
+Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$ (given $N$
+variables). Thus, geometrically, our sampling space is: \textbf{the intersection of hyperplanes
+with the $N$-simplex}. 
+
+\subsection{From $Ax=b$ and the $N$-simplex to $Ax \leq b$}
+
+Our sampling space is bounded (i.e. has finite volume in 
 $\mathbb{R}^N$). More formally, our sampling space is known as a \textbf{convex-polytope} 
 in $\mathbb{R}^N$. Convex-polytopes are commonly 
 described in the literature by a generic $Ax \leq b$. Here, we present a simple linear transformation 
-which transforms the intersection of $Ax=b$ and the unit-simplex to the form
+which transforms the intersection of $Ax=b$ and the $N$-simplex to the form
 $Ax \leq b$. \\
 
 First, note that the equality part of the simplex constraint ($\sum x = 1$) could be added as an extra row 
@@ -153,32 +200,30 @@ A =
    & & ...... & & & \\
    & & ......  & & & \\
    & & ...... & & & \\
-   & & ...... & & & \\
    1 & 1 & ...... & 1 & 1 \\
 
   \end{bmatrix}, 
 \quad 
 b = 
   \begin{bmatrix}
-    \\
   ... \\
   ... \\
-   \\
+  ... \\
   1 \\
   \end{bmatrix}
 $$
 
 Second, to find the complete solution to the new $Ax = b$ (i.e. the set of all possible $x$'s that satisfy
-$Ax=b$), we must find the Null Space Basis of $A$, the set of all possible $x$'s that satisfy $Ax=0$, 
-then add on a particular solution to $Ax = b$ (The specifics can be found in any 
+$Ax=b$), we must find the Null Space of $A$(all $x$'s that satisfy $Ax=0$), 
+then add on any particular solution to $Ax = b$ (This procedure can be found in any 
 Linear Algebra textbook). \\
 
 Mathematically, if the original $A$ was $M \times N$, then after adding on the extra row from the simplex, 
-the set of basis vectors which span the Null Space of our new $A$ will be: 
+the basis vectors, each with $N$ components, which span the Null Space of our new $A$ will be: 
 
 $$
 \Bigg\{
-v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{M-(N+1)}
+v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
 \Bigg\}
 $$
 
@@ -187,14 +232,14 @@ will be
 
 $$
 \Bigg\{
-v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{M-(N+1)}v_{M-(N+1)}
+v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
 \quad | \quad \alpha_i \in \mathbb{R}
 \Bigg\}
 $$ \\ 
 
 Lastly, we tag on the $x_i \geq 0$ constraints, and with some algebraic manipulations:
 
-$$v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{M-(N+1)}v_{M-(N+1)}
+$$v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
 \quad \geq
 \begin{bmatrix}
 0 \\
@@ -207,7 +252,7 @@ $$v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{M-(N+
 $$
 
 $$
-\alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{M-(N+1)}v_{M-(N+1)}
+\alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
 \quad \geq -v_{particular}
 $$
 
@@ -218,7 +263,7 @@ V =
 v_1 &
 v_2 &
 ... &
-v_{M-(N+1)} \\
+v_{N-(M+1)} \\
 \end{bmatrix}, 
 \quad
 \alpha = 
@@ -226,7 +271,7 @@ v_{M-(N+1)} \\
 \alpha_1 \\
 \alpha_2 \\
 ... \\
-\alpha_{M-(N+1)}
+\alpha_{N-(M+1)}
 \end{bmatrix}
 $$
 
@@ -238,12 +283,12 @@ $$
 
 We have performed a \textbf{transformation} from "$x$-space" (
 coordinates described by $x_1, x_2, ...$) to "$\alpha$-space" (coordinates described 
-by $\alpha_1, \alpha_2, ...$). The geometric object described is still the same one. In
-fact, in \texttt{walkr}, when the user inputs $A$ and $b$ for $Ax = b$, the package internally
-performs this transformation, samples the $\alpha$'s, maps them back to "$x$-space, and then
+by $\alpha_1, \alpha_2, ...$). The geometric object described is still the same convex
+polytope. In fact, \texttt{walkr} internally performs this transformation, 
+samples the $\alpha$'s, maps them back to "$x$-space, and then
 returns the sampled points. \\
 
-The reader need not be concerned with this transformation affecting the uniformity 
+The user need not be concerned with this transformation affecting the uniformity 
 or mixing properties of our MCMC sampling algorithms. This is because the transformation
 above is an affine transformation, which preserves uniformity.
 Simply put, sampling in either space is equivalent. \\
@@ -252,10 +297,12 @@ Having understood that the intersection of $Ax=b$ with the unit-simplex is a con
 we are ready to dive into the core of \texttt{walkr}
 -- MCMC random walks.
 
-\section{Random Walks: How to pick starting points?}
+\section{Random Walk: How to pick starting points?}
+
+% analytic center?
 
 MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
-generates starting points using linear programming.
+generates such starting points using linear programming.
 Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which:
 
 $$\text{minimizes} \quad |Cx-d|^2$$
@@ -266,20 +313,20 @@ the $x$'s generated this way fall randomly on the boundaries of our convex polyt
 the minimizing property of linear programming. Thus, we repeat this for say,
 10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
 
-\section{Hit-and-run}
+\section{Random Walk: Hit-and-run}
 
 The hit-and-run algorithm is as follows:
 
 \begin{enumerate}
   
   \item{Set starting point $x_0$ as current point}
-  \item{Generate a random direction $\vec{d}$. If we are in $N$ dimensions, then this random direction will 
-        be a vector of $N$ components. Specifically, this random direction is a uniformly generated 
-        vector on the $N$ dimensional unit-sphere}
-  \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$. Specifically, 
-        we find can find end points $s_1$ and $s_2$ of the chord by going through the rows 
-        of $Ax_0 \leq b$ individually, setting the inequality to equality (so we hit the surface). 
-        Then, we can parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
+  \item{Randomly generate a direction $\vec{d}$. If we are in $N$ dimensions, then $d$ will 
+        be a vector of $N$ components. Specifically, $d$ is a uniformly generated 
+        unit vector on the $N$ dimensional unit-sphere}
+  \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$.  
+        We find end points $s_1$ and $s_2$ of the chord by going through the rows 
+        of $Ax_0 \leq b$ one by one, setting the inequality to equality (so we hit the surface). 
+        Then, parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
   \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}}
   \item{Set $x_1$ as current point}
   \item{Repeat algorithm until number of desired points sampled}
@@ -310,7 +357,7 @@ Here is a picture of the hit-and-run algorithm:
 \centering
 \begin{minipage}{.4\textwidth}
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-\caption[caption]{pick random point $x_1$ on the chord}
+\caption[caption]{move to random point $x_1$ on the chord}
 \end{minipage}%
 \centering
 \begin{minipage}{.4\textwidth}
@@ -321,11 +368,11 @@ Here is a picture of the hit-and-run algorithm:
 
 %probably also want to discuss important facts about the algorithm here.
 
-\section{Dikin Walk}
+\section{Random Walk: Dikin Walk}
 
 \subsection{Preliminary Definitions}
 
-Recall, our solution space is a convex polytope. We call this convex 
+Recall, our sampling space is a convex polytope. We call this convex 
 polytope $K$, which can be described in the form $Ax \leq b$. \\
 
 For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
@@ -342,8 +389,7 @@ $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 $$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A \quad , \quad \text{where:}$$
 $$D = diag(\frac{1}{b_i - a_i^Tx})$$
 
-\textbf{Note:} $H_x$ is a linear operator. 
-Specifically, it is a $N \times N$ matrix. $D$ is a $M \times M$ diagonal matrix.\\
+\textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
 
 \noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
 
@@ -353,9 +399,9 @@ $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as
 $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} 
 \end{center}
 
-\noindent The shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
-In other words, if we think in terms of running a MCMC chain within our polytope $K$, 
-the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through the polytope.
+The shape of the Dikin Ellipsoid with radius $r$ is a function of $A$, $b$, and its center $x_0$.
+Thus, throughout the convex polytope $K$, the Dikin Ellipsoid changes shape depending 
+on where the center $x_0$ is. 
 
 \subsection{Algorithm \texttt{Dikin}}
 
@@ -364,7 +410,7 @@ the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through 
   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
   \item{Pick a random point $y$ from $D_{x_0}$}
-  \item{If $x_0 \notin D_{y}$, then reject $y$ (this condition is counter-intuitive, read it closely)}
+  \item{If $x_0 \notin D_{y}$, then reject $y$ (be careful, this condition is counter-intuitive)}
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
         (the big picture is that the ratio of the determinants are equal
          to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
@@ -418,9 +464,10 @@ Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radiu
 
   \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
   \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
-    \subitem{$\zeta = <x_1,x_2,...,x_n> \qquad \rightarrow \qquad <\frac{rx_1}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
-            \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ... , 
-            \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}$}
+    \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
+            {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
+            \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
+            \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
   \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
         of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
   \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
@@ -429,15 +476,23 @@ Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radiu
 
 \subsection{Important Theorem}
 
-With the algorithm, there is no mention of what happens if the point $y$ we accept is outside 
-of our polytope $K$. Luckily, there is no need to worry about that because of this theorem: \\
+In algorithm \texttt{Dikin}, what if the point $y$ we accept is outside 
+of our polytope $K$? Luckily, there is no need to worry about that because of the following theorem: \\
 
 \noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
 if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
 at $x_0$ with radius $1$ will always be contained in $K$. \\
 
 This is important because this way, we know for sure that if we set $r=1$, then our algorithm 
-will never sample points from outside the polytope $K$. Although there are still two rejection 
+will never sample points from outside the polytope $K$.
+
+hhh \\
+
+\noindent The shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
+In other words, if we think in terms of running a MCMC chain within our polytope $K$, 
+the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through the polytope.\\
+
+Although there are still two rejection 
 components to the algorithm (see above), the rejection rate is much lower than expected 
 because of this theorem. \\
 

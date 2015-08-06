@@ -84,7 +84,7 @@ dikin_walk <- function(A,
   ## set the starting point as the current point
   
   total.points <- points * thin + burn
-  print(total.points)
+
   
   result <- matrix(ncol = total.points, nrow = ncol(A))
   result[ , 1] <- x0
@@ -145,7 +145,7 @@ dikin_walk <- function(A,
     }
     
     ## appending on the result
-    print(i)
+    
     result[ , i] <- y
     current.point <- y
     
