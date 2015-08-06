@@ -498,6 +498,35 @@ because of this theorem. \\
 
 
 \section{Dikin versus Hitandrun}
+%reference here:{http://www.mit.edu/~har/Dikin.pdf}
+\begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
+  \hline
+   &  \texttt{hit-and-run} & \texttt{Dikin Walk} \\ \hline
+  Uniform Sampling & Yes, needs $O(N^3)$ points, where $N$ is the dimension of the polytope & 
+  No, concentrates in the    interior\\ \hline
+  Mixing & $O(\frac{N^2R^2}{r^2})$ *, slows down substantially as dimension of polytope increases and 
+  polytope becomes "skinnier" & $O(MN)$, where $A$ is $M \times N$; much stronger mixing. \\ \hline
+  Cost of One Step & $O(MN)$ & $O(MN^2)$, in practice, one step of Dikin is much more 
+  costly than hit-and-run\\ \hline
+  Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
+  not high\\ \hline
+  
+  
+  
+
+\end{tabular} \\
+
+*$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
+largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
+as the polytope is "skinnier".
+
+
+
+
+
+
+
+
 
 \begin{figure}[H]
 \centering
