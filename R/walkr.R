@@ -151,7 +151,7 @@ walkr <- function(A,
     ##again, sampling alphas
     
     alphas <- t(hitandrun::har(x0, constr, N = n, 
-                              thin = 1, )$samples)
+                              thin = thin, )$samples)
     answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
     
     return(answer)

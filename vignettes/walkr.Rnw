@@ -149,7 +149,7 @@ verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.\\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width = 6in, height = 3in]{img/4_D_simplex_vis.png}
+\includegraphics[width = 4in, height = 2.5in]{img/tetra1.png}
 \caption[caption]{4D Simplex Can Live in 3D Space}
 \end{figure}
 
@@ -173,7 +173,7 @@ $$
 
 \begin{figure}[H]
 \centering
-\includegraphics[width = 7in, height = 4in]{img/4_D_non_simplex_intersection.png}
+\includegraphics[width = 4in, height = 2.5in]{img/tetra2.png}
 \caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
 \end{figure}
 
@@ -498,6 +498,35 @@ because of this theorem. \\
 
 
 \section{Dikin versus Hitandrun}
+%reference here:{http://www.mit.edu/~har/Dikin.pdf}
+\begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
+  \hline
+   &  \texttt{hit-and-run} & \texttt{Dikin Walk} \\ \hline
+  Uniform Sampling & Yes, needs $O(N^3)$ points, where $N$ is the dimension of the polytope & 
+  No, concentrates in the    interior\\ \hline
+  Mixing & $O(\frac{N^2R^2}{r^2})$ *, slows down substantially as dimension of polytope increases and 
+  polytope becomes "skinnier" & $O(MN)$, where $A$ is $M \times N$; much stronger mixing. \\ \hline
+  Cost of One Step & $O(MN)$ & $O(MN^2)$, in practice, one step of Dikin is much more 
+  costly than hit-and-run\\ \hline
+  Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
+  not high\\ \hline
+  
+  
+  
+
+\end{tabular} \\
+
+*$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
+largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
+as the polytope is "skinnier".
+
+
+
+
+
+
+
+
 
 \begin{figure}[H]
 \centering
@@ -512,6 +541,18 @@ because of this theorem. \\
 \end{minipage}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/dikin50.png}
+\caption[caption]{Dikin mixes stronger}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/hitandrun50.png}
+\caption[caption]{Hit-and-run mixes slower}
+\end{minipage}
+\end{figure}
 
 
 \section{Using \texttt{walkr} to sample points}
