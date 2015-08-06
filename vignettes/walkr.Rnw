@@ -288,6 +288,36 @@ The hit-and-run algorithm is as follows:
 
 Here is a picture of the hit-and-run algorithm: 
 
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
+\caption[caption]{Pick $x_0$}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
+\caption[caption]{Random direction $d$}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
+\caption[caption]{Find endpoints of chord}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+\caption[caption]{pick random point $x_1$ on the chord}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+\caption[caption]{repeat the algorithm}
+\end{minipage}
+\end{figure}
 
 %probably also want to discuss important facts about the algorithm here.
 
@@ -344,6 +374,42 @@ the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through 
 
 \end{enumerate}
 
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
+\caption[caption]{Step 1 and 2}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
+\caption[caption]{Step 3}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
+\caption[caption]{Step 4 Case I}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
+\caption[caption]{Step 4 Case II}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
+\caption[caption]{Step 5}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
+\caption[caption]{Step 6}
+\end{minipage}
+\end{figure}
+
 \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
 
 Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
@@ -374,6 +440,24 @@ This is important because this way, we know for sure that if we set $r=1$, then 
 will never sample points from outside the polytope $K$. Although there are still two rejection 
 components to the algorithm (see above), the rejection rate is much lower than expected 
 because of this theorem. \\
+
+
+\section{Dikin versus Hitandrun}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/dikintrap.png}
+\caption[caption]{Dikin concentrates at the center}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/hartrap.png}
+\caption[caption]{Hit-and-run samples the space thoroughly}
+\end{minipage}
+\end{figure}
+
+
 
 \section{Using \texttt{walkr} to sample points}
 
