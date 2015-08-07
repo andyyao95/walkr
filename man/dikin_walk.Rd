@@ -4,28 +4,29 @@
 \alias{dikin_walk}
 \title{Dikin Walk}
 \usage{
-dikin_walk(A, b, x0, n, r = 1)
+dikin_walk(A, b, x0 = NULL, points, r = 1, thin = 1, burn = 0)
 }
 \arguments{
-\item{A}{is the lhs of \eqn{Ax \le b}}
+\item{A}{is the lhs of Ax <= b}
 
-\item{b}{is the rhs of \eqn{Ax \le b}}
+\item{b}{is the rhs of Ax <= b}
 
 \item{x0}{is the starting point}
 
-\item{n}{is the number of points we want to sample}
+\item{r}{is the radius of the ellipsoid (1 by default)}
 
-\item{r}{is the radius of the Dikin ellipsoid (1 by default)}
+\item{n}{is the number of points we want}
+
+\item{analytic_center}{is a boolean indicating whether we want to
+      start at the analytic center of the polytope}
 }
 \value{
 a number of sampled points that satisfy Ax <= b (matrix object,
 columns the points)
 }
 \description{
-This function implements the Dikin Walk when given a
-convex polytope defined by \eqn{Ax \le b} and a starting
-point x0.
-Note that a $r$ of 1 guarantees
+This function implements the Dikin Walk using the Hessian
+of the Log barrier function. Note that a $r$ of 1 guarantees
 that the ellipsoid generated won't leave our polytope $K$ (see
 Theorems online)
 }

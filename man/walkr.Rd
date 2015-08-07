@@ -6,14 +6,14 @@
 \alias{walkr-package}
 \title{The walkr package.}
 \usage{
-walkr(A, b, n, method = "dikin")
+walkr(A, b, points, method = "dikin", thin = 1, burn = 0)
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation A}
 
 \item{b}{is the rhs of the matrix equation b}
 
-\item{n}{is the number of points we want to sample}
+\item{points}{is the number of points we want to sample}
 
 \item{method}{is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
        optimized-dikin"}

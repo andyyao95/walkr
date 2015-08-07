@@ -525,9 +525,6 @@ as the polytope is "skinnier".
 
 
 
-\textbf{everything below not edited yet}
-
-
 
 
 \begin{figure}[H]

@@ -33,20 +33,19 @@
 #' 
 #' @param A is the lhs of the matrix equation A
 #' @param b is the rhs of the matrix equation b
-#' @param n is the number of points we want to sample
+#' @param points is the number of points we want to sample
 #' @param method is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
 #'        optimized-dikin"
 #' 
 #' @return A matrix with its columns as the sampled
 #'         points. 
-#'         
-#' @importFrom hitandrun har          
+#'                  
 #' @export 
 #' 
 
 walkr <- function(A, 
                   b, 
-                  n, 
+                  points, 
                   method = "dikin",
                   thin = 1,
                   burn = 0) {
@@ -133,7 +132,7 @@ walkr <- function(A,
     ## sampling in alpha space
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
     
-    alphas <- dikin_walk(A = new_A, b = new_b, points = n, r = 1, x0 = x0, thin = thin, burn = burn)
+    alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, x0 = x0, thin = thin, burn = burn)
     
     ## convert back into x-space
     
@@ -144,14 +143,10 @@ walkr <- function(A,
   
   else if (method == "hit-and-run") {
     
-    ## make the constraints in the format that the hitandrun package wants
-    
-    constr <- list(constr = new_A, rhs = new_b, dir = rep("<=", nrow(new_A)))
-     
     ##again, sampling alphas
     
-    alphas <- t(hitandrun::har(x0, constr, N = n, 
-                              thin = thin, )$samples)
+    alphas <- hit_and_run(A = new_A, b = new_b, x0 = x0, points = points, thin = thin, burn = burn)
+    
     answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
     
     return(answer)
