@@ -66,5 +66,11 @@ test_that("Testing Walkr Output", {
   expect_equal(names(z2_har), c("chain_1", "chain_2", "chain_3", "chain_4", "chain_5"))
   expect_equal(names(z2_dikin), c("chain_1", "chain_2", "chain_3", "chain_4", "chain_5"))
   
+  ## check that we have no NA's in the output
+  
+  expect_true(!any(is.na(z1_har)))
+  expect_true(!any(is.na(z1_dikin)))
+  expect_true(!any(is.na(z2_har)))
+  expect_true(!any(is.na(z2_dikin)))
   
 })

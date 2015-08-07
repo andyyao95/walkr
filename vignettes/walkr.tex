@@ -8,6 +8,7 @@
 \usepackage{Sweave}
 \usepackage[parfill]{parskip}
 \usepackage[round]{natbib}
+\usepackage{subfigure}
 
 %\VignetteEngine{Sweave}
 %\VignetteIndexEntry{walkr}
@@ -335,36 +336,33 @@ The hit-and-run algorithm is as follows:
 
 Here is a picture of the hit-and-run algorithm: 
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
-\begin{minipage}{.4\textwidth}
+\subfigure[Step 1]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
-\caption[caption]{Pick $x_0$}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
-\caption[caption]{Random direction $d$}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure1}}
+\quad
+\subfigure[Step 3]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
-\caption[caption]{Find endpoints of chord}
-\end{minipage}
+\label{fig:subfigure2}}
+\subfigure[Step 4]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+\label{fig:subfigure3}}
+\quad
+\subfigure[Step 5]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+\label{fig:subfigure4}}
+%
+\caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction
+         is selected (Step 2), and the chord along that direction is calculated (Step 3).
+         Then, we pick a random point along that chord and move there as our new point (Step 4).
+         The algorithm is repeated to sample many points (Step 5)}
+\label{fig:figure}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-\caption[caption]{move to random point $x_1$ on the chord}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
-\caption[caption]{repeat the algorithm}
-\end{minipage}
-\end{figure}
 
 %probably also want to discuss important facts about the algorithm here.
 
@@ -420,43 +418,43 @@ on where the center $x_0$ is.
 
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
-\begin{minipage}{.4\textwidth}
+\subfigure[Step 1]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
-\caption[caption]{Step 1 and 2}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
-\caption[caption]{Step 3}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure2}}
+\quad
+\subfigure[Step 3 Case I]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
-\caption[caption]{Step 4 Case I}
-\end{minipage}
-\end{figure}
-
-\textbf{-->CAPTIONS NEED TO BE FIXED}
-
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure3}}
+\subfigure[Step 3 Case II]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
-\caption[caption]{Step 4 Case II}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure4}}
+\quad
+\subfigure[Step 4]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
-\caption[caption]{Step 5}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure5}}
+\subfigure[Step 5]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
-\caption[caption]{Step 6}
-\end{minipage}
+\label{fig:subfigure6}}
+
+%
+\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
+         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
+         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
+         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
+         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
+         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
+         Algorithm repeats (Step 5)}
+         
+\label{fig:figure}
 \end{figure}
+
+
+
 
 \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
 
@@ -485,8 +483,8 @@ of our polytope $K$? Luckily, there is no need to worry about that because of th
 if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
 at $x_0$ with radius $1$ will always be contained in $K$. \\
 
-This is important because this way, we know for sure that if we set $r=1$, then our algorithm 
-will never sample points from outside the polytope $K$.
+Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
+within the polytope $K$.
 
 \textbf{These points need elaboration and editing}
 
@@ -523,9 +521,6 @@ largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ incr
 as the polytope is "skinnier".
 
 
-
-
-\textbf{everything below not edited yet}
 
 
 
