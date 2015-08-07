@@ -6,7 +6,7 @@
 \alias{walkr-package}
 \title{The walkr package.}
 \usage{
-walkr(A, b, points, method = "dikin", thin = 1, burn = 0)
+walkr(A, b, points, method = "dikin", thin = 1, burn = 0, chains = 1)
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation A}
@@ -19,7 +19,7 @@ walkr(A, b, points, method = "dikin", thin = 1, burn = 0)
        optimized-dikin"}
 }
 \value{
-A matrix with its columns as the sampled
+A list of chains. Each chain is a matrix with its columns as the sampled
         points.
 }
 \description{

@@ -486,17 +486,6 @@ at $x_0$ with radius $1$ will always be contained in $K$. \\
 Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
 within the polytope $K$.
 
-\textbf{These points need elaboration and editing}
-
-\noindent The shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
-In other words, if we think in terms of running a MCMC chain within our polytope $K$, 
-the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through the polytope.\\
-
-Although there are still two rejection 
-components to the algorithm (see above), the rejection rate is much lower than expected 
-because of this theorem. \\
-
-
 \section{Dikin versus Hitandrun}
 %reference here:{http://www.mit.edu/~har/Dikin.pdf}
 \begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
@@ -519,11 +508,6 @@ because of this theorem. \\
 *$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
 as the polytope is "skinnier".
-
-
-
-
-
 
 \begin{figure}[H]
 \centering
@@ -554,10 +538,10 @@ as the polytope is "skinnier".
 
 \section{Using \texttt{walkr} to sample points}
 
-\texttt{walkr} has one main function \code{walkr} which makes it very easy for the user to 
-sample points. \\
+\texttt{walkr} has one main function \code{walkr} which sample points. \\
 
-For example, define $A$ and $b$ as follows:
+First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
+for a 5 dimensional case:
 
 \begin{Schunk}
 \begin{Sinput}
@@ -566,7 +550,19 @@ For example, define $A$ and $b$ as follows:
 \end{Sinput}
 \end{Schunk}
 
-Then, the sampling could be simply ran with \texttt{walkr}:
+The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
+if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
+simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
+
+\begin{Schunk}
+\begin{Sinput}
+> A <- matrix(1, ncol = 5)
+> b <- 1
+\end{Sinput}
+\end{Schunk}
+
+After we have \code{A} and \code{B}
+
 
 \begin{Schunk}
 \begin{Sinput}

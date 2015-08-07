@@ -183,6 +183,14 @@ walkr <- function(A,
   names(answer) <- names
   
   ## return the list of chains
+  
+  ## checking rhats
+  rhats <- calc_rhat(answer)
+  
+  if( any(rhats > 1.1) ) {
+    warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
+  }
+  
   return(answer)
   
 }
