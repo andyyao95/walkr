@@ -57,7 +57,7 @@ walkr <- function(A,
   }
   
   if(!(ncol(A) > nrow(A))) {
-    stop("A must be underdetermined (more cols tha rows)")
+    stop("A must be underdetermined")
   }
   
   if(nrow(A) != length(b)) {
@@ -72,8 +72,8 @@ walkr <- function(A,
     stop("A needs to contain numbers only")
   }
   
-  if(! (method %in% c("hit-and-run", "dikin", "optimized-dikin"))) {
-    stop("Method must be hit-and-run, dikin, or optimized-dikin")
+  if(! (method %in% c("hit-and-run", "dikin"))) {
+    stop("Method must be hit-and-run or dikin")
   } 
   
   ## augment the simplex constraints 
