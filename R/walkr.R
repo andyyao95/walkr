@@ -37,7 +37,7 @@
 #' @param method is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
 #'        optimized-dikin"
 #' 
-#' @return A matrix with its columns as the sampled
+#' @return A list of chains. Each chain is a matrix with its columns as the sampled
 #'         points. 
 #'                  
 #' @export 
@@ -48,7 +48,8 @@ walkr <- function(A,
                   points, 
                   method = "dikin",
                   thin = 1,
-                  burn = 0) {
+                  burn = 0,
+                  chains = 1) {
   
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
@@ -127,38 +128,54 @@ walkr <- function(A,
   
   ## 3. The sampling
   
+  answer <- list()
+  
   if(method == "dikin") {
     
-    ## sampling in alpha space
-    ## n = n - 1 because dikin takes starting point as the 1st sampled point
+    for (j in 1:chains) {
+      
+      ## sampling in alpha space
+      ## n = n - 1 because dikin takes starting point as the 1st sampled point
+      
+      alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, x0 = x0, thin = thin, burn = burn)
+      
+      ## convert back into x-space
+      
+      answer[[j]] <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
+      
+    }
     
-    alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, x0 = x0, thin = thin, burn = burn)
-    
-    ## convert back into x-space
-    
-    answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
-    #vis_sampling(answer, 1)
-    return(answer)
   }
   
   else if (method == "hit-and-run") {
     
-    ##again, sampling alphas
-    
-    alphas <- hit_and_run(A = new_A, b = new_b, x0 = x0, points = points, thin = thin, burn = burn)
-    
-    answer <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
-    
-    return(answer)
-  }
+    for (j in 1:chains) {
+      
+      ##again, sampling alphas
+      
+      alphas <- hit_and_run(A = new_A, b = new_b, x0 = x0, points = points, thin = thin, burn = burn)
+      
+      answer[[j]] <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
+      
+    }
   
-    
-  ## for safety
+  }
   
   else{
     stop("Sampling method must be \"hitandrun\" or \"dikin\".")
   }
   
-  ## function should never hit here
+  ## renaming the items as chains
+  
+  names <- vector()
+  for(i in 1:chains){
+    
+    names <- c(names, paste("chain",i, sep = "_"))
+    
+  }
+  names(answer) <- names
+  
+  ## return the list of chains
+  return(answer)
   
 }
