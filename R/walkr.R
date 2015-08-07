@@ -1,4 +1,4 @@
-#' walkr 
+#' The Walkr Function 
 #' 
 #' Given \eqn{Ax = b}, \code{walkr} samples points from the intersection of 
 #' \eqn{Ax = b} with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The 
@@ -14,9 +14,9 @@
 #' \code{walkr} transforms back into the original coordinate system 
 #' and returns the result. This transformation is affine, so the uniformity 
 #' and mixing properties of the MCMC algorithms are not affected. 
-#' 
 #' The current MCMC sampling methods supported are "hit-and-run", 
 #' "dikin" and "optimized-dikin" (a Rcpp boosted version for speed). 
+#' 
 #' 1) Hit-and-run is computationally less expensive and also 
 #' guarantees uniformity asympotically with complexity of O(n^3)
 #' points with respect to dimension n. However, in real practice, 
@@ -27,8 +27,8 @@
 #' 2) Dikin Walk is a nearly uniform method known for its very strong 
 #' mixing properties. However, each Dikin step is much more 
 #' computationally expensive than hit-and-run, so it takes more time 
-#' to sample every point. Thus, there is a "optimized-dikin" method
-#' in which we use RcppEigen to speed up the core computationally 
+#' to sample every point. Thus, the "dikin" method
+#' uses RcppEigen to speed up the core computationally 
 #' expensive operations in the algorithm.
 #' 
 #' @param A is the lhs of the matrix equation A
