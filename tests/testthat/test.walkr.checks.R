@@ -3,7 +3,7 @@ context("Testing Walkr")
 ## Tests that Walkr throws the correct error messages when 
 ## input is incorrect
 
-test_that("Testing Walkr Checks", {
+test_that("Testing Walkr Checks and Input", {
   
   ## check that A is a matrix
   
@@ -40,6 +40,21 @@ test_that("Testing Walkr Checks", {
   b <- 1
   expect_error(walkr(A = A, b = b, points = 10, method = "ball-search"), 
                "Method must be hit-and-run or dikin")
+  
+  ## Correct points, thin, chains parameter
+  A <- matrix(1, ncol = 3)
+  b <- 1
+  expect_error(walkr(A = A, b = b, points = 0), 
+               "points, thin, chains must be geq 1")
+  expect_error(walkr(A = A, b = b, points = 1, thin = 0), 
+               "points, thin, chains must be geq 1")
+  expect_error(walkr(A = A, b = b, points = 1, thin = 1, chains = 0), 
+               "points, thin, chains must be geq 1")
+  
+  ## burn non-negative
+  expect_error(walkr(A = A, b = b, points = 1, burn = -1), 
+               "burn must be non-negative")
+ 
   
   
 })

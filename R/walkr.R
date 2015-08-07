@@ -76,6 +76,13 @@ walkr <- function(A,
     stop("Method must be hit-and-run or dikin")
   } 
   
+  if( (points < 1) | (thin < 1) | (chains < 1) ) {
+    stop("points, thin, chains must be geq 1")
+  }
+  if(burn < 0) {
+    stop("burn must be non-negative")
+  }
+  
   ## augment the simplex constraints 
   
   aug_A <- rbind(A, matrix(1, ncol = ncol(A), nrow = 1))
