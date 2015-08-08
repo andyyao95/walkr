@@ -16,17 +16,9 @@
 #' @importFrom shinyStan launch_shinystan as.shinystan
 #' 
 
-vis_sampling <- function(x) {
+vis_sampling <- function(x, chains) {
       
-      chains <- length(x)
-    
-      this.df <- x[[1]]
-      
-      for(j in 2:chains) {
-        
-        this.df <- cbind(this.df, x[[j]])
-      }
-      
+      this.df <- x
       
       ## iterations is the number of points in hitandrun
       ## parameters is the dimension of the sample space

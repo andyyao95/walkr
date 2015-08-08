@@ -161,6 +161,7 @@ walkr <- function(A,
     ## we warn the user if any of the rhats for the parameters is above 1.1
     
     rhats <- calc_rhat(answer)
+    rhats <- ifelse(!is.na(rhats), rhats, 1)
     
     if( any(rhats > 1.1) ) {
       warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
@@ -181,6 +182,9 @@ walkr <- function(A,
     answer <- lapply(alphas, mapping)
     rhats <- calc_rhat(answer)
     
+    rhats <- calc_rhat(answer)
+    rhats <- ifelse(!is.na(rhats), rhats, 1)
+    
     if( any(rhats > 1.1) ) {
       warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
     }
@@ -197,12 +201,17 @@ walkr <- function(A,
   ## chains, and then return the final result
   
   mat_answer <- answer[[1]]
-
-  for(i in 2:chains) {
-    
-    mat_answer <- cbind(mat_answer, answer[[i]])
-    
+  
+  ## for loop breaks if chains == 1, so we need the if to check it
+  
+  if(chains > 1) {
+    for(i in 2:chains) {
+      
+      mat_answer <- cbind(mat_answer, answer[[i]])
+      
+    }    
   }
+
 
   return(mat_answer)
   
