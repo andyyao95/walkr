@@ -24,9 +24,12 @@ dikin_walk <- function(A,
                        points, 
                        r = 1,
                        thin = 1,
-                       burn = 0) {
+                       burn = 0,
+                       chains = 1) {
   
+  #stopifnot(class(x0) == list)
   
+  stopifnot(points %% chains == 0)
   #stopifnot(burn >= 0)
   #stopifnot(is.integer(thin))
   #stopifnot(is.integer(burn))
@@ -82,93 +85,101 @@ dikin_walk <- function(A,
   
   ## initialize return matrix
   ## set the starting point as the current point
+  answer <- list()
   
-  total.points <- points * thin + burn
-
+  ##total points for each indiv chain
   
-  result <- matrix(ncol = total.points, nrow = ncol(A))
-  result[ , 1] <- x0
-  current.point <- x0
-  this.length <- length(b)
+  for (j in 1:chains) {
   
-  for (i in 2:total.points) {
+    total.points <- ( (points / chains)  * thin + burn) 
+  
     
-    ## 1. Generate random point y in Ellip(x)
-    ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, RUNIF IS NOT UNIFORM AFTER TRANSFORMATION
-    ## see vignette for details
+    result <- matrix(ncol = total.points, nrow = ncol(A))
+    result[ , 1] <- x0[[j]]
+    current.point <- x0[[j]]
+    this.length <- length(b)
     
-    zeta <- rnorm(this.length, 0, 1)
-    
-    ## normalise to be on the m- unit sphere
-    ## and then compute lhs as a m-vector
-    
-    ## essentially: Hd = t(A) %*% D^2 %*% zeta
-    ## solving for d gives us a uniformly random vector in the ellipsoid centered at x 
-    ## the y = x_0 + d is the new point 
-    
-    zeta <- r * zeta / sqrt(as.numeric(rcppeigen_fcrossprod(zeta,zeta)))
-    rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
-    
-    y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
-    
-
-    ## 2. Check whether x_0 is in Ellip(y)
-    ## 3. Keep on trying y until condition satisfied
-    
-    while(!ellipsoid(current.point, y)) {
+    for (i in 2:total.points) {
       
-      ## exact same set of procedures as above
+      ## 1. Generate random point y in Ellip(x)
+      ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, RUNIF IS NOT UNIFORM AFTER TRANSFORMATION
+      ## see vignette for details
       
       zeta <- rnorm(this.length, 0, 1)
-      zeta <- r * zeta / sqrt(sum(zeta * zeta))
+      
+      ## normalise to be on the m- unit sphere
+      ## and then compute lhs as a m-vector
+      
+      ## essentially: Hd = t(A) %*% D^2 %*% zeta
+      ## solving for d gives us a uniformly random vector in the ellipsoid centered at x 
+      ## the y = x_0 + d is the new point 
+      
+      zeta <- r * zeta / sqrt(as.numeric(rcppeigen_fcrossprod(zeta,zeta)))
       rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
+      
       y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
       
-      if(ellipsoid(current.point, y)) {
+  
+      ## 2. Check whether x_0 is in Ellip(y)
+      ## 3. Keep on trying y until condition satisfied
+      
+      while(!ellipsoid(current.point, y)) {
         
-        ## det(A)/det(B) = det(B^-1 A)
-        ## acceptance rate according to probability formula. see paper for detail
+        ## exact same set of procedures as above
         
-        probability <- min(1, sqrt (rcppeigen_fdet( rcppeigen_fprod(
-          rcppeigen_fsolve(H_x(current.point)),H_x(y)))))
+        zeta <- rnorm(this.length, 0, 1)
+        zeta <- r * zeta / sqrt(sum(zeta * zeta))
+        rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
+        y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
         
-        bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
-        
-        if(bool) {
+        if(ellipsoid(current.point, y)) {
           
-          ## perhaps, there is a better way to handle break here?
+          ## det(A)/det(B) = det(B^-1 A)
+          ## acceptance rate according to probability formula. see paper for detail
           
-          break
-        } 
-        
+          probability <- min(1, sqrt (rcppeigen_fdet( rcppeigen_fprod(
+            rcppeigen_fsolve(H_x(current.point)),H_x(y)))))
+          
+          bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
+          
+          if(bool) {
+            
+            ## perhaps, there is a better way to handle break here?
+            
+            break
+          } 
+          
+        }
       }
+      
+      ## appending on the result
+      
+      result[ , i] <- y
+      current.point <- y
+      
+      
     }
     
-    ## appending on the result
+    ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
+  
+    if(dim(result)[1] == 1) {
+      
+      result <- matrix(result[, (1+burn) : total.points], nrow = 1)
+      result <- matrix(result[ , (1:(points/chains))*thin], nrow = 1)
+    }
     
-    result[ , i] <- y
-    current.point <- y
+    else {
+      result <- result[, (1+burn) : total.points]
     
+      result <- result[ , (1:(points/chains))*thin]
+    }
     
+    ## cols <- which(!is.na(result[1,]))
+    ## result <- result[,cols]
+  
+    
+    answer[[j]] <- result
   }
   
-  ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
-
-  if(dim(result)[1] == 1) {
-    
-    result <- matrix(result[, (1+burn) : total.points], nrow = 1)
-    result <- matrix(result[ , (1:points)*thin], nrow = 1)
-  }
-  
-  else {
-    result <- result[, (1+burn) : total.points]
-    result <- result[ , (1:points)*thin]
-  }
-  
-  ## cols <- which(!is.na(result[1,]))
-  ## result <- result[,cols]
-
-  
-  return(result)
-  
+  return(answer)
 }

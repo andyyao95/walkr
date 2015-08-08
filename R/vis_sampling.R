@@ -16,14 +16,17 @@
 #' @importFrom shinyStan launch_shinystan as.shinystan
 #' 
 
-vis_sampling <- function(x, chains) {
+vis_sampling <- function(x) {
       
-      ## checking
-      stopifnot(is.matrix(x))
+      chains <- length(x)
+    
+      this.df <- x[[1]]
       
-      ## create local copy since we are performing side-effects
-  
-      this.df <- x
+      for(j in 2:chains) {
+        
+        this.df <- cbind(this.df, x[[j]])
+      }
+      
       
       ## iterations is the number of points in hitandrun
       ## parameters is the dimension of the sample space

@@ -22,12 +22,12 @@ calc_rhat <- function(x) {
   
   ## n is the number of points in each chain
   
-  n <- dim(x$chain_1)[2]
+  n <- dim(x[[1]])[2]
   
   ## params is the number of parameters (dimension of sampling space)
   ## that we have
   
-  params <- dim(x$chain_1)[1]
+  params <- dim(x[[1]])[1]
   rhats <- numeric()
   for (i in 1:params) {
     

@@ -126,32 +126,39 @@ walkr <- function(A,
   
   
   ## 2. Find starting point within convex polytope
+  x0 <- list()
   
-  x0 <- start_point(A = new_A, b = new_b, n = 1, average = 20)
+  for (q in 1:chains) {
+    x0[[q]] <- start_point(A = new_A, b = new_b, n = 1, average = 20)    
+  }
   
   ## make sure starting point is a vector
   
-  stopifnot(is.vector(x0))
+  # stopifnot(is.vector(x0))
   
   ## 3. The sampling
   
-  answer <- list()
-  
   if(method == "dikin") {
     
-    for (j in 1:chains) {
+    ## sampling in alpha space
+    ## n = n - 1 because dikin takes starting point as the 1st sampled point
       
-      ## sampling in alpha space
-      ## n = n - 1 because dikin takes starting point as the 1st sampled point
-      
-      alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, x0 = x0, thin = thin, burn = burn)
-      
-      ## convert back into x-space
-      
-      answer[[j]] <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
-      
-    }
+    alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, 
+                         x0 = x0, thin = thin, burn = burn, chains = chains)
     
+    #print(alphas)
+    ## convert back into x-space
+    
+    mapping <- function(alpha_matrix) {apply(alpha_matrix, 2, function(x) { homogeneous %*% x + particular  })}
+    
+    answer <- lapply(alphas, mapping)
+    
+    rhats <- calc_rhat(answer)
+    
+    if( any(rhats > 1.1) ) {
+      warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
+    }
+    return(answer)
   }
   
   else if (method == "hit-and-run") {
