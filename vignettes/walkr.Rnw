@@ -5,15 +5,17 @@
 \usepackage{amsmath,amssymb,array}
 \usepackage{booktabs}
 \usepackage{float}
-\usepackage{Sweave}
+%\usepackage{Sweave}
 \usepackage[parfill]{parskip}
 \usepackage[round]{natbib}
+\usepackage{subfigure}
 
 %\VignetteEngine{Sweave}
 %\VignetteIndexEntry{walkr}
 
 \begin{document}
-\SweaveOpts{concordance=FALSE}
+%% \SweaveOpts{concordance=TRUE}
+%% \SweaveOpts{concordance=FALSE}
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
 \volume{XX}
@@ -50,6 +52,8 @@ such a sample.
 Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
 but mixes slower and slower as the dimensions of $A$ increase. Our second random walk is the 
 Dikin Walk. Dikin Walk generates a nearly uniform sample and exhibits much stronger mixing. 
+%\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) 
+for the core matrix calculations which take up most of the run-time.
 
 \texttt{walkr} also provides statistical diagnostics of the mixing and convergence
 properties of a MCMC random walk. 
@@ -335,36 +339,36 @@ The hit-and-run algorithm is as follows:
 
 Here is a picture of the hit-and-run algorithm: 
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
-\begin{minipage}{.4\textwidth}
+\subfigure[Step 1]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
-\caption[caption]{Pick $x_0$}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
-\caption[caption]{Random direction $d$}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure1}}
+\quad
+\subfigure[Step 3]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
-\caption[caption]{Find endpoints of chord}
-\end{minipage}
+\label{fig:subfigure2}}
+\subfigure[Step 4]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+\label{fig:subfigure3}}
+\quad
+\subfigure[Step 5]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+\label{fig:subfigure4}}
+%
+\caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction
+         is selected (Step 2), and the chord along that direction is calculated (Step 3).
+         Then, we pick a random point along that chord and move there as our new point (Step 4).
+         The algorithm is repeated to sample many points (Step 5)}
+\label{fig:figure}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-\caption[caption]{move to random point $x_1$ on the chord}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
-\caption[caption]{repeat the algorithm}
-\end{minipage}
-\end{figure}
+The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
+\code{hit-and-run} package on CRAN (\cide{hitandrun}). \code{walkr} serves as a convenient wrapper
+with MCMC diagnostics and multiple chains.
 
 %probably also want to discuss important facts about the algorithm here.
 
@@ -420,42 +424,39 @@ on where the center $x_0$ is.
 
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
-\begin{minipage}{.4\textwidth}
+\subfigure[Step 1]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
-\caption[caption]{Step 1 and 2}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
-\caption[caption]{Step 3}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure2}}
+\quad
+\subfigure[Step 3 Case I]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
-\caption[caption]{Step 4 Case I}
-\end{minipage}
-\end{figure}
-
-\textbf{-->CAPTIONS NEED TO BE FIXED}
-
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure3}}
+\subfigure[Step 3 Case II]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
-\caption[caption]{Step 4 Case II}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure4}}
+\quad
+\subfigure[Step 4]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
-\caption[caption]{Step 5}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
+\label{fig:subfigure5}}
+\subfigure[Step 5]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
-\caption[caption]{Step 6}
-\end{minipage}
+\label{fig:subfigure6}}
+
+%
+\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
+         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
+         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
+         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
+         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
+         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
+         Algorithm repeats (Step 5)}
+         
+\label{fig:figure}
 \end{figure}
 
 \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
@@ -485,19 +486,76 @@ of our polytope $K$? Luckily, there is no need to worry about that because of th
 if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
 at $x_0$ with radius $1$ will always be contained in $K$. \\
 
-This is important because this way, we know for sure that if we set $r=1$, then our algorithm 
-will never sample points from outside the polytope $K$.
+Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
+within the polytope $K$.
 
-\textbf{These points need elaboration and editing}
+\section{Using \texttt{walkr} to sample points}
 
-\noindent The shape of the Dikin Ellipsoid is a function of $A$, $b$, and $x_0$. 
-In other words, if we think in terms of running a MCMC chain within our polytope $K$, 
-the Dikin Ellipsoid is able to reshape itself accordingly as it surveys through the polytope.\\
+%% this is helpful : http://yihui.name/knitr/options/
 
-Although there are still two rejection 
-components to the algorithm (see above), the rejection rate is much lower than expected 
-because of this theorem. \\
 
+\texttt{walkr} has one main function \code{walkr} which sample points. \\
+
+First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
+for a 5 dimensional case:
+
+<<example2, eval = T>>=
+library(walkr)
+A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
+b <- 0.5
+A
+b
+@
+
+The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
+if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
+simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
+
+<<eval = FALSE>>=
+A <- matrix(1, ncol = 5)
+@
+
+After we have \code{A} and \code{B}, we are now ready for sampling. \texttt{walkr} has the following
+parameters:
+
+\begin{itemize}
+
+  \item{ \code{A} is the right hand side of the matrix equation $Ax=b$}
+  \item{ \code{b} is the left hand side of the matrix equation $Ax=b$}
+  \item{ \code{method} is the method of sampling -- can be either \code{"hit-and-"run"} or 
+         \code{"dikin"}}
+  \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is stored into the final sample}
+  \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
+  \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
+        of the list which \code{walkr} eventually returns}
+
+\end{itemize}
+
+\code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
+"well enough". First is an interal warning message within walkr before the results are returned. 
+
+<<eval = TRUE>>=
+## sampling from the 3D simplex
+A <- matrix(1, ncol = 3)
+b <- 1
+answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
+                thin = 1, burn = 0, chains = 5)
+answer
+@
+
+As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
+then the statistical tests pass.
+
+<<eval = TRUE>>=
+answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
+                thin = 1, burn = 0, chains = 5)
+@
+
+Moreover, the user can use \code{shinyStan} to visualize the sampling:
+
+<<eval = FALSE>>=
+vis_sampling(x = answer, chains = 5)
+@
 
 \section{Dikin versus Hitandrun}
 %reference here:{http://www.mit.edu/~har/Dikin.pdf}
@@ -512,20 +570,14 @@ because of this theorem. \\
   costly than hit-and-run\\ \hline
   Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
   not high\\ \hline
-  
-  
-  
 
 \end{tabular} \\
 
 *$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
-as the polytope is "skinnier".
+as the polytope is "skinnier"(\cite{kannan}). \\
 
-
-
-
-
+\textbf{NEED TO REPLACE THE FOLLOWING TWO PLOTS WITH REPRODUCIBLE CODE CHUNKS (3D HIST IF POSSIBLE)}
 
 \begin{figure}[H]
 \centering
@@ -540,80 +592,46 @@ as the polytope is "skinnier".
 \end{minipage}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/dikin50.png}
-\caption[caption]{Dikin mixes stronger}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/hitandrun50.png}
-\caption[caption]{Hit-and-run mixes slower}
-\end{minipage}
-\end{figure}
+As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
+given the same set of parameters
 
+<<eval = TRUE, fig.width=5, fig.height=3>>=
+set.seed(314)
+N <- 50
+A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)
+A <- rbind(A, matrix(sample(c(0,3), N, replace = T), nrow = 1))
+b <- c(0.7, 0.3)
 
-\section{Using \texttt{walkr} to sample points}
+answer_hitandrun <- walkr(A = A, b = b, points = 500, method = "hit-and-run", 
+                 thin = 10, burn = 0, chains = 1)
+answer_dikin <- walkr(A = A, b = b, points = 500, method = "dikin", 
+                 thin = 10, burn = 0, chains = 1)
 
-\texttt{walkr} has one main function \code{walkr} which makes it very easy for the user to 
-sample points. \\
+plot(y = answer_hitandrun[50,], x = 1:500, 
+     xlab = "random walk", ylab = "value", type = 'l', 
+     main = "Hit-and-run Mixing",
+     ylim = c(0, 0.2))
+plot(y = answer_dikin[50,], x = 1:500, 
+     xlab = "random walk", ylab = "value", type = 'l',
+     main = "Dikin Mixing", 
+     ylim = c(0, 0.2))
 
-For example, define $A$ and $b$ as follows:
-
-<<eval = FALSE>>=
-A <- matrix(c(1, 0, 1, 0, 1), ncol = 3)
-b <- 0.5
-@
-
-Then, the sampling could be simply ran with \texttt{walkr}:
-
-<<eval = FALSE>>=
-## n is the number of points sampled
-## method is the sampling method
-
-hitandrun <- walkr(A = A, b = b, n = 1000, method = "hit-and-run")
-dikin <- walkr(A = A, b = b, n = 1000, method = "dikin")
-optimized_dikin <- walkr(A = A, b = b, n = 1000, method = "optimized-dikin")
-
-## see some of the sampled points
-
-hitandrun[ , 10:15]
-dikin[ , 10:15]
-optimized_dikin[ , 10:15]
-@
-
-To see the difference in performance between Dikin in R and Optimized Dikin using Rcpp:
-
-<<eval = FALSE>>=
-A <- matrix(c(1,0,1,0,1), ncol = 5)
-b <- 0.5
-
-unoptimized <- function() {walkr(A = A, b = b, n = 5000, method = "dikin")}
-optimized <- function() {walkr(A = A, b = b, n = 5000, method = "optimized-dikin")}
-
-
-microbenchmark(
-  
-  unoptimized(),
-  optimized(),
-  times = 20
-)
-
-@
-
-
-\section{Using \texttt{walkr} to examine MCMC random walks}
-
-We could visualize/diagnose the MCMC chains by: 
-
-<<eval = FALSE>>=
-vis_sampling(hitandrun, chains = 1)
-optimized_dikin(hitandrun, chains = 1)
 @
 
 
 \section{Conclusion}
+
+\code{walkr} samples $x$ that satisfy the underdetermined matrix equation $Ax=b$, every component
+of $x$ is non-negative, and every component sum to $1$. \code{walkr} internally performs the affine
+transformation which transforms $Ax=b$ and the simplex constraints into the $Ax \leq b$ form. Then, 
+\code{walkr} samples points under this transform, takes the inverse transform, and finally
+returns the $x$'s sampled.
+
+The two methods that the user may specify is \code{"dikin"} and \code{"hit-and-run"}. Hit-and-run
+is a widely used sampling method that converges to the uniform sampling asymptotically, but 
+fails to mix well in higher dimensions. Dikin generates a nearly uniform sample, but mixes stronger than
+hit-and-run, especially in higher dimensions. In addition, \code{walkr} will warn the user if the 
+mixing is not strong enough according to the Gelman-Rubin Diagnostics.
 
 \section{Authors}
 
@@ -630,9 +648,6 @@ Hutchin Hill Capital\\
 \email{dave.kane@gmail.com}
 
 \bibliography{walkr}
-\cite{kannan}
-\cite{hitandrun}
-\cite{rcpp}
 
 \end{article}
 \end{document}
