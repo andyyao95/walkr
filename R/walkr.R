@@ -83,6 +83,10 @@ walkr <- function(A,
     stop("burn must be non-negative")
   }
   
+  if(points %% chains != 0){
+    stop("chains must be a multiple of points")
+  }
+  
   ## augment the simplex constraints 
   
   aug_A <- rbind(A, matrix(1, ncol = ncol(A), nrow = 1))
@@ -132,10 +136,6 @@ walkr <- function(A,
     x0[[q]] <- start_point(A = new_A, b = new_b, n = 1, average = 20)    
   }
   
-  ## make sure starting point is a vector
-  
-  # stopifnot(is.vector(x0))
-  
   ## 3. The sampling
   
   if(method == "dikin") {
@@ -146,31 +146,43 @@ walkr <- function(A,
     alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, 
                          x0 = x0, thin = thin, burn = burn, chains = chains)
     
-    #print(alphas)
-    ## convert back into x-space
+    ## <convert back into x-space> there are two lambda functions here 1)
+    ## mapping is the function to be applied to the individual columns of each
+    ## of the chains (matricies). It acts of a matrix of alphas. mapping is then
+    ## lapplied to each of the element in the list 2) the homogeneous x +
+    ## particular function is acting on each column of the matrix, so that we
+    ## can convert the alphas back into x-space
     
-    mapping <- function(alpha_matrix) {apply(alpha_matrix, 2, function(x) { homogeneous %*% x + particular  })}
     
+    mapping <- function(alpha_matrix) {apply(alpha_matrix, 2, function(x) { homogeneous %*% x + particular  })}   
     answer <- lapply(alphas, mapping)
+    
+    ## here, we calculate the rhats from the individual chains 
+    ## we warn the user if any of the rhats for the parameters is above 1.1
     
     rhats <- calc_rhat(answer)
     
     if( any(rhats > 1.1) ) {
       warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
     }
-    return(answer)
   }
   
   else if (method == "hit-and-run") {
+  
     
-    for (j in 1:chains) {
-      
-      ##again, sampling alphas
-      
-      alphas <- hit_and_run(A = new_A, b = new_b, x0 = x0, points = points, thin = thin, burn = burn)
-      
-      answer[[j]] <- apply(alphas, 2, function(x) { homogeneous %*% x + particular  })
-      
+    ## to see what's going on here, see the comments above for dikin
+    ## it is doing the same thing
+    
+    alphas <- hit_and_run(A = new_A, b = new_b, x0 = x0, points = points, 
+                            thin = thin, burn = burn, chains = chains)
+    
+    mapping <- function(alpha_matrix) {apply(alpha_matrix, 2, function(x) { homogeneous %*% x + particular  })}
+    
+    answer <- lapply(alphas, mapping)
+    rhats <- calc_rhat(answer)
+    
+    if( any(rhats > 1.1) ) {
+      warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
     }
   
   }
@@ -179,25 +191,19 @@ walkr <- function(A,
     stop("Sampling method must be \"hitandrun\" or \"dikin\".")
   }
   
-  ## renaming the items as chains
+
+  ## after we perform all the checking above we return the chains as a matrix,
+  ## with the sampled points as a row thus, here we column bind each of the
+  ## chains, and then return the final result
   
-  names <- vector()
-  for(i in 1:chains){
+  mat_answer <- answer[[1]]
+
+  for(i in 2:chains) {
     
-    names <- c(names, paste("chain",i, sep = "_"))
+    mat_answer <- cbind(mat_answer, answer[[i]])
     
   }
-  names(answer) <- names
-  
-  ## return the list of chains
-  
-  ## checking rhats
-  rhats <- calc_rhat(answer)
-  
-  if( any(rhats > 1.1) ) {
-    warning("there are parameters with rhat > 1.1, you may want to run your chains for longer")
-  }
-  
-  return(answer)
+
+  return(mat_answer)
   
 }

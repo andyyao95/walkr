@@ -21,8 +21,10 @@ hit_and_run <- function(A,
                         x0, 
                         points, 
                         thin = 1,
-                        burn = 0) {
+                        burn = 0,
+                        chains = 1) {
   
+  stopifnot(points %% thin == 0)
   
   ## need some checking here
   
@@ -33,25 +35,40 @@ hit_and_run <- function(A,
   
   ## getting samples
   
-  total.points <- ( points + burn ) * thin 
+  answer <- list()
   
-  result <- t(hitandrun::har(x0, constr, N = total.points, 
-                   thin = thin, )$samples)
-  
-  ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
-  
-  if(dim(result)[1] == 1) {
+  for (j in 1:chains) {
     
-    result <- matrix(result[, (1+burn) : ncol(result)], nrow = 1)
+    total.points <- (points*thin/chains + burn)
     
+    result <- t(hitandrun::har(x0[[j]], constr, N = total.points, 
+                               thin = 1, )$samples)
+    
+    ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
+    
+    if(dim(result)[1] == 1) {
+      
+      ## first, delete out the number of points that we want to burn
+      ## second, only take every thin-th point
+      
+      result <- matrix(result[, (1+burn) : total.points], nrow = 1)
+      result <- matrix(result[ , (1:(points/chains))*thin], nrow = 1)
+      
+    }
+    
+    else {
+      
+      ## first, delete out the number of points that we want to burn
+      ## second, only take every thin-th point
+      
+      result <- result[, (1+burn) : total.points]
+      result <- result[ , (1:(points/chains))*thin]
+      
+    }
+    
+    answer[[j]] <- result
   }
-  
-  else {
-    result <- result[ , (1+burn) : ncol(result)]
     
-  }
-  
-  return(result)
-  
+  return(answer)
   
 } 

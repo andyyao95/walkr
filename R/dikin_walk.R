@@ -27,13 +27,7 @@ dikin_walk <- function(A,
                        burn = 0,
                        chains = 1) {
   
-  #stopifnot(class(x0) == list)
-  
   stopifnot(points %% chains == 0)
-  #stopifnot(burn >= 0)
-  #stopifnot(is.integer(thin))
-  #stopifnot(is.integer(burn))
-  #stopifnot(is.integer(points))
   
   #############################
   ## f stands for fast! 
@@ -164,19 +158,25 @@ dikin_walk <- function(A,
   
     if(dim(result)[1] == 1) {
       
+      ## first, delete out the number of points that we want to burn
+      ## second, only take every thin-th point
+      
       result <- matrix(result[, (1+burn) : total.points], nrow = 1)
       result <- matrix(result[ , (1:(points/chains))*thin], nrow = 1)
     }
     
     else {
+      
+      
+      ## first, delete out the number of points that we want to burn
+      ## second, only take every thin-th point
+      
       result <- result[, (1+burn) : total.points]
     
       result <- result[ , (1:(points/chains))*thin]
     }
     
-    ## cols <- which(!is.na(result[1,]))
-    ## result <- result[,cols]
-  
+    ## appending on 1 chain onto the result
     
     answer[[j]] <- result
   }

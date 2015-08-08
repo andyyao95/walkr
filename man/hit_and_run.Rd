@@ -4,7 +4,7 @@
 \alias{hit_and_run}
 \title{Hit and Run}
 \usage{
-hit_and_run(A, b, x0, points, thin = 1, burn = 0)
+hit_and_run(A, b, x0, points, thin = 1, burn = 0, chains = 1)
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation A}

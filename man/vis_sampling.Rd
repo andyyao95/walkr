@@ -4,7 +4,7 @@
 \alias{vis_sampling}
 \title{Visualise Sampling}
 \usage{
-vis_sampling(x, chains)
+vis_sampling(x)
 }
 \arguments{
 \item{x}{is the set of points sampled, with its columns as the sampled points.
