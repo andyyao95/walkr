@@ -54,16 +54,14 @@
 \usepackage{amsmath,amssymb,array}
 \usepackage{booktabs}
 \usepackage{float}
-%\usepackage{Sweave}
 \usepackage[parfill]{parskip}
 \usepackage[round]{natbib}
 \usepackage{subfigure}
 
-%\VignetteEngine{Sweave}
+%\VignetteEngine{knitr}
 %\VignetteIndexEntry{walkr}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
-%% \SweaveOpts{concordance=FALSE}
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
 \volume{XX}
@@ -100,6 +98,8 @@ such a sample.
 Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
 but mixes slower and slower as the dimensions of $A$ increase. Our second random walk is the 
 Dikin Walk. Dikin Walk generates a nearly uniform sample and exhibits much stronger mixing. 
+\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) 
+for the core matrix calculations which take up most of the run-time.
 
 \texttt{walkr} also provides statistical diagnostics of the mixing and convergence
 properties of a MCMC random walk. 
@@ -383,7 +383,7 @@ The hit-and-run algorithm is as follows:
         
 \end{enumerate}
 
-Here is a picture of the hit-and-run algorithm: 
+Here is a picture of the hit-and-run algorithm: \newpage
 
 \begin{figure}[ht]
 \centering
@@ -412,6 +412,9 @@ Here is a picture of the hit-and-run algorithm:
 \label{fig:figure}
 \end{figure}
 
+The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
+\code{hit-and-run} package on CRAN (\cite{hitandrun}). \code{walkr} serves as a convenient wrapper
+with MCMC diagnostics and multiple chains. 
 
 %probably also want to discuss important facts about the algorithm here.
 
@@ -466,6 +469,7 @@ on where the center $x_0$ is.
   \item{repeat until obtained number of desired points}
 
 \end{enumerate}
+\newpage
 
 \begin{figure}[ht]
 \centering
@@ -501,9 +505,6 @@ on where the center $x_0$ is.
          
 \label{fig:figure}
 \end{figure}
-
-
-
 
 \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
 
@@ -549,18 +550,13 @@ for a 5 dimensional case:
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{library}\hlstd{(walkr)}
-\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{3}\hlstd{)}
-\end{alltt}
-
-
-{\ttfamily\noindent\color{warningcolor}{\#\# Warning in matrix(c(1, 0, 1, 0, 1), ncol = 3): data length [5] is not a sub-multiple or multiple of the number of rows [2]}}\begin{alltt}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{)}
 \hlstd{b} \hlkwb{<-} \hlnum{0.5}
 \hlstd{A}
 \end{alltt}
 \begin{verbatim}
-##      [,1] [,2] [,3]
-## [1,]    1    1    1
-## [2,]    0    0    1
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    1    0    1
 \end{verbatim}
 \begin{alltt}
 \hlstd{b}
@@ -617,14 +613,14 @@ parameters:
 \hlstd{answer}
 \end{alltt}
 \begin{verbatim}
-##            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-## [1,] 0.64213739 0.5005789 0.5294071 0.2455340 0.2610428 0.1525811
-## [2,] 0.07112819 0.2029761 0.1251093 0.1508854 0.4145434 0.4532236
-## [3,] 0.28673442 0.2964451 0.3454836 0.6035806 0.3244138 0.3941953
-##           [,7]      [,8]      [,9]      [,10]
-## [1,] 0.3720534 0.4038622 0.4001039 0.52319260
-## [2,] 0.4833888 0.4587185 0.3254509 0.38458222
-## [3,] 0.1445578 0.1374193 0.2744452 0.09222518
+##           [,1]      [,2]       [,3]      [,4]       [,5]       [,6]
+## [1,] 0.1524209 0.4220232 0.55917309 0.5652725 0.06110688 0.83929009
+## [2,] 0.2907093 0.1135731 0.42288492 0.1959740 0.57352635 0.06162652
+## [3,] 0.5568698 0.4644036 0.01794198 0.2387534 0.36536677 0.09908340
+##           [,7]      [,8]       [,9]     [,10]
+## [1,] 0.4260243 0.4004922 0.62099261 0.5167061
+## [2,] 0.2184562 0.3770371 0.01185597 0.3372122
+## [3,] 0.3555195 0.2224707 0.36715142 0.1460816
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -669,7 +665,7 @@ Moreover, the user can use \code{shinyStan} to visualize the sampling:
 
 *$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
-as the polytope is "skinnier". \\
+as the polytope is "skinnier"(\cite{kannan}). \\
 
 \textbf{NEED TO REPLACE THE FOLLOWING TWO PLOTS WITH REPRODUCIBLE CODE CHUNKS (3D HIST IF POSSIBLE)}
 
@@ -686,7 +682,8 @@ as the polytope is "skinnier". \\
 \end{minipage}
 \end{figure}
 
-As we can in the two trace-plots below, the 
+As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
+given the same set of parameters
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -704,14 +701,16 @@ As we can in the two trace-plots below, the
 
 \hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_hitandrun[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
      \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
-     \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-run Mixing"}\hlstd{)}
+     \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-run Mixing"}\hlstd{,}
+     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-5-1} 
 \begin{kframe}\begin{alltt}
 \hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_dikin[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
      \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
-     \hlkwc{main} \hlstd{=} \hlstr{"Dikin Mixing"}\hlstd{)}
+     \hlkwc{main} \hlstd{=} \hlstr{"Dikin Mixing"}\hlstd{,}
+     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-5-2} 
@@ -748,9 +747,6 @@ Hutchin Hill Capital\\
 \email{dave.kane@gmail.com}
 
 \bibliography{walkr}
-\cite{kannan}
-\cite{hitandrun}
-\cite{rcpp}
 
 \end{article}
 \end{document}
