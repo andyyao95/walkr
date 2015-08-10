@@ -5,6 +5,8 @@ context("Testing Walkr Output")
 
 test_that("Testing Walkr Output", {
   
+  set.seed(314)
+  
   ## Simple 3D simplex
   
   A1 <- matrix(c(1,0,1), ncol = 3)

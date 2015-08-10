@@ -26,9 +26,10 @@ hit_and_run <- function(A,
                         burn = 0,
                         chains = 1) {
   
+  ## thin needs to be a multiple of the total number of points 
+  
   stopifnot(points %% thin == 0)
   
-  ## need some checking here
   
   ## initialize the list of constraints
   ## should also do some checking

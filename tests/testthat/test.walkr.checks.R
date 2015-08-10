@@ -5,6 +5,8 @@ context("Testing Walkr")
 
 test_that("Testing Walkr Checks and Input", {
   
+  set.seed(314)
+  
   ## check that A is a matrix
   
   A <- data.frame(1, ncol = 3)

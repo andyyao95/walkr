@@ -13,6 +13,7 @@
 %\VignetteIndexEntry{walkr}
 
 \begin{document}
+
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
 \volume{XX}

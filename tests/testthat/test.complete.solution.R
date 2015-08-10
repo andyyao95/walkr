@@ -2,6 +2,8 @@ context("Testing Affine Transformation")
 
 test_that("Affine Transformation", {
   
+  set.seed(314)
+  
   ## a random 20-D polytope
   
   n <- 20
