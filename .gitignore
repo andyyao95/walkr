@@ -13,3 +13,5 @@ pkg/vignettes/*aux
 pkg/vignettes/*toc
 pkg/vignettes/figure/*
 pkg/vignettes/cache/*
+.o
+.so

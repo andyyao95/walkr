@@ -1,53 +1,4 @@
-\documentclass[a4paper]{report}\usepackage[]{graphicx}\usepackage[]{color}
-%% maxwidth is the original width if it is less than linewidth
-%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
+\documentclass[a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{RJournal}
@@ -58,10 +9,12 @@
 \usepackage[round]{natbib}
 \usepackage{subfigure}
 
-%\VignetteEngine{knitr::knitr} 
+%\VignetteEngine{Sweave} 
 %\VignetteIndexEntry{walkr}
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+\usepackage{Sweave}
 \begin{document}
+\input{walkr-concordance}
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
 \volume{XX}
@@ -546,38 +499,25 @@ within the polytope $K$.
 First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
 for a 5 dimensional case:
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(walkr)}
-\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{)}
-\hlstd{b} \hlkwb{<-} \hlnum{0.5}
-\hlstd{A}
-\end{alltt}
-\begin{verbatim}
-##      [,1] [,2] [,3] [,4] [,5]
-## [1,]    1    0    1    0    1
-\end{verbatim}
-\begin{alltt}
-\hlstd{b}
-\end{alltt}
-\begin{verbatim}
-## [1] 0.5
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+\begin{Schunk}
+\begin{Sinput}
+> library(walkr)
+> A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
+> b <- 0.5
+> A
+> b
+\end{Sinput}
+\end{Schunk}
 
 The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
 if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
 simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+\begin{Schunk}
+\begin{Sinput}
+> A <- matrix(1, ncol = 5)
+\end{Sinput}
+\end{Schunk}
 
 After we have \code{A} and \code{B}, we are now ready for sampling. \texttt{walkr} has the following
 parameters:
@@ -598,46 +538,28 @@ parameters:
 \code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
 "well enough". First is an interal warning message within walkr before the results are returned. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{## sampling from the 3D simplex}
-\hlkwd{library}\hlstd{(walkr)}
-\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{3}\hlstd{)}
-\hlstd{b} \hlkwb{<-} \hlnum{1}
-\hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
-                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
-\end{alltt}
-
-
-{\ttfamily\noindent\color{warningcolor}{\#\# Warning in walkr(A = A, b = b, points = 10, method = "{}hit-and-run"{}, thin = 1, : there are parameters with rhat > 1.1, you may want to run your chains for longer}}\begin{alltt}
-\hlstd{answer}
-\end{alltt}
-\begin{verbatim}
-##           [,1]       [,2]      [,3]      [,4]      [,5]       [,6]
-## [1,] 0.4085773 0.51907093 0.2498849 0.1481495 0.1393202 0.01090433
-## [2,] 0.1829417 0.45704544 0.5757692 0.6269385 0.3526077 0.62264272
-## [3,] 0.4084809 0.02388363 0.1743459 0.2249120 0.5080721 0.36645294
-##           [,7]       [,8]      [,9]     [,10]
-## [1,] 0.4846692 0.56251509 0.4662095 0.6050490
-## [2,] 0.3107642 0.38733791 0.1933634 0.1504614
-## [3,] 0.2045666 0.05014699 0.3404270 0.2444896
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+\begin{Schunk}
+\begin{Sinput}
+> ## sampling from the 3D simplex
+> library(walkr)
+> A <- matrix(1, ncol = 3)
+> b <- 1
+> answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
++                 thin = 1, burn = 0, chains = 5)
+> answer
+\end{Sinput}
+\end{Schunk}
 
 As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
 then the statistical tests pass.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(walkr)}
-\hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
-                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+\begin{Schunk}
+\begin{Sinput}
+> library(walkr)
+> answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
++                 thin = 1, burn = 0, chains = 5)
+\end{Sinput}
+\end{Schunk}
 
 \section{Dikin versus Hitandrun}
 %reference here:{http://www.mit.edu/~har/Dikin.pdf}
@@ -677,37 +599,28 @@ as the polytope is "skinnier"(\cite{kannan}). \\
 As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
 given the same set of parameters
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{set.seed}\hlstd{(}\hlnum{314}\hlstd{)}
-\hlstd{N} \hlkwb{<-} \hlnum{50}
-\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{), N,} \hlkwc{replace} \hlstd{= T),} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{)}
-\hlstd{A} \hlkwb{<-} \hlkwd{rbind}\hlstd{(A,} \hlkwd{matrix}\hlstd{(}\hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{), N,} \hlkwc{replace} \hlstd{= T),} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{))}
-\hlstd{b} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0.7}\hlstd{,} \hlnum{0.3}\hlstd{)}
-
-\hlstd{answer_hitandrun} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
-                 \hlkwc{thin} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{1}\hlstd{)}
-\hlstd{answer_dikin} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"dikin"}\hlstd{,}
-                 \hlkwc{thin} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{1}\hlstd{)}
-
-\hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_hitandrun[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
-     \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
-     \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-run Mixing"}\hlstd{,}
-     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/example7-1} 
-\begin{kframe}\begin{alltt}
-\hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_dikin[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
-     \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
-     \hlkwc{main} \hlstd{=} \hlstr{"Dikin Mixing"}\hlstd{,}
-     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/example7-2} 
-
-\end{knitrout}
+\begin{Schunk}
+\begin{Sinput}
+> set.seed(314)
+> N <- 50
+> A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)
+> A <- rbind(A, matrix(sample(c(0,3), N, replace = T), nrow = 1))
+> b <- c(0.7, 0.3)
+> answer_hitandrun <- walkr(A = A, b = b, points = 500, method = "hit-and-run", 
++                  thin = 10, burn = 0, chains = 1)
+> answer_dikin <- walkr(A = A, b = b, points = 500, method = "dikin", 
++                  thin = 10, burn = 0, chains = 1)
+> plot(y = answer_hitandrun[50,], x = 1:500, 
++      xlab = "random walk", ylab = "value", type = 'l', 
++      main = "Hit-and-run Mixing",
++      ylim = c(0, 0.2))
+> plot(y = answer_dikin[50,], x = 1:500, 
++      xlab = "random walk", ylab = "value", type = 'l',
++      main = "Dikin Mixing", 
++      ylim = c(0, 0.2))
+> 
+\end{Sinput}
+\end{Schunk}
 
 
 \section{Conclusion}
