@@ -384,7 +384,26 @@ the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matr
 
 $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 
-\noindent We can compute and simplify the Hessian of the Log Barrier:\\
+The log-barrier function of $Ax \leq b$ measures how "extreme" or "close-to-the-boundary" a point $x$ is 
+within the polytope $K$. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
+boundary of the polytope $K$. Mathematically, the polytope could be described by: 
+
+$$Ax \leq b$$
+$$b - Ax \geq 0$$
+
+Also recall that the negative logarithmic graph looks like this
+
+
+<<example1, eval = TRUE>>=
+
+x <- seq(0, 1, 0.0001)
+
+plot(-log(x)~x, type = 'l', ylim = c(0,10))
+
+@
+
+Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
+of the convex polytope $K$. \\
 
 \noindent \textbf{Hessian of Log Barrier $H_x$:} 
 
@@ -393,17 +412,33 @@ $$D = diag(\frac{1}{b_i - a_i^Tx})$$
 
 \textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
 
+The Hessian matrix($H_x = \nabla ^2 \phi(x)$) is a matrix containing the second derivatives 
+of the function $\phi(x)$ with respect to $x$. In the land of optimization, the Hessian contains 
+information on how the landscape is shaped. Thus, this specific Hessian measures how quickly 
+the log-barrier function $\phi(x)$ is changing around the current point $x$. 
+
 \noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
 
 $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
 
 \begin{center}
-$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} 
+$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
 \end{center}
 
-The shape of the Dikin Ellipsoid with radius $r$ is a function of $A$, $b$, and its center $x_0$.
-Thus, throughout the convex polytope $K$, the Dikin Ellipsoid changes shape depending 
-on where the center $x_0$ is. 
+The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
+"Hessian norm" as the notion of length in this space. The "Hessian norm" we could think as way of 
+quantifying how quickly approaching the boundary a point in the polytope is. In other words,
+the Dikin Ellipsoid is the collection of all points whose difference with the current point($y-x_0$) 
+is within the unit threshhold of $r=1$. \\
+
+The virtue of the Dikin Ellipsoid is that it is biased away from the corners of the polytope $K$(\cite{kannan}).
+Moreover, because the Dikin Ellipsoid is the collection of all the points whose "change in closeness to 
+the boundary" is within a threshold, the Dikin Ellipsoid changes shapes as the point $x$ surveys through the space.
+Namely, when the center $x$ of the Dikin Ellipsoid is far from the boundary
+of the polytope, the ellipsoid is bigger. As the point 
+$x$ approaches the boundary of the polytope, the ellipsoid becomes smaller and smaller. Therefore, 
+the ellipsoid is able to reshape itself as it surveys through the polytope $K$, biasing away from the corners
+of the region.
 
 \subsection{Algorithm \texttt{Dikin}}
 
@@ -571,8 +606,6 @@ answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run",
 *$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
 as the polytope is "skinnier"(\cite{kannan}). \\
-
-\textbf{NEED TO REPLACE THE FOLLOWING TWO PLOTS WITH REPRODUCIBLE CODE CHUNKS (3D HIST IF POSSIBLE)}
 
 \begin{figure}[H]
 \centering

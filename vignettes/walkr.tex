@@ -1,4 +1,53 @@
-\documentclass[a4paper]{report}
+\documentclass[a4paper]{report}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{RJournal}
@@ -9,12 +58,11 @@
 \usepackage[round]{natbib}
 \usepackage{subfigure}
 
-%\VignetteEngine{Sweave} 
+%\VignetteEngine{knitr::knitr} 
 %\VignetteIndexEntry{walkr}
-
-\usepackage{Sweave}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
-\input{walkr-concordance}
+
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
 \volume{XX}
@@ -385,7 +433,30 @@ the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matr
 
 $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 
-\noindent We can compute and simplify the Hessian of the Log Barrier:\\
+The log-barrier function of $Ax \leq b$ measures how "extreme" or "close-to-the-boundary" a point $x$ is 
+within the polytope $K$. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
+boundary of the polytope $K$. Mathematically, the polytope could be described by: 
+
+$$Ax \leq b$$
+$$b - Ax \geq 0$$
+
+Also recall that the negative logarithmic graph looks like this
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{x} \hlkwb{<-} \hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0.0001}\hlstd{)}
+
+\hlkwd{plot}\hlstd{(}\hlopt{-}\hlkwd{log}\hlstd{(x)}\hlopt{~}\hlstd{x,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{10}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/example1-1} 
+
+\end{knitrout}
+
+Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
+of the convex polytope $K$. \\
 
 \noindent \textbf{Hessian of Log Barrier $H_x$:} 
 
@@ -394,17 +465,33 @@ $$D = diag(\frac{1}{b_i - a_i^Tx})$$
 
 \textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
 
+The Hessian matrix($H_x = \nabla ^2 \phi(x)$) is a matrix containing the second derivatives 
+of the function $\phi(x)$ with respect to $x$. In the land of optimization, the Hessian contains 
+information on how the landscape is shaped. Thus, this specific Hessian measures how quickly 
+the log-barrier function $\phi(x)$ is changing around the current point $x$. 
+
 \noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
 
 $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
 
 \begin{center}
-$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x)^T H_{x_0}(y-x) \leq r^2$\} 
+$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
 \end{center}
 
-The shape of the Dikin Ellipsoid with radius $r$ is a function of $A$, $b$, and its center $x_0$.
-Thus, throughout the convex polytope $K$, the Dikin Ellipsoid changes shape depending 
-on where the center $x_0$ is. 
+The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
+"Hessian norm" as the notion of length in this space. The "Hessian norm" we could think as way of 
+quantifying how quickly approaching the boundary a point in the polytope is. In other words,
+the Dikin Ellipsoid is the collection of all points whose difference with the current point($y-x_0$) 
+is within the unit threshhold of $r=1$. \\
+
+The virtue of the Dikin Ellipsoid is that it is biased away from the corners of the polytope $K$(\cite{kannan}).
+Moreover, because the Dikin Ellipsoid is the collection of all the points whose "change in closeness to 
+the boundary" is within a threshold, the Dikin Ellipsoid changes shapes as the point $x$ surveys through the space.
+Namely, when the center $x$ of the Dikin Ellipsoid is far from the boundary
+of the polytope, the ellipsoid is bigger. As the point 
+$x$ approaches the boundary of the polytope, the ellipsoid becomes smaller and smaller. Therefore, 
+the ellipsoid is able to reshape itself as it surveys through the polytope $K$, biasing away from the corners
+of the region.
 
 \subsection{Algorithm \texttt{Dikin}}
 
@@ -499,25 +586,38 @@ within the polytope $K$.
 First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
 for a 5 dimensional case:
 
-\begin{Schunk}
-\begin{Sinput}
-> library(walkr)
-> A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
-> b <- 0.5
-> A
-> b
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(walkr)}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{)}
+\hlstd{b} \hlkwb{<-} \hlnum{0.5}
+\hlstd{A}
+\end{alltt}
+\begin{verbatim}
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    1    0    1
+\end{verbatim}
+\begin{alltt}
+\hlstd{b}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.5
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
 if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
 simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
 
-\begin{Schunk}
-\begin{Sinput}
-> A <- matrix(1, ncol = 5)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 After we have \code{A} and \code{B}, we are now ready for sampling. \texttt{walkr} has the following
 parameters:
@@ -538,28 +638,46 @@ parameters:
 \code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
 "well enough". First is an interal warning message within walkr before the results are returned. 
 
-\begin{Schunk}
-\begin{Sinput}
-> ## sampling from the 3D simplex
-> library(walkr)
-> A <- matrix(1, ncol = 3)
-> b <- 1
-> answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
-+                 thin = 1, burn = 0, chains = 5)
-> answer
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## sampling from the 3D simplex}
+\hlkwd{library}\hlstd{(walkr)}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{3}\hlstd{)}
+\hlstd{b} \hlkwb{<-} \hlnum{1}
+\hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
+                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning in walkr(A = A, b = b, points = 10, method = "{}hit-and-run"{}, thin = 1, : there are parameters with rhat > 1.1, you may want to run your chains for longer}}\begin{alltt}
+\hlstd{answer}
+\end{alltt}
+\begin{verbatim}
+##           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
+## [1,] 0.4256675 0.5245698 0.1959297 0.1767314 0.2740561 0.2529715 0.2575030
+## [2,] 0.4465196 0.1714794 0.6279739 0.6019743 0.1532165 0.1484322 0.3881598
+## [3,] 0.1278129 0.3039507 0.1760964 0.2212943 0.5727274 0.5985964 0.3543371
+##           [,8]       [,9]      [,10]
+## [1,] 0.2440586 0.42755488 0.35231926
+## [2,] 0.3419459 0.57112834 0.61130192
+## [3,] 0.4139955 0.00131678 0.03637882
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
 then the statistical tests pass.
 
-\begin{Schunk}
-\begin{Sinput}
-> library(walkr)
-> answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
-+                 thin = 1, burn = 0, chains = 5)
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(walkr)}
+\hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
+                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 \section{Dikin versus Hitandrun}
 %reference here:{http://www.mit.edu/~har/Dikin.pdf}
@@ -581,8 +699,6 @@ then the statistical tests pass.
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
 as the polytope is "skinnier"(\cite{kannan}). \\
 
-\textbf{NEED TO REPLACE THE FOLLOWING TWO PLOTS WITH REPRODUCIBLE CODE CHUNKS (3D HIST IF POSSIBLE)}
-
 \begin{figure}[H]
 \centering
 \begin{minipage}{.4\textwidth}
@@ -599,28 +715,40 @@ as the polytope is "skinnier"(\cite{kannan}). \\
 As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
 given the same set of parameters
 
-\begin{Schunk}
-\begin{Sinput}
-> set.seed(314)
-> N <- 50
-> A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)
-> A <- rbind(A, matrix(sample(c(0,3), N, replace = T), nrow = 1))
-> b <- c(0.7, 0.3)
-> answer_hitandrun <- walkr(A = A, b = b, points = 500, method = "hit-and-run", 
-+                  thin = 10, burn = 0, chains = 1)
-> answer_dikin <- walkr(A = A, b = b, points = 500, method = "dikin", 
-+                  thin = 10, burn = 0, chains = 1)
-> plot(y = answer_hitandrun[50,], x = 1:500, 
-+      xlab = "random walk", ylab = "value", type = 'l', 
-+      main = "Hit-and-run Mixing",
-+      ylim = c(0, 0.2))
-> plot(y = answer_dikin[50,], x = 1:500, 
-+      xlab = "random walk", ylab = "value", type = 'l',
-+      main = "Dikin Mixing", 
-+      ylim = c(0, 0.2))
-> 
-\end{Sinput}
-\end{Schunk}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{set.seed}\hlstd{(}\hlnum{314}\hlstd{)}
+\hlstd{N} \hlkwb{<-} \hlnum{50}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{), N,} \hlkwc{replace} \hlstd{= T),} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{)}
+\hlstd{A} \hlkwb{<-} \hlkwd{rbind}\hlstd{(A,} \hlkwd{matrix}\hlstd{(}\hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{), N,} \hlkwc{replace} \hlstd{= T),} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{))}
+\hlstd{b} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0.7}\hlstd{,} \hlnum{0.3}\hlstd{)}
+
+\hlstd{answer_hitandrun} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
+                 \hlkwc{thin} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{1}\hlstd{)}
+\hlstd{answer_dikin} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"dikin"}\hlstd{,}
+                 \hlkwc{thin} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{1}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in hello.world[, what] <- y: number of items to replace is not a multiple of replacement length}}\begin{alltt}
+\hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_hitandrun[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
+     \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-run Mixing"}\hlstd{,}
+     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/example7-1} 
+\begin{kframe}\begin{alltt}
+\hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_dikin[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
+     \hlkwc{main} \hlstd{=} \hlstr{"Dikin Mixing"}\hlstd{,}
+     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in xy.coords(x, y, xlabel, ylabel, log): object 'answer\_dikin' not found}}\end{kframe}
+\end{knitrout}
 
 
 \section{Conclusion}
