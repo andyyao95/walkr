@@ -36,6 +36,9 @@
 #' @param points is the number of points we want to sample
 #' @param method is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
 #'        optimized-dikin"
+#' @param thin every thin-th point is stored
+#' @param burn the first burn points are deleted
+#' @param chains is the number of chains we run
 #' 
 #' @return A list of chains. Each chain is a matrix with its columns as the sampled
 #'         points. 

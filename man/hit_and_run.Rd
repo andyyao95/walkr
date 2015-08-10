@@ -7,19 +7,23 @@
 hit_and_run(A, b, x0, points, thin = 1, burn = 0, chains = 1)
 }
 \arguments{
-\item{A}{is the lhs of the matrix equation A}
+\item{A}{is the lhs of Ax <= b}
 
-\item{b}{is the rhs of the matrix equation b}
+\item{b}{is the rhs of Ax <= b}
+
+\item{x0}{is the starting point (a list of points)}
 
 \item{points}{is the number of points we want to sample}
 
-\item{thin}{-- every thin-th point is taken}
+\item{thin}{every thin-th point is stored}
 
-\item{burn}{the first burn number of points are deleted}
+\item{burn}{the first burn points are deleted}
+
+\item{chains}{is the number of chains we run}
 }
 \value{
-a number of sampled points that satisfy Ax <= b (matrix object,
-       columns the points)
+a list of chains of the sampled points, each chain
+        being a matrix object with each column as a point
 }
 \description{
 This function provides a wrapper

@@ -16,7 +16,13 @@ walkr(A, b, points, method = "dikin", thin = 1, burn = 0, chains = 1)
 \item{points}{is the number of points we want to sample}
 
 \item{method}{is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
-       optimized-dikin"}
+optimized-dikin"}
+
+\item{thin}{every thin-th point is stored}
+
+\item{burn}{the first burn points are deleted}
+
+\item{chains}{is the number of chains we run}
 }
 \value{
 A list of chains. Each chain is a matrix with its columns as the sampled

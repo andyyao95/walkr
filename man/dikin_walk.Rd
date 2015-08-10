@@ -12,18 +12,21 @@ dikin_walk(A, b, x0 = list(), points, r = 1, thin = 1, burn = 0,
 
 \item{b}{is the rhs of Ax <= b}
 
-\item{x0}{is the starting point}
+\item{x0}{is the starting point (a list of points)}
+
+\item{points}{is the number of points we want to sample}
 
 \item{r}{is the radius of the ellipsoid (1 by default)}
 
-\item{n}{is the number of points we want}
+\item{thin}{every thin-th point is stored}
 
-\item{analytic_center}{is a boolean indicating whether we want to
-      start at the analytic center of the polytope}
+\item{burn}{the first burn points are deleted}
+
+\item{chains}{is the number of chains we run}
 }
 \value{
-a number of sampled points that satisfy Ax <= b (matrix object,
-columns the points)
+a list of chains of the sampled points, each chain
+        being a matrix object with each column as a point
 }
 \description{
 This function implements the Dikin Walk using the Hessian

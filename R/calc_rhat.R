@@ -6,6 +6,7 @@
 #' internal function, I'll document it more later.
 #' 
 #' @param x is the list of chains 
+#' @importFrom stats var
 #' 
 #' @return a vector of rhats 
 
@@ -42,7 +43,7 @@ calc_rhat <- function(x) {
     
     B <- (n / (m-1)) * sum (  (mu_each_chain - theta_2bar)^2 )
     
-    W <- sum(as.numeric(lapply(x, function(chain_matrix) {var(chain_matrix[i, ])}))) / m
+    W <- sum(as.numeric(lapply(x, function(chain_matrix) {stats::var(chain_matrix[i, ])}))) / m
     
     R2 <- (W * (1 - 1/n) + B / n) / W
     rhats <- c(rhats, sqrt(R2))

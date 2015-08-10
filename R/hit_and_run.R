@@ -4,14 +4,16 @@
 #' for the har function of the 
 #' hit-and-run package
 #' 
-#' @param A is the lhs of the matrix equation A
-#' @param b is the rhs of the matrix equation b
-#' @param points is the number of points we want to sample
-#' @param thin -- every thin-th point is taken
-#' @param burn the first burn number of points are deleted
+#'@param A is the lhs of Ax <= b
+#'@param b is the rhs of Ax <= b
+#'@param x0 is the starting point (a list of points)
+#'@param points is the number of points we want to sample
+#'@param thin every thin-th point is stored
+#'@param burn the first burn points are deleted
+#'@param chains is the number of chains we run
 #' 
-#'@return a number of sampled points that satisfy Ax <= b (matrix object, 
-#'        columns the points)
+#' @return a list of chains of the sampled points, each chain
+#'         being a matrix object with each column as a point
 #' 
 #' @importFrom hitandrun har 
 

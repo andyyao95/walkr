@@ -7,14 +7,15 @@
 #'
 #'@param A is the lhs of Ax <= b
 #'@param b is the rhs of Ax <= b
-#'@param x0 is the starting point
+#'@param x0 is the starting point (a list of points)
 #'@param r is the radius of the ellipsoid (1 by default)
-#'@param n is the number of points we want
-#'@param analytic_center is a boolean indicating whether we want to 
-#'       start at the analytic center of the polytope
+#'@param points is the number of points we want to sample
+#'@param thin every thin-th point is stored
+#'@param burn the first burn points are deleted
+#'@param chains is the number of chains we run
 #'
-#'@return a number of sampled points that satisfy Ax <= b (matrix object, 
-#'columns the points)
+#' @return a list of chains of the sampled points, each chain
+#'         being a matrix object with each column as a point
 #'
 
 
