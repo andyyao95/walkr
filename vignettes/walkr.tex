@@ -1,4 +1,53 @@
-\documentclass[a4paper]{report}
+\documentclass[a4paper]{report}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{RJournal}
@@ -11,7 +60,7 @@
 
 %\VignetteEngine{knitr::knitr} 
 %\VignetteIndexEntry{walkr}
-
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
@@ -549,9 +598,147 @@ parameters:
 \code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
 "well enough". First is an interal warning message within walkr before the results are returned. 
 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## sampling from the 3D simplex}
+\hlkwd{library}\hlstd{(walkr)}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{3}\hlstd{)}
+\hlstd{b} \hlkwb{<-} \hlnum{1}
+\hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
+                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
+\end{alltt}
 
 
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning in walkr(A = A, b = b, points = 10, method = "{}hit-and-run"{}, thin = 1, : there are parameters with rhat > 1.1, you may want to run your chains for longer}}\begin{alltt}
+\hlstd{answer}
+\end{alltt}
+\begin{verbatim}
+##            [,1]       [,2]        [,3]       [,4]       [,5]       [,6]
+## [1,] 0.23959806 0.07932791 0.251327998 0.22643520 0.27408170 0.26710634
+## [2,] 0.66378904 0.88223408 0.745745780 0.73837994 0.67981092 0.71713803
+## [3,] 0.09661291 0.03843801 0.002926221 0.03518486 0.04610738 0.01575563
+##            [,7]      [,8]       [,9]      [,10]
+## [1,] 0.08973057 0.1338480 0.08659668 0.03719618
+## [2,] 0.23544689 0.1034884 0.44895932 0.57834991
+## [3,] 0.67482254 0.7626636 0.46444399 0.38445391
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
+then the statistical tests pass.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(walkr)}
+\hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
+                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section{Dikin versus Hitandrun}
+%reference here:{http://www.mit.edu/~har/Dikin.pdf}
+\begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
+  \hline
+   &  \texttt{hit-and-run} & \texttt{Dikin Walk} \\ \hline
+  Uniform Sampling & Yes, needs $O(N^3)$ points, where $N$ is the dimension of the polytope & 
+  No, concentrates in the    interior\\ \hline
+  Mixing & $O(\frac{N^2R^2}{r^2})$ *, slows down substantially as dimension of polytope increases and 
+  polytope becomes "skinnier" & $O(MN)$, where $A$ is $M \times N$; much stronger mixing. \\ \hline
+  Cost of One Step & $O(MN)$ & $O(MN^2)$, in practice, one step of Dikin is much more 
+  costly than hit-and-run\\ \hline
+  Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
+  not high\\ \hline
+
+\end{tabular} \\
+
+*$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
+largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
+as the polytope is "skinnier"(\cite{kannan}). \\
+
+\textbf{NEED TO REPLACE THE FOLLOWING TWO PLOTS WITH REPRODUCIBLE CODE CHUNKS (3D HIST IF POSSIBLE)}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/dikintrap.png}
+\caption[caption]{Dikin concentrates at the center}
+\end{minipage}%
+\centering
+\begin{minipage}{.4\textwidth}
+\includegraphics[width = 1.95in, height = 1.5in]{img/hartrap.png}
+\caption[caption]{Hit-and-run samples the space thoroughly}
+\end{minipage}
+\end{figure}
+
+As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
+given the same set of parameters
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{set.seed}\hlstd{(}\hlnum{314}\hlstd{)}
+\hlstd{N} \hlkwb{<-} \hlnum{50}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{), N,} \hlkwc{replace} \hlstd{= T),} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{)}
+\hlstd{A} \hlkwb{<-} \hlkwd{rbind}\hlstd{(A,} \hlkwd{matrix}\hlstd{(}\hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{), N,} \hlkwc{replace} \hlstd{= T),} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{))}
+\hlstd{b} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0.7}\hlstd{,} \hlnum{0.3}\hlstd{)}
+
+\hlstd{answer_hitandrun} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
+                 \hlkwc{thin} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{1}\hlstd{)}
+\hlstd{answer_dikin} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{500}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"dikin"}\hlstd{,}
+                 \hlkwc{thin} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{1}\hlstd{)}
+
+\hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_hitandrun[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
+     \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-run Mixing"}\hlstd{,}
+     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/example7-1} 
+\begin{kframe}\begin{alltt}
+\hlkwd{plot}\hlstd{(}\hlkwc{y} \hlstd{= answer_dikin[}\hlnum{50}\hlstd{,],} \hlkwc{x} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{500}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlstr{"random walk"}\hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"value"}\hlstd{,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,}
+     \hlkwc{main} \hlstd{=} \hlstr{"Dikin Mixing"}\hlstd{,}
+     \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.2}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/example7-2} 
+
+\end{knitrout}
 
 
+\section{Conclusion}
 
+\code{walkr} samples $x$ that satisfy the underdetermined matrix equation $Ax=b$, every component
+of $x$ is non-negative, and every component sum to $1$. \code{walkr} internally performs the affine
+transformation which transforms $Ax=b$ and the simplex constraints into the $Ax \leq b$ form. Then, 
+\code{walkr} samples points under this transform, takes the inverse transform, and finally
+returns the $x$'s sampled.
 
+The two methods that the user may specify is \code{"dikin"} and \code{"hit-and-run"}. Hit-and-run
+is a widely used sampling method that converges to the uniform sampling asymptotically, but 
+fails to mix well in higher dimensions. Dikin generates a nearly uniform sample, but mixes stronger than
+hit-and-run, especially in higher dimensions. In addition, \code{walkr} will warn the user if the 
+mixing is not strong enough according to the Gelman-Rubin Diagnostics.
+
+\section{Authors}
+
+\address{Andy Yao\\
+Mathematics and Physics\\
+Williams College \\
+Williamstown, MA, USA\\}
+\email{ay3@williams.edu}
+
+\address{David Kane\\
+Managing Director \\
+Hutchin Hill Capital\\
+101 Federal Street, Boston, USA\\}
+\email{dave.kane@gmail.com}
+
+\bibliography{walkr}
+
+\end{article}
+\end{document}

@@ -22,8 +22,7 @@
 #' @importFrom limSolve lsei
 #' @importFrom MASS Null
 #' @importFrom stats rnorm runif
-#' @import Rcpp
-#' @import RcppEigen
+#' @importFrom Rcpp evalCpp
 #' 
 #' @useDynLib walkr
 #' @exportPattern "^[[:alpha:]]+"

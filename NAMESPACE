@@ -2,9 +2,8 @@
 
 export(walkr)
 exportPattern("^[[:alpha:]]+")
-import(Rcpp)
-import(RcppEigen)
 importFrom(MASS,Null)
+importFrom(Rcpp,evalCpp)
 importFrom(hitandrun,har)
 importFrom(limSolve,lsei)
 importFrom(stats,rnorm)
