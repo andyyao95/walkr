@@ -497,7 +497,7 @@ within the polytope $K$.
 First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
 for a 5 dimensional case:
 
-<<example2, eval = T, cache = TRUE>>=
+<<example2, eval = T>>=
 library(walkr)
 A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
 b <- 0.5
@@ -532,7 +532,7 @@ parameters:
 \code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
 "well enough". First is an interal warning message within walkr before the results are returned. 
 
-<<example4, eval = TRUE, cache = TRUE>>=
+<<example4, eval = TRUE>>=
 ## sampling from the 3D simplex
 library(walkr)
 A <- matrix(1, ncol = 3)
@@ -545,7 +545,7 @@ answer
 As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
 then the statistical tests pass.
 
-<<example5, eval = TRUE, cache = TRUE>>=
+<<example5, eval = TRUE>>=
 library(walkr)
 answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
                 thin = 1, burn = 0, chains = 5)
@@ -589,7 +589,7 @@ as the polytope is "skinnier"(\cite{kannan}). \\
 As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
 given the same set of parameters
 
-<<example7, eval = TRUE, fig.width=5, fig.height=3, cache = TRUE>>=
+<<example7, eval = TRUE, fig.width=5, fig.height=3>>=
 set.seed(314)
 N <- 50
 A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)
