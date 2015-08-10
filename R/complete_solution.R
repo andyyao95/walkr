@@ -42,7 +42,7 @@ complete_solution <- function(A, b) {
       
   objfunc <- matrix(sample(c(-1, 1), ncol(A), replace = TRUE),
                         nrow = 1, ncol = ncol(A))
-  const <- runif(1, -1, 1)
+  const <- stats::runif(1, -1, 1)
     
   ## particular solution is the 1st list object of the lsei fxn 
   ## here, we need to catch a warning that says the system has no solutions

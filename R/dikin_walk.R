@@ -100,7 +100,7 @@ dikin_walk <- function(A,
       ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, RUNIF IS NOT UNIFORM AFTER TRANSFORMATION
       ## see vignette for details
       
-      zeta <- rnorm(this.length, 0, 1)
+      zeta <- stats::rnorm(this.length, 0, 1)
       
       ## normalise to be on the m- unit sphere
       ## and then compute lhs as a m-vector
@@ -122,7 +122,7 @@ dikin_walk <- function(A,
         
         ## exact same set of procedures as above
         
-        zeta <- rnorm(this.length, 0, 1)
+        zeta <- stats::rnorm(this.length, 0, 1)
         zeta <- r * zeta / sqrt(sum(zeta * zeta))
         rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
         y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 

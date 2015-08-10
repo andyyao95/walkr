@@ -8,7 +8,7 @@ Author:  as.person(c(
                 "Andy Yao <ay3@williams.edu> [aut]"
               ))
 Maintainer:  Andy Yao <ay3@williams.edu>
-Suggests:    testthat
+Suggests:    testthat, knitr
 Imports:     hitandrun, 
              limSolve, 
              MASS,
@@ -20,3 +20,4 @@ Description: Samples from the intersection of the n-simplex and m hyperplanes us
              tools to examine and visualize the convergence properties of the random walks.
 License:     GPL-3
 LinkingTo:   Rcpp, RcppEigen
+VignetteBuilder: knitr

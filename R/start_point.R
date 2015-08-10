@@ -56,9 +56,9 @@ start_point <- function(A,
         
         ## these two lines randomize the objective function
         
-        objfunc <- matrix(sample(runif(1,-1, 1), ncol(A), replace = TRUE),
+        objfunc <- matrix(sample(stats::runif(1,-1, 1), ncol(A), replace = TRUE),
                           nrow = 1, ncol = ncol(A))
-        const <- runif(1, -1, 1)
+        const <- stats::runif(1, -1, 1)
         
         ## suppresswarnings because we don't specific a equality constraint,
         ## we only care about Ax <= b (lsei gives a warning, but it's fine)

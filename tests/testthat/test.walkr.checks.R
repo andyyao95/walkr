@@ -14,7 +14,7 @@ test_that("Testing Walkr Checks and Input", {
   
   ## check that A is underdetermined
   
-  A <- matrix(runif(9,0,1), ncol = 3)
+  A <- matrix(stats::runif(9,0,1), ncol = 3)
   b <- 1
   expect_error(walkr(A = A, b = b, points = 10), "A must be underdetermined")
   

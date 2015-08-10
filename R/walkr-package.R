@@ -21,6 +21,7 @@
 #' @importFrom hitandrun har
 #' @importFrom limSolve lsei
 #' @importFrom MASS Null
+#' @importFrom stats rnorm runif
 #' @import Rcpp
 #' @import RcppEigen
 #' 

@@ -9,7 +9,7 @@
 \usepackage[round]{natbib}
 \usepackage{subfigure}
 
-%\VignetteEngine{knitr}
+%\VignetteEngine{knitr::knitr} 
 %\VignetteIndexEntry{walkr}
 
 \begin{document}
@@ -534,6 +534,7 @@ parameters:
 
 <<example4, eval = TRUE, cache = TRUE>>=
 ## sampling from the 3D simplex
+library(walkr)
 A <- matrix(1, ncol = 3)
 b <- 1
 answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
@@ -545,6 +546,7 @@ As we see from the code chunk above, \code{walkr} returns a warning message that
 then the statistical tests pass.
 
 <<example5, eval = TRUE, cache = TRUE>>=
+library(walkr)
 answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
                 thin = 1, burn = 0, chains = 5)
 @
