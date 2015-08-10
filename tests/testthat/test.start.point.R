@@ -2,6 +2,8 @@ context("Testing for Starting Points")
 
 test_that("Testing Starting Points - 3D simplex", {
   
+  set.seed(314)
+  
   ## Initialize 3D Simplex
   
   n <- 3
@@ -48,6 +50,8 @@ test_that("Testing Starting Points - 3D simplex", {
 })
 
 test_that("Testing Starting Points - 20D with constraints", {
+  
+  set.seed(314)
   
   ## Initialize 20D Simplex
   
