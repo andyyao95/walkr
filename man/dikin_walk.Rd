@@ -4,7 +4,7 @@
 \alias{dikin_walk}
 \title{Dikin Walk}
 \usage{
-dikin_walk(A, b, x0 = NULL, points, r = 1, thin = 1, burn = 0,
+dikin_walk(A, b, x0 = list(), points, r = 1, thin = 1, burn = 0,
   chains = 1)
 }
 \arguments{

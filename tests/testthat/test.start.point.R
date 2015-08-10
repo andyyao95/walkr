@@ -10,7 +10,7 @@ test_that("Testing Starting Points - 3D simplex", {
   
   ## find the particular and homogeneous solutions
 
-  z <- complete_solution(A,b, randomize = T)
+  z <- walkr:::complete_solution(A,b)
   particular  <- z$particular
   homogeneous <- z$homogeneous
   
@@ -24,8 +24,8 @@ test_that("Testing Starting Points - 3D simplex", {
   
   ## note that these sampled points are alphas 
   
-  start.points1 <- start_point(A = new_A, b = new_b, n = 10, average = 10)
-  start.points2 <- start_point(A = new_A, b = new_b, n = 5, average = 20)
+  start.points1 <- walkr:::start_point(A = new_A, b = new_b, n = 10, average = 10)
+  start.points2 <- walkr:::start_point(A = new_A, b = new_b, n = 5, average = 20)
   
   ## now we use a mapping function to obtain the points on the simplex 
   
@@ -59,7 +59,7 @@ test_that("Testing Starting Points - 20D with constraints", {
   
   ## find the particular and homogeneous solutions
   
-  z <- complete_solution(A,b, randomize = T)
+  z <- walkr:::complete_solution(A,b)
   particular  <- z$particular
   homogeneous <- z$homogeneous
   
@@ -73,8 +73,8 @@ test_that("Testing Starting Points - 20D with constraints", {
   
   ## note that these sampled points are alphas 
   
-  start.points1 <- start_point(A = new_A, b = new_b, n = 10, average = 10)
-  start.points2 <- start_point(A = new_A, b = new_b, n = 5, average = 20)
+  start.points1 <- walkr:::start_point(A = new_A, b = new_b, n = 10, average = 10)
+  start.points2 <- walkr:::start_point(A = new_A, b = new_b, n = 5, average = 20)
   
   ## now we use a mapping function to obtain the points on the simplex 
   

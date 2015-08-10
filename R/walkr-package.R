@@ -21,7 +21,6 @@
 #' @importFrom hitandrun har
 #' @importFrom limSolve lsei
 #' @importFrom MASS Null
-#' @importFrom shinyStan as.shinystan launch_shinystan
 #' @import Rcpp
 #' @import RcppEigen
 #' 

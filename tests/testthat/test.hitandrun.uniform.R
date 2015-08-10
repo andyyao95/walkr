@@ -2,12 +2,13 @@ context("Testing hit-and-run uniformity")
 
 test_that("Testing hit-and-run uniformity", {
   
+  set.seed(314)
   ## Simplest possible case 
   
-  A <- matrix(1, ncol = 2)
+  A <- matrix(1, ncol = 3)
   b <- 1
   
-  ## In this case, we are sampling from the 2D simplex
+  ## In this case, we are sampling from the 3D simplex
   
   ## Draw a sample of 1,000. If the sample is truly random,
   ## then each variable should have a 50/50 chance of being above 0.5. It 
@@ -16,22 +17,24 @@ test_that("Testing hit-and-run uniformity", {
   ## above 0.5, for both variables, is less than the 99th percentile of the
   ## binomial distribution.
   
-  z <- walkr(A = A, b = b, n = 1000, method = "hit-and-run")
-  expect_true(all(apply(z, 1, function(x) length(which(x> .5)) < 
-                          qbinom(.99, 1000, .5))))
+  z <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
+  z1 <- z[1,]
+  z2 <- z[2,]
+  standard.dev <- sd(z1-z2)
   
-  ## also should be greater than the 1st percentile of the binomial
+  conf <- qnorm(p = c(0.01, 0.99), mean = 0, sd = standard.dev / sqrt(1000))
   
-  expect_true(all(apply(z, 1, function(x) length(which(x> .5)) > 
-                          qbinom(.01, 1000, .5))))
+  actual <- mean(z1-z2)
   
+  expect_true(actual > conf[1])
+  expect_true(actual < conf[2])
  
-  ### What about a 5D Simplex
+  ### A 5D Simplex
   
   A <- matrix(1, ncol = 5)
   b <- 1 
   
-  z <- walkr(A = A, b = b, n = 5000, method = "hit-and-run")
+  z <- walkr(A = A, b = b, points = 5000, method = "hit-and-run")
   
   ## should expect that the sum of x_1, x_2 be roughly the same as x_4, x_5
   

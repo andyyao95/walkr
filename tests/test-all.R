@@ -1,2 +1,2 @@
 library(testthat)
-test_check("kmatching")
+test_check("walkr")

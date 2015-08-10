@@ -20,7 +20,7 @@
 
 dikin_walk <- function(A, 
                        b, 
-                       x0 = NULL, 
+                       x0 = list(), 
                        points, 
                        r = 1,
                        thin = 1,
@@ -28,7 +28,7 @@ dikin_walk <- function(A,
                        chains = 1) {
   
   stopifnot(points %% chains == 0)
-  
+  stopifnot(is.list(x0))
   #############################
   ## f stands for fast! 
   

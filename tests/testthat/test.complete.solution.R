@@ -13,7 +13,7 @@ test_that("Affine Transformation", {
   
   ## we want to check that our solution basis is indeed correct
   
-  z <- complete_solution(A, b, randomize = FALSE)
+  z <- walkr:::complete_solution(A, b)
   
   ## since any linear combination of the null space basis span the null space
   ## thus, particular + (homogeneous %*% any linear combination) = b 

@@ -5,17 +5,14 @@
 \usepackage{amsmath,amssymb,array}
 \usepackage{booktabs}
 \usepackage{float}
-%\usepackage{Sweave}
 \usepackage[parfill]{parskip}
 \usepackage[round]{natbib}
 \usepackage{subfigure}
 
-%\VignetteEngine{Sweave}
+%\VignetteEngine{knitr}
 %\VignetteIndexEntry{walkr}
 
 \begin{document}
-%% \SweaveOpts{concordance=TRUE}
-%% \SweaveOpts{concordance=FALSE}
 %% do not edit, for illustration only
 \sectionhead{Contributed research article}
 \volume{XX}
@@ -52,7 +49,7 @@ such a sample.
 Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
 but mixes slower and slower as the dimensions of $A$ increase. Our second random walk is the 
 Dikin Walk. Dikin Walk generates a nearly uniform sample and exhibits much stronger mixing. 
-%\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) 
+\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) 
 for the core matrix calculations which take up most of the run-time.
 
 \texttt{walkr} also provides statistical diagnostics of the mixing and convergence
@@ -337,7 +334,7 @@ The hit-and-run algorithm is as follows:
         
 \end{enumerate}
 
-Here is a picture of the hit-and-run algorithm: 
+Here is a picture of the hit-and-run algorithm: \newpage
 
 \begin{figure}[ht]
 \centering
@@ -367,8 +364,8 @@ Here is a picture of the hit-and-run algorithm:
 \end{figure}
 
 The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
-\code{hit-and-run} package on CRAN (\cide{hitandrun}). \code{walkr} serves as a convenient wrapper
-with MCMC diagnostics and multiple chains.
+\code{hit-and-run} package on CRAN (\cite{hitandrun}). \code{walkr} serves as a convenient wrapper
+with MCMC diagnostics and multiple chains. 
 
 %probably also want to discuss important facts about the algorithm here.
 
@@ -423,6 +420,7 @@ on where the center $x_0$ is.
   \item{repeat until obtained number of desired points}
 
 \end{enumerate}
+\newpage
 
 \begin{figure}[ht]
 \centering
@@ -499,7 +497,7 @@ within the polytope $K$.
 First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
 for a 5 dimensional case:
 
-<<example2, eval = T>>=
+<<example2, eval = T, cache = TRUE>>=
 library(walkr)
 A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
 b <- 0.5
@@ -511,7 +509,7 @@ The \texttt{walkr} function takes care of the intersection with the simplex for 
 if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
 simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
 
-<<eval = FALSE>>=
+<<example3, eval = FALSE>>=
 A <- matrix(1, ncol = 5)
 @
 
@@ -534,7 +532,7 @@ parameters:
 \code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
 "well enough". First is an interal warning message within walkr before the results are returned. 
 
-<<eval = TRUE>>=
+<<example4, eval = TRUE, cache = TRUE>>=
 ## sampling from the 3D simplex
 A <- matrix(1, ncol = 3)
 b <- 1
@@ -546,15 +544,9 @@ answer
 As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
 then the statistical tests pass.
 
-<<eval = TRUE>>=
+<<example5, eval = TRUE, cache = TRUE>>=
 answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
                 thin = 1, burn = 0, chains = 5)
-@
-
-Moreover, the user can use \code{shinyStan} to visualize the sampling:
-
-<<eval = FALSE>>=
-vis_sampling(x = answer, chains = 5)
 @
 
 \section{Dikin versus Hitandrun}
@@ -595,7 +587,7 @@ as the polytope is "skinnier"(\cite{kannan}). \\
 As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
 given the same set of parameters
 
-<<eval = TRUE, fig.width=5, fig.height=3>>=
+<<example7, eval = TRUE, fig.width=5, fig.height=3, cache = TRUE>>=
 set.seed(314)
 N <- 50
 A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)

@@ -2,6 +2,8 @@ context("Testing Dikin Walk")
 
 test_that("Testing Dikin Walk", {
   
+  set.seed(314)
+  
   ## 3D simplex, initialize Aw = b  
   n <- 3
   A <- matrix(rep(1,n), ncol = n, nrow = 1)
@@ -12,7 +14,7 @@ test_that("Testing Dikin Walk", {
   ## performing affine transformation into 
   ## new A and new b (Ax <= b)
   
-  z <- complete_solution(A,b, randomize = T)
+  z <- walkr:::complete_solution(A,b)
   particular  <- z$particular
   homogeneous <- z$homogeneous
   new_A <- -homogeneous
@@ -21,12 +23,13 @@ test_that("Testing Dikin Walk", {
   
   ## find a starting point in the polytope
   
-  x0 <- start_point(A = new_A, b = new_b, n = 1, average = 30)
-  my.center <- as.vector(x0)
+  x0 <- walkr:::start_point(A = new_A, b = new_b, n = 1, average = 30)
+  my.center <- list(as.vector(x0))
   
   ## run the algorithm
   
-  z <- dikin_walk(A = new_A, b = new_b, n = 50, r = 1, x0 = my.center)
+  z <- walkr:::dikin_walk(A = new_A, b = new_b, x0 = my.center, points = 50, chains = 1)
+  z <- z[[1]]
   answer <- apply( z, 2, function(x) { homogeneous %*% x + particular  })
   
   ## check results, indeed on the simplex
@@ -37,19 +40,18 @@ test_that("Testing Dikin Walk", {
   
   ######## HIGHER DIM WITH CONSTRAINTS ########
   
-  ## 20D simplex, intersecting 3 hyperplanes, initialize Aw = b  
+  ## 20D simplex, intersecting 2 hyperplanes, initialize Aw = b  
   n <- 20
   A <- matrix(rep(1,n), ncol = n, nrow = 1)
   A <- rbind(A, sample(c(1,0), n, replace = T))
   A <- rbind(A, sample(c(1,0), n, replace = T))
-  A <- rbind(A, sample(c(1,0), n, replace = T))
-  b <- c(1, 0.7, 0.2, 0.05)
+  b <- c(1, 0.7, 0.05)
   
   ## Find the basis representation
   ## performing affine transformation into 
   ## new A and new b (Ax <= b)
   
-  z <- complete_solution(A,b, randomize = T)
+  z <- walkr:::complete_solution(A,b)
   particular  <- z$particular
   homogeneous <- z$homogeneous
   new_A <- -homogeneous
@@ -58,12 +60,13 @@ test_that("Testing Dikin Walk", {
   
   ## find a starting point in the polytope
   
-  x0 <- start_point(A = new_A, b = new_b, n = 1, average = 30)
-  my.center <- as.vector(x0)
+  x0 <- walkr:::start_point(A = new_A, b = new_b, n = 1, average = 30)
+  my.center <- list(as.vector(x0))
   
   ## run the algorithm
   
-  z <- dikin_walk(A = new_A, b = new_b, n = 50, r = 1, x0 = my.center)
+  z <- walkr:::dikin_walk(A = new_A, b = new_b, points = 50, r = 1, x0 = my.center)
+  z <- z[[1]]
   answer <- apply( z, 2, function(x) { homogeneous %*% x + particular  })
   
   ## check results, indeed on the simplex
