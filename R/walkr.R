@@ -96,6 +96,21 @@ walkr <- function(A,
     stop("chains must be a multiple of points")
   }
   
+  ## the positive ( > 0) part was already checked above there
+  
+  if(points %% 1 != 0){
+    stop("points must be a positive integer")
+  }
+  
+  if(thin %% 1 != 0){
+    stop("thin must be a positive integer")
+  }
+  
+  if(chains %% 1 != 0){
+    stop("chains must be a positive integer")
+  }
+  
+  
   ## augment the simplex constraints 
   
   aug_A <- rbind(A, matrix(1, ncol = ncol(A), nrow = 1))
