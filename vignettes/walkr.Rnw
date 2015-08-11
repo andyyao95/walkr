@@ -394,11 +394,11 @@ $$b - Ax \geq 0$$
 Also recall that the negative logarithmic graph looks like this: \\
 
 
-<<example1, eval = TRUE>>=
+<<example1, eval = TRUE, fig.width=3, fig.height=3>>=
 
 z <- seq(0, 1, 0.0001)
 
-plot(-log(z)~z, type = 'l', ylim = c(0,10))
+plot(-log(z)~z, type = 'l', ylim = c(0,5))
 
 @
 
@@ -421,11 +421,11 @@ can think of it as a generalized notion of the second derivative. \\
 Let $z$ denote $b_i - a_ix$.
 Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks like this: \\
 
-<<example1_5, eval = TRUE>>=
+<<example1_5, eval = TRUE, fig.width = 3, fig.height = 3>>=
 
 z <- seq(0, 1, 0.0001)
 
-plot((1/z^2)~z, type = 'l', ylim = c(0,100))
+plot((1/z^2)~z, type = 'l', ylim = c(0,50))
 
 @
 

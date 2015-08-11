@@ -448,7 +448,7 @@ Also recall that the negative logarithmic graph looks like this: \\
 \begin{alltt}
 \hlstd{z} \hlkwb{<-} \hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0.0001}\hlstd{)}
 
-\hlkwd{plot}\hlstd{(}\hlopt{-}\hlkwd{log}\hlstd{(z)}\hlopt{~}\hlstd{z,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{10}\hlstd{))}
+\hlkwd{plot}\hlstd{(}\hlopt{-}\hlkwd{log}\hlstd{(z)}\hlopt{~}\hlstd{z,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{5}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/example1-1} 
@@ -479,7 +479,7 @@ Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks li
 \begin{alltt}
 \hlstd{z} \hlkwb{<-} \hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0.0001}\hlstd{)}
 
-\hlkwd{plot}\hlstd{((}\hlnum{1}\hlopt{/}\hlstd{z}\hlopt{^}\hlnum{2}\hlstd{)}\hlopt{~}\hlstd{z,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{100}\hlstd{))}
+\hlkwd{plot}\hlstd{((}\hlnum{1}\hlopt{/}\hlstd{z}\hlopt{^}\hlnum{2}\hlstd{)}\hlopt{~}\hlstd{z,} \hlkwc{type} \hlstd{=} \hlstr{'l'}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{50}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/example1_5-1} 
@@ -672,14 +672,14 @@ to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{ge
 \hlstd{answer}
 \end{alltt}
 \begin{verbatim}
-##           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
-## [1,] 0.3310648 0.1005510 0.4174974 0.4299083 0.1091779 0.2569246 0.7384966
-## [2,] 0.4791352 0.2931248 0.4348637 0.2582013 0.3606443 0.3452742 0.2425498
-## [3,] 0.1898000 0.6063242 0.1476389 0.3118904 0.5301779 0.3978013 0.0189536
-##            [,8]      [,9]     [,10]
-## [1,] 0.72833256 0.3553689 0.3240811
-## [2,] 0.26210362 0.4366531 0.3780780
-## [3,] 0.00956382 0.2079781 0.2978409
+##            [,1]      [,2]      [,3]      [,4]      [,5]       [,6]
+## [1,] 0.35058592 0.5177956 0.3102097 0.1475507 0.2403375 0.10648788
+## [2,] 0.62385906 0.2563244 0.5165506 0.5520851 0.6065870 0.86594311
+## [3,] 0.02555502 0.2258801 0.1732397 0.3003641 0.1530755 0.02756901
+##           [,7]       [,8]       [,9]      [,10]
+## [1,] 0.1115985 0.03108041 0.34387887 0.23228883
+## [2,] 0.7826410 0.04414081 0.64365691 0.73630416
+## [3,] 0.1057605 0.92477878 0.01246422 0.03140701
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
