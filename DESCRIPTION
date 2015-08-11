@@ -1,18 +1,20 @@
 Package: walkr
-Type:    Package
-Title:   Walkr -- Sampling from the intersection of the n-simplex and hyperplanes
 Version: 0.3-2
 Date:    2015-08-04
+Type:    Package
+Title:   Random Walks the Intersection of the N-Simplex and Hyperplanes
 Author:  as.person(c(
                 "David Kane <dave.kane@gmail.com> [aut]",
                 "Andy Yao <ay3@williams.edu> [aut]"
               ))
 Maintainer:  Andy Yao <ay3@williams.edu>
+Depends:     R (>= 3.2.1) 
 Suggests:    testthat, knitr
 Imports:     hitandrun, 
              limSolve, 
              MASS,
-             Rcpp (>= 0.11.6)
+             Rcpp (>= 0.11.6),
+             shinystan
 Description: Samples from the intersection of the n-simplex and m hyperplanes using MCMC random walks. 
              Specifically, the sampling space is described by the underdetermined matrix Ax = b, 
              such that every element of x must be non-negative and sum to 1. 
@@ -20,6 +22,5 @@ Description: Samples from the intersection of the n-simplex and m hyperplanes us
              tools to examine and visualize the convergence properties of the random walks.
 License:     GPL-3
 LinkingTo:   Rcpp, RcppEigen
-NeedsCompilation: yes
 VignetteBuilder: knitr
 Repository: CRAN

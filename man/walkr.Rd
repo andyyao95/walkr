@@ -34,7 +34,7 @@ Either a list of chains (with each chain as a matrix of points) or
 }
 \description{
 \tabular{ll}{ Package \tab walkr \cr Type: \tab Package\cr
-Version: \tab 1.0\cr Date: \tab 2015-07-14\cr License: \tab GPL-3\cr }
+Version: \tab 0.3.1\cr Date: \tab 2015-07-14\cr License: \tab GPL-3\cr }
 
 Given \eqn{Ax = b}, \code{walkr} samples points from the intersection of
 \eqn{Ax = b} with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The

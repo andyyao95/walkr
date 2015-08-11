@@ -607,7 +607,6 @@ for a 5 dimensional case:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(walkr)}
 \hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{)}
 \hlstd{b} \hlkwb{<-} \hlnum{0.5}
 \hlstd{A}
@@ -650,6 +649,9 @@ parameters:
   \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
   \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
         of the list which \code{walkr} eventually returns}
+  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
+         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
+         then a single matrix of points is returned. A column is a sampled point.}
 
 \end{itemize}
 
@@ -664,7 +666,7 @@ to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{ge
 \hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{3}\hlstd{)}
 \hlstd{b} \hlkwb{<-} \hlnum{1}
 \hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
-                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
+                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{ret.format} \hlstd{=} \hlstr{"list"}\hlstd{)}
 \end{alltt}
 
 
@@ -672,14 +674,35 @@ to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{ge
 \hlstd{answer}
 \end{alltt}
 \begin{verbatim}
-##            [,1]      [,2]      [,3]      [,4]      [,5]       [,6]
-## [1,] 0.35058592 0.5177956 0.3102097 0.1475507 0.2403375 0.10648788
-## [2,] 0.62385906 0.2563244 0.5165506 0.5520851 0.6065870 0.86594311
-## [3,] 0.02555502 0.2258801 0.1732397 0.3003641 0.1530755 0.02756901
-##           [,7]       [,8]       [,9]      [,10]
-## [1,] 0.1115985 0.03108041 0.34387887 0.23228883
-## [2,] 0.7826410 0.04414081 0.64365691 0.73630416
-## [3,] 0.1057605 0.92477878 0.01246422 0.03140701
+## [[1]]
+##             [,1]      [,2]
+## [1,] 0.748182847 0.5688588
+## [2,] 0.247690936 0.3272884
+## [3,] 0.004126217 0.1038527
+## 
+## [[2]]
+##           [,1]      [,2]
+## [1,] 0.4598451 0.4034480
+## [2,] 0.0905776 0.4380749
+## [3,] 0.4495773 0.1584771
+## 
+## [[3]]
+##             [,1]       [,2]
+## [1,] 0.853371532 0.53165438
+## [2,] 0.137500693 0.41407309
+## [3,] 0.009127776 0.05427253
+## 
+## [[4]]
+##           [,1]       [,2]
+## [1,] 0.1421933 0.04891122
+## [2,] 0.7174856 0.88293460
+## [3,] 0.1403211 0.06815417
+## 
+## [[5]]
+##            [,1]      [,2]
+## [1,] 0.49714858 0.7059685
+## [2,] 0.41861099 0.1829643
+## [3,] 0.08424042 0.1110672
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -690,12 +713,25 @@ then the statistical tests pass.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{library}\hlstd{(walkr)}
 \hlstd{answer} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{,}
-                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{)}
+                \hlkwc{thin} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{burn} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{chains} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{ret.format} \hlstd{=} \hlstr{"list"}\hlstd{)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+
+Moreover, \code{walkr} provides an easy to use wrapper function \code{explore\_walkr} which
+calls \code{shinystan} to diagnose and visualize the MCMC chains. Note that the \code{"ret.format"}
+must be a \code{"list"}.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{explore_walkr}\hlstd{(answer)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+%% ATTACH SCREENSHOT HERE
 
 \section{Dikin versus Hitandrun}
 %reference here:{http://www.mit.edu/~har/Dikin.pdf}
@@ -754,26 +790,16 @@ given the same set of parameters
 
 As mentioned before, Dikin samples more in the interior of the polytope $K$.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{0}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
-\hlstd{b} \hlkwb{<-} \hlnum{0.5}
-\hlkwd{set.seed}\hlstd{(}\hlnum{314}\hlstd{)}
-\hlstd{z1} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"dikin"}\hlstd{)}
-\hlstd{z2} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{)}
-\hlkwd{library}\hlstd{(scatterplot3d)}
-\hlkwd{scatterplot3d}\hlstd{(}\hlkwc{x} \hlstd{= z1[}\hlnum{2}\hlstd{,],} \hlkwc{y} \hlstd{= z1[}\hlnum{3}\hlstd{, ],} \hlkwc{z} \hlstd{= z1[}\hlnum{4}\hlstd{, ],} \hlkwc{pch} \hlstd{=} \hlnum{19}\hlstd{,} \hlkwc{scale.y} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"Dikin"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/example8-1} 
-\begin{kframe}\begin{alltt}
-\hlkwd{scatterplot3d}\hlstd{(}\hlkwc{x} \hlstd{= z2[}\hlnum{2}\hlstd{,],} \hlkwc{y} \hlstd{= z2[}\hlnum{3}\hlstd{, ],} \hlkwc{z} \hlstd{= z2[}\hlnum{4}\hlstd{, ],} \hlkwc{pch} \hlstd{=} \hlnum{19}\hlstd{,} \hlkwc{scale.y} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-Run"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/example8-2} 
-
-\end{knitrout}
+% # <<example8, eval = TRUE, fig.width = 3, fig.height = 4>>=
+% # A <- matrix(c(2,0,3,0), ncol = 4)
+% # b <- 0.5
+% # set.seed(314)
+% # z1 <- walkr(A = A, b = b, points = 1000, method = "dikin")
+% # z2 <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
+% # library(scatterplot3d)
+% # scatterplot3d(x = z1[2,], y = z1[3, ], z = z1[4, ], pch = 19, scale.y = 2, main = "Dikin")
+% # scatterplot3d(x = z2[2,], y = z2[3, ], z = z2[4, ], pch = 19, scale.y = 2, main = "Hit-and-Run")
+% # @
 
 
 \section{Conclusion}

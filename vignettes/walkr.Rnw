@@ -548,7 +548,6 @@ First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation.
 for a 5 dimensional case:
 
 <<example2, eval = T>>=
-library(walkr)
 A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
 b <- 0.5
 A
@@ -576,6 +575,9 @@ parameters:
   \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
   \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
         of the list which \code{walkr} eventually returns}
+  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
+         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
+         then a single matrix of points is returned. A column is a sampled point.}
 
 \end{itemize}
 
@@ -588,7 +590,7 @@ library(walkr)
 A <- matrix(1, ncol = 3)
 b <- 1
 answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
-                thin = 1, burn = 0, chains = 5)
+                thin = 1, burn = 0, chains = 5, ret.format = "list")
 answer
 @
 
@@ -596,10 +598,19 @@ As we see from the code chunk above, \code{walkr} returns a warning message that
 then the statistical tests pass.
 
 <<example5, eval = TRUE>>=
-library(walkr)
 answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
-                thin = 1, burn = 0, chains = 5)
+                thin = 1, burn = 0, chains = 5, ret.format = "list")
 @
+
+Moreover, \code{walkr} provides an easy to use wrapper function \code{explore\_walkr} which
+calls \code{shinystan} to diagnose and visualize the MCMC chains. Note that the \code{"ret.format"}
+must be a \code{"list"}.
+
+<<example5_5, eval = FALSE>>=
+explore_walkr(answer)
+@
+
+%% ATTACH SCREENSHOT HERE
 
 \section{Dikin versus Hitandrun}
 %reference here:{http://www.mit.edu/~har/Dikin.pdf}
@@ -644,21 +655,20 @@ plot(y = answer_dikin[50,], x = 1:500,
      xlab = "random walk", ylab = "value", type = 'l',
      main = "Dikin Mixing", 
      ylim = c(0, 0.2))
-
 @
 
 As mentioned before, Dikin samples more in the interior of the polytope $K$.
 
-<<example8, eval = TRUE, fig.width = 3, fig.height = 4>>=
-A <- matrix(c(2,0,3,0), ncol = 4)
-b <- 0.5
-set.seed(314)
-z1 <- walkr(A = A, b = b, points = 1000, method = "dikin")
-z2 <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
-library(scatterplot3d)
-scatterplot3d(x = z1[2,], y = z1[3, ], z = z1[4, ], pch = 19, scale.y = 2, main = "Dikin")
-scatterplot3d(x = z2[2,], y = z2[3, ], z = z2[4, ], pch = 19, scale.y = 2, main = "Hit-and-Run")
-@
+% # <<example8, eval = TRUE, fig.width = 3, fig.height = 4>>=
+% # A <- matrix(c(2,0,3,0), ncol = 4)
+% # b <- 0.5
+% # set.seed(314)
+% # z1 <- walkr(A = A, b = b, points = 1000, method = "dikin")
+% # z2 <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
+% # library(scatterplot3d)
+% # scatterplot3d(x = z1[2,], y = z1[3, ], z = z1[4, ], pch = 19, scale.y = 2, main = "Dikin")
+% # scatterplot3d(x = z2[2,], y = z2[3, ], z = z2[4, ], pch = 19, scale.y = 2, main = "Hit-and-Run")
+% # @
 
 
 \section{Conclusion}
