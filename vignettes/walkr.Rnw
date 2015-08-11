@@ -621,19 +621,6 @@ answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run",
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
 as the polytope is "skinnier"(\cite{kannan}). \\
 
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/dikintrap.png}
-\caption[caption]{Dikin concentrates at the center}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/hartrap.png}
-\caption[caption]{Hit-and-run samples the space thoroughly}
-\end{minipage}
-\end{figure}
-
 As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
 given the same set of parameters
 
@@ -658,6 +645,19 @@ plot(y = answer_dikin[50,], x = 1:500,
      main = "Dikin Mixing", 
      ylim = c(0, 0.2))
 
+@
+
+As mentioned before, Dikin samples more in the interior of the polytope $K$.
+
+<<example8, eval = TRUE, fig.width = 3, fig.height = 4>>=
+A <- matrix(c(2,0,3,0), ncol = 4)
+b <- 0.5
+set.seed(314)
+z1 <- walkr(A = A, b = b, points = 1000, method = "dikin")
+z2 <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
+library(scatterplot3d)
+scatterplot3d(x = z1[2,], y = z1[3, ], z = z1[4, ], pch = 19, scale.y = 2, main = "Dikin")
+scatterplot3d(x = z2[2,], y = z2[3, ], z = z2[4, ], pch = 19, scale.y = 2, main = "Hit-and-Run")
 @
 
 

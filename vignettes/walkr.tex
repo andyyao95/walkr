@@ -672,14 +672,14 @@ to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{ge
 \hlstd{answer}
 \end{alltt}
 \begin{verbatim}
-##           [,1]       [,2]         [,3]       [,4]      [,5]       [,6]
-## [1,] 0.1867770 0.04642564 0.9384501529 0.92146693 0.5671380 0.34476057
-## [2,] 0.5682799 0.50464516 0.0612996080 0.04743140 0.3277182 0.63232867
-## [3,] 0.2449431 0.44892920 0.0002502391 0.03110167 0.1051438 0.02291075
-##           [,7]      [,8]      [,9]      [,10]
-## [1,] 0.4254227 0.4418168 0.1234434 0.11365284
-## [2,] 0.4368319 0.4395879 0.4989029 0.82395547
-## [3,] 0.1377454 0.1185953 0.3776536 0.06239168
+##           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
+## [1,] 0.3310648 0.1005510 0.4174974 0.4299083 0.1091779 0.2569246 0.7384966
+## [2,] 0.4791352 0.2931248 0.4348637 0.2582013 0.3606443 0.3452742 0.2425498
+## [3,] 0.1898000 0.6063242 0.1476389 0.3118904 0.5301779 0.3978013 0.0189536
+##            [,8]      [,9]     [,10]
+## [1,] 0.72833256 0.3553689 0.3240811
+## [2,] 0.26210362 0.4366531 0.3780780
+## [3,] 0.00956382 0.2079781 0.2978409
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -717,19 +717,6 @@ then the statistical tests pass.
 largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
 as the polytope is "skinnier"(\cite{kannan}). \\
 
-\begin{figure}[H]
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/dikintrap.png}
-\caption[caption]{Dikin concentrates at the center}
-\end{minipage}%
-\centering
-\begin{minipage}{.4\textwidth}
-\includegraphics[width = 1.95in, height = 1.5in]{img/hartrap.png}
-\caption[caption]{Hit-and-run samples the space thoroughly}
-\end{minipage}
-\end{figure}
-
 As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
 given the same set of parameters
 
@@ -762,6 +749,29 @@ given the same set of parameters
 \end{alltt}
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/example7-2} 
+
+\end{knitrout}
+
+As mentioned before, Dikin samples more in the interior of the polytope $K$.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{A} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{0}\hlstd{),} \hlkwc{ncol} \hlstd{=} \hlnum{4}\hlstd{)}
+\hlstd{b} \hlkwb{<-} \hlnum{0.5}
+\hlkwd{set.seed}\hlstd{(}\hlnum{314}\hlstd{)}
+\hlstd{z1} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"dikin"}\hlstd{)}
+\hlstd{z2} \hlkwb{<-} \hlkwd{walkr}\hlstd{(}\hlkwc{A} \hlstd{= A,} \hlkwc{b} \hlstd{= b,} \hlkwc{points} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{"hit-and-run"}\hlstd{)}
+\hlkwd{library}\hlstd{(scatterplot3d)}
+\hlkwd{scatterplot3d}\hlstd{(}\hlkwc{x} \hlstd{= z1[}\hlnum{2}\hlstd{,],} \hlkwc{y} \hlstd{= z1[}\hlnum{3}\hlstd{, ],} \hlkwc{z} \hlstd{= z1[}\hlnum{4}\hlstd{, ],} \hlkwc{pch} \hlstd{=} \hlnum{19}\hlstd{,} \hlkwc{scale.y} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"Dikin"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/example8-1} 
+\begin{kframe}\begin{alltt}
+\hlkwd{scatterplot3d}\hlstd{(}\hlkwc{x} \hlstd{= z2[}\hlnum{2}\hlstd{,],} \hlkwc{y} \hlstd{= z2[}\hlnum{3}\hlstd{, ],} \hlkwc{z} \hlstd{= z2[}\hlnum{4}\hlstd{, ],} \hlkwc{pch} \hlstd{=} \hlnum{19}\hlstd{,} \hlkwc{scale.y} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"Hit-and-Run"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/example8-2} 
 
 \end{knitrout}
 
