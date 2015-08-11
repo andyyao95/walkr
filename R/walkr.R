@@ -39,9 +39,11 @@
 #' @param thin every thin-th point is stored
 #' @param burn the first burn points are deleted
 #' @param chains is the number of chains we run
+#' @param ret.format is the format in which walkr returns the answer. Please
+#'        enter "list" (of chains) or "matrix". 
 #' 
-#' @return A list of chains. Each chain is a matrix with its columns as the sampled
-#'         points. 
+#' @return Either a list of chains (with each chain as a matrix of points) or 
+#'         a matrix containing all the points. Each column is a point sampled. 
 #'   
 #' @examples
 #' ## 4D constraint
@@ -58,7 +60,8 @@ walkr <- function(A,
                   method = "dikin",
                   thin = 1,
                   burn = 0,
-                  chains = 1) {
+                  chains = 1,
+                  ret.format = "matrix") {
   
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
@@ -109,7 +112,9 @@ walkr <- function(A,
   if(chains %% 1 != 0){
     stop("chains must be a positive integer")
   }
-  
+  if(!(ret.format %in% c("list", "matrix"))){
+    stop("ret.format must be either list or matrix")
+  }
   
   ## augment the simplex constraints 
   
@@ -219,24 +224,35 @@ walkr <- function(A,
     stop("Sampling method must be \"hitandrun\" or \"dikin\".")
   }
   
-
-  ## after we perform all the checking above we return the chains as a matrix,
-  ## with the sampled points as a row thus, here we column bind each of the
-  ## chains, and then return the final result
+  if(ret.format == "matrix") {
+    ## after we perform all the checking above we return the chains as a matrix,
+    ## with the sampled points as a row thus, here we column bind each of the
+    ## chains, and then return the final result
+    
+    mat_answer <- answer[[1]]
+    
+    ## for loop breaks if chains == 1, so we need the if to check it
+    
+    if(chains > 1) {
+      for(i in 2:chains) {
+        
+        mat_answer <- cbind(mat_answer, answer[[i]])
+        
+      }    
+    }
   
-  mat_answer <- answer[[1]]
   
-  ## for loop breaks if chains == 1, so we need the if to check it
+    return(mat_answer)
+  }
   
-  if(chains > 1) {
-    for(i in 2:chains) {
-      
-      mat_answer <- cbind(mat_answer, answer[[i]])
-      
-    }    
+  ## since checking for correct input was done above, we
+  ## can assume ret.format is 1 of the 2 correct ones
+  
+  else {
+    
+    ## list of chains
+    
+    return(answer)
   }
 
-
-  return(mat_answer)
-  
 }

@@ -6,7 +6,8 @@
 \alias{walkr-package}
 \title{The walkr package.}
 \usage{
-walkr(A, b, points, method = "dikin", thin = 1, burn = 0, chains = 1)
+walkr(A, b, points, method = "dikin", thin = 1, burn = 0, chains = 1,
+  ret.format = "matrix")
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation A}
@@ -23,10 +24,13 @@ optimized-dikin"}
 \item{burn}{the first burn points are deleted}
 
 \item{chains}{is the number of chains we run}
+
+\item{ret.format}{is the format in which walkr returns the answer. Please
+       enter "list" (of chains) or "matrix".}
 }
 \value{
-A list of chains. Each chain is a matrix with its columns as the sampled
-        points.
+Either a list of chains (with each chain as a matrix of points) or
+        a matrix containing all the points. Each column is a point sampled.
 }
 \description{
 \tabular{ll}{ Package \tab walkr \cr Type: \tab Package\cr

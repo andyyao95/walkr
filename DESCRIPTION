@@ -22,3 +22,4 @@ License:     GPL-3
 LinkingTo:   Rcpp, RcppEigen
 NeedsCompilation: yes
 VignetteBuilder: knitr
+Repository: CRAN
