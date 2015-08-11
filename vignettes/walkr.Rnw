@@ -579,8 +579,8 @@ parameters:
 
 \end{itemize}
 
-\code{walkr} has two components to telling the user whether few chains of the MCMC walk has mixed
-"well enough". First is an interal warning message within walkr before the results are returned. 
+\code{walkr} warns the user if the chains have not mixed "well-enough" or have not converged
+to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{gelman}). 
 
 <<example4, eval = TRUE>>=
 ## sampling from the 3D simplex
