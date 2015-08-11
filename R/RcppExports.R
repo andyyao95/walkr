@@ -8,6 +8,11 @@
 #' @param A is the matrix being transposed
 #' 
 #' @return transpose of A
+#' @examples
+#' \dontrun{
+#' rcppeigen_ftrans(A)
+#' }
+#' 
 rcppeigen_ftrans <- function(A) {
     .Call('walkr_rcppeigen_ftrans', PACKAGE = 'walkr', A)
 }
@@ -19,6 +24,12 @@ rcppeigen_ftrans <- function(A) {
 #' @param A is the matrix being inverted
 #' 
 #' @return inverse of A
+#' 
+#' @examples
+#' \dontrun{
+#' rcppeigen_fsolve(A)
+#' }
+#' 
 rcppeigen_fsolve <- function(A) {
     .Call('walkr_rcppeigen_fsolve', PACKAGE = 'walkr', A)
 }
@@ -30,6 +41,12 @@ rcppeigen_fsolve <- function(A) {
 #' @param A is the matrix whose determinant calculated 
 #' 
 #' @return determinant of A
+#' 
+#' @examples
+#' \dontrun{
+#' rcppeigen_fdet(A)
+#' }
+#' 
 rcppeigen_fdet <- function(A) {
     .Call('walkr_rcppeigen_fdet', PACKAGE = 'walkr', A)
 }
@@ -42,6 +59,12 @@ rcppeigen_fdet <- function(A) {
 #' @param B is the second parameter in A times B
 #' 
 #' @return matrix product A times B
+#' 
+#' @examples
+#' \dontrun{
+#' rcppeigen_fprod(A, B)
+#' }
+#' 
 rcppeigen_fprod <- function(A, B) {
     .Call('walkr_rcppeigen_fprod', PACKAGE = 'walkr', A, B)
 }
@@ -54,6 +77,12 @@ rcppeigen_fprod <- function(A, B) {
 #' @param B is the second parameter in t(A) times B
 #' 
 #' @return matrix cross-product t(A) times B
+#' 
+#' @examples
+#' \dontrun{
+#' rcppeigen_fcrossprod(A, B)
+#' }
+#' 
 rcppeigen_fcrossprod <- function(A, B) {
     .Call('walkr_rcppeigen_fcrossprod', PACKAGE = 'walkr', A, B)
 }
@@ -66,6 +95,12 @@ rcppeigen_fcrossprod <- function(A, B) {
 #' @param B is the second parameter in A times t(B)
 #' 
 #' @return matrix tcross-product A times t(B)
+#' 
+#' @examples
+#' \dontrun{
+#' rcppeigen_ftcrossprod(A, B)
+#' }
+#' 
 rcppeigen_ftcrossprod <- function(A, B) {
     .Call('walkr_rcppeigen_ftcrossprod', PACKAGE = 'walkr', A, B)
 }

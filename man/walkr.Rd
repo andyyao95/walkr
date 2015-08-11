@@ -29,6 +29,15 @@ A list of chains. Each chain is a matrix with its columns as the sampled
         points.
 }
 \description{
+\tabular{ll}{ Package \tab walkr \cr Type: \tab Package\cr
+Version: \tab 1.0\cr Date: \tab 2015-07-14\cr License: \tab GPL-3\cr }
+
+Given \eqn{Ax = b}, \code{walkr} samples points from the intersection of
+\eqn{Ax = b} with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The
+Ax = b must be underdetermined, otherwise there is an unique solution
+and there will be no sampling.
+}
+\details{
 The \code{walkr} package samples points using MCMC random walks from the
 intersection of the \eqn{N}-Simplex with \eqn{M} hyperplanes. Mathematically
 speaking, the sampling space is all vectors \eqn{x} that satisfy
@@ -37,12 +46,6 @@ algorithms implemented are hit-and-run and Dikin Walk. \code{walkr} also
 provides tools to examine and visualize the convergence properties of the
 random walks.
 
-Given \eqn{Ax = b}, \code{walkr} samples points from the intersection of
-\eqn{Ax = b} with the n-simplex (\eqn{\sum x = 1}, \eqn{x_i \ge 0}). The
-Ax = b must be underdetermined, otherwise there is an unique solution
-and there will be no sampling.
-}
-\details{
 The main function of the package is \code{walkr}. The user specifies \eqn{A} and
 \eqn{b} in \eqn{Ax = b}, and the \code{walkr} function samples points
 from the complete solution to \eqn{Ax=b} intersected with the \eqn{N}-simplex.
@@ -75,5 +78,11 @@ computationally expensive than hit-and-run, so it takes more time
 to sample every point. Thus, the "dikin" method
 uses RcppEigen to speed up the core computationally
 expensive operations in the algorithm.
+}
+\examples{
+## 4D constraint
+A <- matrix(c(2,0,1,3), ncol = 4)
+b <- 0.5
+sampled_points <- walkr(A = A, b = b, points = 100, method = "dikin")
 }
 

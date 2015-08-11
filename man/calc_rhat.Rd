@@ -18,4 +18,10 @@ of each parameter given the list of chains
 that walkr produces. Since this is just an
 internal function, I'll document it more later.
 }
+\examples{
+\dontrun{
+## x is a list of sampled chains
+calc_rhat(x)
+}
+}
 

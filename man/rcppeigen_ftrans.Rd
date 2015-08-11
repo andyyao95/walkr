@@ -15,4 +15,9 @@ transpose of A
 \description{
 Computes using RcppEigen transposed of A
 }
+\examples{
+\dontrun{
+rcppeigen_ftrans(A)
+}
+}
 

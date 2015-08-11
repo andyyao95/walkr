@@ -24,4 +24,11 @@ Given \eqn{Ax \le b}, which defines a convex
 polytope, this function picks n random
 starting "center" points using linear programming.
 }
+\examples{
+\dontrun{
+## note that this Ax <= b is different from Ax=b that the
+## user specifies for walkr (see transformation section in vignette)
+start_point(A = A, b = b, n = 1, average = 10)
+}
+}
 

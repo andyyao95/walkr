@@ -16,6 +16,11 @@
 #' @importFrom limSolve lsei
 #' @importFrom MASS Null
 #' 
+#' @examples 
+#' A <- matrix(1, ncol = 3)
+#' b <- 0.5
+#' complete_solution(A, b)
+#' 
         
 
 complete_solution <- function(A, b) {

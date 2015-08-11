@@ -17,4 +17,9 @@ matrix tcross-product A times t(B)
 \description{
 Computes using RcppEigen the product of A and t(B)
 }
+\examples{
+\dontrun{
+rcppeigen_ftcrossprod(A, B)
+}
+}
 

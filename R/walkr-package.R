@@ -1,4 +1,7 @@
 #' The walkr package.
+#' 
+#' \tabular{ll}{ Package \tab walkr \cr Type: \tab Package\cr 
+#' Version: \tab 1.0\cr Date: \tab 2015-07-14\cr License: \tab GPL-3\cr }
 #'
 #' The \code{walkr} package samples points using MCMC random walks from the 
 #' intersection of the \eqn{N}-Simplex with \eqn{M} hyperplanes. Mathematically

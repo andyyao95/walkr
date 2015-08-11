@@ -23,4 +23,9 @@ complete solution (an affine transformation),
 returning the homogeneous and particular solution
 which describe the polytope in alpha-space
 }
+\examples{
+A <- matrix(1, ncol = 3)
+b <- 0.5
+complete_solution(A, b)
+}
 

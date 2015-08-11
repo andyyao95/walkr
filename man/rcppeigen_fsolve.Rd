@@ -15,4 +15,9 @@ inverse of A
 \description{
 Computes using RcppEigen the inverse of A
 }
+\examples{
+\dontrun{
+rcppeigen_fsolve(A)
+}
+}
 

@@ -42,7 +42,13 @@
 #' 
 #' @return A list of chains. Each chain is a matrix with its columns as the sampled
 #'         points. 
-#'                  
+#'   
+#' @examples
+#' ## 4D constraint
+#' A <- matrix(c(2,0,1,3), ncol = 4)
+#' b <- 0.5
+#' sampled_points <- walkr(A = A, b = b, points = 100, method = "dikin")                
+#'                                                
 #' @export 
 #' 
 

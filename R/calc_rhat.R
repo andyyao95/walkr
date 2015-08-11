@@ -9,6 +9,12 @@
 #' @importFrom stats var
 #' 
 #' @return a vector of rhats 
+#' 
+#' @examples
+#' \dontrun{
+#' ## x is a list of sampled chains
+#' calc_rhat(x)
+#' }
 
 
 calc_rhat <- function(x) {

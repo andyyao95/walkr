@@ -17,4 +17,9 @@ matrix product A times B
 \description{
 Computes using RcppEigen the product of A and B
 }
+\examples{
+\dontrun{
+rcppeigen_fprod(A, B)
+}
+}
 

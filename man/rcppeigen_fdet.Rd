@@ -15,4 +15,9 @@ determinant of A
 \description{
 Computes using RcppEigen the determinant of A
 }
+\examples{
+\dontrun{
+rcppeigen_fdet(A)
+}
+}
 

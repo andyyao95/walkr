@@ -34,4 +34,12 @@ of the Log barrier function. Note that a $r$ of 1 guarantees
 that the ellipsoid generated won't leave our polytope $K$ (see
 Theorems online)
 }
+\examples{
+\dontrun{
+## note that this Ax <= b is different from Ax=b that the
+## user specifies for walkr (see transformation section in vignette)
+dikin_walk(A = A, b = b, x0, points = 100,
+           r = 1thin = 1, burn = 0, chains = 1)
+}
+}
 
