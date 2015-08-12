@@ -23,104 +23,33 @@
 
 \begin{article}
 
-\title{walkr}
+\title{walkr: MCMC Sampling from Convex Polytopes}
 
 \author{by Andy Yao, David Kane}
 
 \maketitle      
 
 \abstract{
-The \texttt{walkr} package uses random walks to sample points from the intersection of 
-the $N$ simplex with $M$ hyperplanes. Mathematically, the sampling space is all vectors $x$ 
-that satisfy $Ax=b$, $\sum x = 1$, and $x_i \geq 0$. The sampling algorithms implemented 
-are hit-and-run and Dikin walk, both of which are MCMC (Monte-Carlo Markov Chain) random 
-walks. \texttt{walkr} also provide tools to examine the convergence
-properties of the random walks.
-
+Consider the intersection of two spaces. The first space is the complete solution space 
+to $Ax=b$ (i.e. all vectors $x$ that satisfy $Ax=b$). The second space is the $N$-Simplex, 
+described by $\sum\limits_{i=1}^N {x_i} = 1$ and $x_i \geq 0$. The intersection of 
+these two spaces is a convex polytope. \pkg{walkr} samples from this intersection using 
+two Monte-Carlo Markov Chain (MCMC) methods: hit-and-run and Dikin walk. \pkg{walkr}
+also provide tools to examine the convergence properties of the random walks. 
+% DESCRIPTION should mirror this abstract very similarly
 }
 
 \section{Introduction} 
 
-Consider all possible vectors $x$ that satisfy the underdetermined matrix equation $Ax=b$, such that 
-every component of $x$ is $\geq 0$ and sum to $1$. How do we generate a diverse sample of such 
-$x$'s? The \texttt{walkr} package uses MCMC (Monte-Carlo Markov Chain) random walks to generate 
-such a sample.
+Consider all possible vectors $x$ that satisfy the underdetermined matrix equation $Ax=b$,
+where $A$ is a $M \times N$ matrix, $x$ is a $N \times 1$ vector, and $b$ is a $M \times 1$ vector. 
+Assuming that the rows of $A$ are linearly indepedent (if not, then remove rows until linearly independent), 
+the problem is only interesting when there are more rows than columns (more variables than equations, or $M < N$). 
+If $M = N$, then there is only a single solution, and if $M > N$, there then are no solutions. 
+When $M \ll N$, the problem is especially interesting, as the solution space is infinite and complicated. \\
 
-\texttt{walkr} contains two MCMC random walks. Our first random walk is hit-and-run. 
-Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
-but mixes slower and slower as the dimensions of $A$ increase. Our second random walk is the 
-Dikin Walk, which generates a nearly uniform sample and exhibits much stronger mixing. 
-\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) 
-for its core matrix calculations which take up most of the run-time.
-
-\texttt{walkr} also provides statistical diagnostics of the mixing and convergence
-properties of a MCMC random walk. 
-
-\section{Mathematical Background of Sampling Space}
-
-In this section, we go through the mathematical background of the space from which 
-we are sampling -- the intersection of the $N$-simplex and hyperplanes. The reader does not need to 
-read this section in order to use our package or understand the sampling algorithms. 
-However, this section should provide the reader a better sense of what the sample space 
-is geometrically and mathematically. 
-
-\textbf{1) } $\mathbf{Ax = b}$ represent a system of $M$ linear equations with $N$ variables ($M \ll N$). 
-Hence, $A$ is a $M \times N$ matrix ($M$ variables and $N$ constraints), $x$ is 
-a $N \times 1$ vector, and $b$ is a $M \times 1$ vector. Every row in $A$ represents a hyperplane
-in $\mathbb{R}^N$.
-
-\textbf{2) The $\mathbf{N}$-dimensional unit simplex ($\mathbf{N}$-Simplex)} is described by:
-
-$$x_1 + x_2 + x_3 + ... + x_N = 1$$
-$$x_i \geq 0$$
-
-\subsection{Sampling space: simple 3D case}
-
-Let's begin with the simplest case -- one linear constraint in 3 dimensional space.
-
-$$x_1 + x_3 = 0.5$$
-
-We can express this in terms of matrix equation $Ax=b$, where:
-
-$$
-A = 
-\begin{bmatrix}
-1 & 0 & 1 \\
-\end{bmatrix},
-\quad
-b = 0.5,
-\quad
-x = 
-\begin{bmatrix}
-x_1 \\
-x_2 \\
-x_3 \\
-\end{bmatrix}
-$$ 
-
-In addition, we require the solution space to be intersected with the $3$D simplex: 
-
-$$\sum x_i = 1$$
-$$x_i \geq 0$$
-
-In the following graph, we draw the intersection of the two. 
-The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents 
-the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) 
-is the red line segment, which is our sampling space.
-
-% The figure below should be replaced with one that is better drawn
-
-\begin{figure}[H]
-\centering
-\includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
-\caption[caption]{The sampling space is the line segment (red), which is the intersection
-                  of the 3D simplex (orange) and a hyperplane (blue)}
-\end{figure}
-
-\subsection{Matrix Representation of Multiple Hyperplanes}
-
-Every hyperplane is described by one linear equation. Thus, a system of linear equations is the intersection
-of hyperplanes. In general, if we have $M$ linear equations and $N$ variables, then $Ax=b$ would look like:
+Geometrically, every row in $Ax=b$ describes a hyperplane in $\mathbb{R}^N$. Therefore, $Ax=b$ represents
+the intersection of hyperplanes in $\mathbb{R}^N$. 
 
 $$
 A_{M \times N} = 
@@ -129,575 +58,672 @@ A_{M \times N} =
    & & & & & & \\
    & & & ... & & & \\
    & & & & & & \\
-%    &  & . & . & . &  & \\
-%    &  & . & . & . &  & \\
-%    &  & . & . & . &  & \\
-%    & & & & & & \\
   \end{bmatrix}
 }_\text{N columns (variables)}
 \Bigg\}\text{{M rows (constraints)}}
 $$
 
-Again, $b$ is a $M \times 1$ vector, and $x$ is a $N \times 1$ vector.
-
-\subsection{$4$D space}
-
-Just like how the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simplex 
-(i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) could be viewed as a $3$D object. Specifically,
-the $4$D simplex is the following tetradhedron when viewed from $3$D space, with 
-verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.\\
-
-% Figure needs to be replaced
-
-\begin{figure}[H]
-\centering
-\includegraphics[width = 3in, height = 2.5in]{img/tetra1.png}
-\caption[caption]{4D Simplex Can Live in 3D Space}
-\end{figure}
-
-Now imagine the intersection of the $4$D simplex with one hyperplane in $4$D (1 equation,
-or 1 row in $Ax=b$). For a specific $A$ and $b$, we demonstrate the intersection 
-in the figure below. The resulting shape is a trapezoid in $4$D space. 
-
-$$
-A = 
-\begin{bmatrix}
-1 & 1 & 1 & 1 \\
-22 & 2 & 2 & 37\\
-\end{bmatrix},
-\quad
-b = 
-\begin{bmatrix}
-1\\
-16
-\end{bmatrix}
-$$
-
-\begin{figure}[H]
-\centering
-\includegraphics[width = 3in, height = 2.5in]{img/tetra2.png}
-\caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
-\end{figure}
-
-In higher dimensions, the same logic applies. 
-Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$ (given $N$
-variables). Thus, geometrically, our sampling space is: \textbf{the intersection of hyperplanes
-with the $N$-simplex}. 
-
-\subsection{From $Ax=b$ and the $N$-simplex to $Ax \leq b$}
-
-Our sampling space is bounded (i.e. has finite volume in 
-$\mathbb{R}^N$). More formally, our sampling space is known as a \textbf{convex-polytope} 
-in $\mathbb{R}^N$. Convex-polytopes are commonly 
-described in the literature by a generic $Ax \leq b$. Here, we present a simple linear transformation 
-which transforms the intersection of $Ax=b$ and the $N$-simplex to the form
-$Ax \leq b$. \\
-
-First, note that the equality part of the simplex constraint ($\sum x = 1$) could be added as an extra row 
-in $Ax = b$
-
-$$
-A =
-  \begin{bmatrix}
-   & & ...... & & & \\
-   & & ......  & & & \\
-   & & ...... & & & \\
-   1 & 1 & ...... & 1 & 1 \\
-
-  \end{bmatrix}, 
-\quad 
-b = 
-  \begin{bmatrix}
-  ... \\
-  ... \\
-  ... \\
-  1 \\
-  \end{bmatrix}
-$$
-
-Second, to find the complete solution to the new $Ax = b$ (i.e. the set of all possible $x$'s that satisfy
-$Ax=b$), we must find the Null Space of $A$(all $x$'s that satisfy $Ax=0$), 
-then add on any particular solution to $Ax = b$ (This procedure can be found in any 
-Linear Algebra textbook). \\
-
-Mathematically, if the original $A$ was $M \times N$, then after adding on the extra row from the simplex, 
-the basis vectors, each with $N$ components, which span the Null Space of our new $A$ will be: 
-
-$$
-\Bigg\{
-v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
-\Bigg\}
-$$
-
-\noindent Using any particular solution, $v_{particular}$, the complete solution to the new $Ax=b$
-will be 
-
-$$
-\Bigg\{
-v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-\quad | \quad \alpha_i \in \mathbb{R}
-\Bigg\}
-$$ \\ 
-
-Lastly, we tag on the $x_i \geq 0$ constraints, and with some algebraic manipulations:
-
-$$v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-\quad \geq
-\begin{bmatrix}
-0 \\
-0 \\
-... \\
-... \\
-... \\
-0 \\
-\end{bmatrix}
-$$
-
-$$
-\alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-\quad \geq -v_{particular}
-$$
-
-$$
-V\alpha \geq -v_{particular}, \quad \text{where:} \quad
-V = 
-\begin{bmatrix}
-v_1 &
-v_2 &
-... &
-v_{N-(M+1)} \\
-\end{bmatrix}, 
-\quad
-\alpha = 
-\begin{bmatrix}
-\alpha_1 \\
-\alpha_2 \\
-... \\
-\alpha_{N-(M+1)}
-\end{bmatrix}
-$$
-
-\noindent And finally, we arrive at the form $Ax \leq b$.
-
-$$
--V\alpha \leq v_{particular}
-$$
-
-We have performed a \textbf{transformation} from "$x$-space" (
-coordinates described by $x_1, x_2, ...$) to "$\alpha$-space" (coordinates described 
-by $\alpha_1, \alpha_2, ...$). The geometric object described is still the same convex
-polytope. In fact, \texttt{walkr} internally performs this transformation, 
-samples the $\alpha$'s, maps them back to "$x$-space, and then
-returns the sampled points. \\
-
-The user need not be concerned with this transformation affecting the uniformity 
-or mixing properties of our MCMC sampling algorithms. This is because the transformation
-above is an affine transformation, which preserves uniformity.
-Simply put, sampling in either space is equivalent. \\
-
-Having understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, 
-we are ready to dive into the core of \texttt{walkr}
--- MCMC random walks.
-
-\section{Random Walk: How to pick starting points?}
-
-% analytic center?
-
-MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
-generates such starting points using linear programming.
-Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which:
-
-$$\text{minimizes} \quad |Cx-d|^2$$
-$$\text{subject to} \quad Ax \leq b$$
-
-Thus, we randomly generate $C$ and $d$ obtaining $x$ which satisfy $Ax \leq b$. We discovered that 
-the $x$'s generated this way fall randomly on the boundaries of our convex polytope, due to 
-the minimizing property of linear programming. Thus, we repeat this for say,
-10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
-
-\section{Random Walk: Hit-and-run}
-
-The hit-and-run algorithm is as follows:
-
-\begin{enumerate}
-  
-  \item{Set starting point $x_0$ as current point}
-  \item{Randomly generate a direction $\vec{d}$. If we are in $N$ dimensions, then $d$ will 
-        be a vector of $N$ components. Specifically, $d$ is a uniformly generated 
-        unit vector on the $N$ dimensional unit-sphere}
-  \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$.  
-        We find end points $s_1$ and $s_2$ of the chord by going through the rows 
-        of $Ax_0 \leq b$ one by one, setting the inequality to equality (so we hit the surface). 
-        Then, parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
-  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}}
-  \item{Set $x_1$ as current point}
-  \item{Repeat algorithm until number of desired points sampled}
-        
-\end{enumerate}
-
-Here is a picture of the hit-and-run algorithm: \newpage
-
-\begin{figure}[ht]
-\centering
-\subfigure[Step 1]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
-\label{fig:subfigure1}}
-\subfigure[Step 2]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
-\label{fig:subfigure1}}
-\quad
-\subfigure[Step 3]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
-\label{fig:subfigure2}}
-\subfigure[Step 4]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-\label{fig:subfigure3}}
-\quad
-\subfigure[Step 5]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
-\label{fig:subfigure4}}
-%
-\caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction
-         is selected (Step 2), and the chord along that direction is calculated (Step 3).
-         Then, we pick a random point along that chord and move there as our new point (Step 4).
-         The algorithm is repeated to sample many points (Step 5)}
-\label{fig:figure}
-\end{figure}
-
-The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
-\code{hit-and-run} package on CRAN (\cite{hitandrun}). \code{walkr} serves as a convenient wrapper
-with MCMC diagnostics and multiple chains. 
-
-%probably also want to discuss important facts about the algorithm here.
-
-\section{Random Walk: Dikin Walk}
-
-\subsection{Preliminary Definitions}
-
-Recall, our sampling space is a convex polytope. We call this convex 
-polytope $K$, which can be described in the form $Ax \leq b$. \\
-
-For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
-the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matrix. \\
-
-\noindent \textbf{Log Barrier Function $\phi$:} 
-
-$$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
-
-The log-barrier function of $Ax \leq b$ measures how "extreme" or "close-to-the-boundary" a point 
-$x \in K$ is. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
-boundary of the polytope $K$. Mathematically, the polytope could be described by: 
-
-$$Ax \leq b$$
-$$b - Ax \geq 0$$
-
-Also recall that the negative logarithmic graph looks like this: \\
-
-
-<<example1, eval = TRUE, fig.width=3, fig.height=3>>=
-
-z <- seq(0, 1, 0.0001)
-
-plot(-log(z)~z, type = 'l', ylim = c(0,5))
-
-@
-
-Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
-of the convex polytope $K$ (as $(b_i-a_ix) \rightarrow 0$). \\
-
-\noindent \textbf{Hessian of Log Barrier $H_x$:} 
-
-$$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A \quad , \quad \text{where:}$$
-$$D = diag(\frac{1}{b_i - a_i^Tx})$$
-
-\textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
-
-The Hessian matrix($H_x = \nabla ^2 \phi(x)$) contains all the second derivatives 
-of the function $\phi(x)$ with respect to vector $x$. In the land of optimization, 
-the Hessian contains information on how the landscape is shaped, and also on extreme values of 
-the landscape. To develop a better understanding of our intuition for the Hessian, we 
-can think of it as a generalized notion of the second derivative. \\
-
-Let $z$ denote $b_i - a_ix$.
-Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks like this: \\
-
-<<example1_5, eval = TRUE, fig.width = 3, fig.height = 3>>=
-
-z <- seq(0, 1, 0.0001)
-
-plot((1/z^2)~z, type = 'l', ylim = c(0,50))
-
-@
-
-As we could see from the plot, as $z \rightarrow 0$ ($x \rightarrow \text{boundary}$), the rate at 
-which the Hessian increases becomes faster and faster. %Thus, the Hessian of the log-barrier is 
-%a function that quantifies how quickly 
-
-\noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
-
-$D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
-
-\begin{center}
-$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
-\end{center}
-
-The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
-"Hessian norm" as the notion of length. The "Hessian norm" we could think as a $\delta y$ on 
-the previous $\frac{1}{z^2}$ graph. For $x_0$ that are far away from the boundary, given
-an allowed $\delta y$ (captured in $r$), the range for allowed value of $z$ is very large.
-This corresponds to having a large ellipsoid. \\
-
-To rephrase, the Dikin Ellipsoid is the collection of all points whose difference with 
-the current point($y-x_0$) is within the unit threshhold of $r=1$. When the center $x_0$ of the Dikin Ellipsoid 
-is far from the boundary of the polytope, the ellipsoid is larger, as a large $\delta (z-x)$ corresponds
-to a small $\delta y$. As the center point $x_0$ approaches the boundary 
-of the polytope, the ellipsoid becomes smaller and smaller. Therefore, the ellipsoid is able to reshape 
-itself as it surveys through the polytope $K$, biasing away from the corners of the region(\cite{kannan}).
-
-\subsection{Algorithm \texttt{Dikin}}
-
-\begin{enumerate}
-
-  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
-  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
-  \item{Pick a random point $y$ from $D_{x_0}$}
-  \item{If $x_0 \notin D_{y}$, then reject $y$ (be careful, this condition is counter-intuitive)}
-  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
-        (the big picture is that the ratio of the determinants are equal
-         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
-         the geometric argument would be that 
-         this way the Dikin walk can avoid extreme corners of the region)}
-  \item{repeat until obtained number of desired points}
-
-\end{enumerate}
-\newpage
-
-\begin{figure}[ht]
-\centering
-\subfigure[Step 1]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
-\label{fig:subfigure1}}
-\subfigure[Step 2]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
-\label{fig:subfigure2}}
-\quad
-\subfigure[Step 3 Case I]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
-\label{fig:subfigure3}}
-\subfigure[Step 3 Case II]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
-\label{fig:subfigure4}}
-\quad
-\subfigure[Step 4]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
-\label{fig:subfigure5}}
-\subfigure[Step 5]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
-\label{fig:subfigure6}}
+However, the intersection of hyperplanes described by $Ax=b$ is unbounded, as the solution space
+streches to infinity. Therefore, we bound the sampling space by also requiring vector $x$
+to be on the $N$-Simplex. The $\mathbf{N}$\textbf{-Simplex} is described by:
+
+$$x_1 + x_2 + x_3 + ... + x_N = 1$$
+$$x_i \geq 0, \qquad \forall i \in \text{\{$1, 2, ..., N$\}}$$ 
+
+It is a $N-1$ dimensional object living in $N$ dimensional space. For example, the $3$D Simplex 
+is a $2$ dimensional triangle in $3$D space (reference figure here). \\ %insert 3d simplex figure
+
+The intersection of the complete solution to $Ax=b$ and the $N$-Simplex is a 
+convex polytope. This convex polytope quickly becomes extremely complex, 
+as its number of vertices grow combinatorically with $N$. Sampling from such a convex polytope 
+is a difficult problem, and the common approach is to run Monte Carlo Markov Chains (MCMC) 
+in the interior of the polytope. \\
+
+\pkg{walkr} contains two MCMC random walks. Our first random walk is hit-and-run. 
+Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
+but mixes slower and slower as the dimensions of $A$ increase (cite hitandrun here). 
+Our second random walk is the Dikin Walk, which generates a nearly uniform sample and exhibits 
+much stronger mixing (\cite{kannan}). 
+\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) % skip space between Rcpp and \cite
+for its core matrix calculations which take up most of the run-time.
+
+% reference to the 2 algorithms itself belong in the introduction
+% walkr package can be considered an extension to the hitandrun package 
+
+\texttt{walkr} also provides statistical diagnostics of the mixing and convergence
+properties of a MCMC random walk. 
+
+% ^^^ make this a paragraph. How do you know mixing. how do you you're not getting into corners
+% we generally use multiple chains 
+% you can tell when this HAVENT mixed
+% easier to tell its screwed up 
+% harder to tell that its not screwed up at all
+
+%  INSTEAD: \section{Simple Examples}
+
+% in order to fix ideas, lets go through 3D and 4D examples
 
 %
-\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
-         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
-         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
-         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
-         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
-         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
-         Algorithm repeats (Step 5)}
-         
-\label{fig:figure}
-\end{figure}
 
-\subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
-
-Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
-
-\begin{enumerate}
-
-  \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
-  \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
-    \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
-            {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
-            \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
-            \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
-  \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
-        of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
-  \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
-
-\end{enumerate}
-
-\subsection{Important Theorem}
-
-In algorithm \texttt{Dikin}, what if the point $y$ we accept is outside 
-of our polytope $K$? Luckily, there is no need to worry about that because of the following theorem: \\
-
-\noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
-if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
-at $x_0$ with radius $1$ will always be contained in $K$. \\
-
-Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
-within the polytope $K$.
-
-\section{Using \texttt{walkr} to sample points}
-
-%% this is helpful : http://yihui.name/knitr/options/
-
-
-\texttt{walkr} has one main function \code{walkr} which sample points. \\
-
-First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
-for a 5 dimensional case:
-
-<<example2, eval = T>>=
-A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
-b <- 0.5
-A
-b
-@
-
-The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
-if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
-simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
-
-<<example3, eval = FALSE>>=
-A <- matrix(1, ncol = 5)
-@
-
-After we have \code{A} and \code{B}, we are now ready for sampling. \texttt{walkr} has the following
-parameters:
-
-\begin{itemize}
-
-  \item{ \code{A} is the right hand side of the matrix equation $Ax=b$}
-  \item{ \code{b} is the left hand side of the matrix equation $Ax=b$}
-  \item{ \code{method} is the method of sampling -- can be either \code{"hit-and-"run"} or 
-         \code{"dikin"}}
-  \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is stored into the final sample}
-  \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
-  \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
-        of the list which \code{walkr} eventually returns}
-  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
-         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
-         then a single matrix of points is returned. A column is a sampled point.}
-
-\end{itemize}
-
-\code{walkr} warns the user if the chains have not mixed "well-enough" or have not converged
-to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{gelman}). 
-
-<<example4, eval = TRUE>>=
-## sampling from the 3D simplex
-library(walkr)
-A <- matrix(1, ncol = 3)
-b <- 1
-answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
-                thin = 1, burn = 0, chains = 5, ret.format = "list")
-answer
-@
-
-As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
-then the statistical tests pass.
-
-<<example5, eval = TRUE>>=
-answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
-                thin = 1, burn = 0, chains = 5, ret.format = "list")
-@
-
-Moreover, \code{walkr} provides an easy to use wrapper function \code{explore\_walkr} which
-calls \code{shinystan} to diagnose and visualize the MCMC chains. Note that the \code{"ret.format"}
-must be a \code{"list"}.
-
-<<example5_5, eval = FALSE>>=
-explore_walkr(answer)
-@
-
-%% ATTACH SCREENSHOT HERE
-
-\section{Dikin versus Hitandrun}
-%reference here:{http://www.mit.edu/~har/Dikin.pdf}
-\begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
-  \hline
-   &  \texttt{hit-and-run} & \texttt{Dikin Walk} \\ \hline
-  Uniform Sampling & Yes, needs $O(N^3)$ points, where $N$ is the dimension of the polytope & 
-  No, concentrates in the    interior\\ \hline
-  Mixing & $O(\frac{N^2R^2}{r^2})$ *, slows down substantially as dimension of polytope increases and 
-  polytope becomes "skinnier" & $O(MN)$, where $A$ is $M \times N$; much stronger mixing. \\ \hline
-  Cost of One Step & $O(MN)$ & $O(MN^2)$, in practice, one step of Dikin is much more 
-  costly than hit-and-run\\ \hline
-  Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
-  not high\\ \hline
-
-\end{tabular} \\
-
-*$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
-largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
-as the polytope is "skinnier"(\cite{kannan}). \\
-
-As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
-given the same set of parameters
-
-<<example7, eval = TRUE, fig.width=5, fig.height=3>>=
-set.seed(314)
-N <- 50
-A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)
-A <- rbind(A, matrix(sample(c(0,3), N, replace = T), nrow = 1))
-b <- c(0.7, 0.3)
-
-answer_hitandrun <- walkr(A = A, b = b, points = 500, method = "hit-and-run", 
-                 thin = 10, burn = 0, chains = 1)
-answer_dikin <- walkr(A = A, b = b, points = 500, method = "dikin", 
-                 thin = 10, burn = 0, chains = 1)
-
-plot(y = answer_hitandrun[50,], x = 1:500, 
-     xlab = "random walk", ylab = "value", type = 'l', 
-     main = "Hit-and-run Mixing",
-     ylim = c(0, 0.2))
-plot(y = answer_dikin[50,], x = 1:500, 
-     xlab = "random walk", ylab = "value", type = 'l',
-     main = "Dikin Mixing", 
-     ylim = c(0, 0.2))
-@
-
-As mentioned before, Dikin samples more in the interior of the polytope $K$.
-
-% # <<example8, eval = TRUE, fig.width = 3, fig.height = 4>>=
-% # A <- matrix(c(2,0,3,0), ncol = 4)
-% # b <- 0.5
-% # set.seed(314)
-% # z1 <- walkr(A = A, b = b, points = 1000, method = "dikin")
-% # z2 <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
-% # library(scatterplot3d)
-% # scatterplot3d(x = z1[2,], y = z1[3, ], z = z1[4, ], pch = 19, scale.y = 2, main = "Dikin")
-% # scatterplot3d(x = z2[2,], y = z2[3, ], z = z2[4, ], pch = 19, scale.y = 2, main = "Hit-and-Run")
-% # @
-
-
-\section{Conclusion}
-
-\code{walkr} samples $x$ that satisfy the underdetermined matrix equation $Ax=b$, every component
-of $x$ is non-negative, and every component sum to $1$. \code{walkr} internally performs the affine
-transformation which transforms $Ax=b$ and the simplex constraints into the $Ax \leq b$ form. Then, 
-\code{walkr} samples points under this transform, takes the inverse transform, and finally
-returns the $x$'s sampled.
-
-The two methods that the user may specify is \code{"dikin"} and \code{"hit-and-run"}. Hit-and-run
-is a widely used sampling method that converges to the uniform sampling asymptotically, but 
-fails to mix well in higher dimensions. Dikin generates a nearly uniform sample, but mixes stronger than
-hit-and-run, especially in higher dimensions. In addition, \code{walkr} will warn the user if the 
-mixing is not strong enough according to the Gelman-Rubin Diagnostics.
-
-\section{Authors}
-
-\address{Andy Yao\\
-Mathematics and Physics\\
-Williams College \\
-Williamstown, MA, USA\\}
-\email{andy.yao17@gmail.com}
-
-\address{David Kane\\
-Managing Director \\
-Hutchin Hill Capital\\
-101 Federal Street, Boston, USA\\}
-\email{dave.kane@gmail.com}
+%' \section{Mathematical Background of Sampling Space}
+%' 
+%' In this section, we go through the mathematical background of the space from which 
+%' we are sampling -- the intersection of the $N$-simplex and hyperplanes. The reader does not need to 
+%' read this section in order to use our package or understand the sampling algorithms. 
+%' However, this section should provide the reader a better sense of what the sample space 
+%' is geometrically and mathematically. 
+%' 
+%' 
+%' % THIS SECTION, JUST REMOVE. JUST EXPLAIN MORE CLEARLY IN INTRODUCTION
+%' 
+%' 
+%' \subsection{Sampling space: simple 3D case}
+%' 
+%' Let's begin with the simplest case -- one linear constraint in 3 dimensional space.
+%' 
+%' $$x_1 + x_3 = 0.5$$
+%' 
+%' We can express this in terms of matrix equation $Ax=b$, where:
+%' 
+%' $$
+%' A = 
+%' \begin{bmatrix}
+%' 1 & 0 & 1 \\
+%' \end{bmatrix},
+%' \quad
+%' b = 0.5,
+%' \quad
+%' x = 
+%' \begin{bmatrix}
+%' x_1 \\
+%' x_2 \\
+%' x_3 \\
+%' \end{bmatrix}
+%' $$ 
+%' 
+%' % instead of "following graph" ==> in figure (\ref{figure label}), something like that 
+%' 
+%' In the following graph, we draw the intersection of the two. 
+%' The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents 
+%' the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) 
+%' is the red line segment, which is our sampling space.
+%' 
+%' % The figure below should be replaced with one that is better drawn
+%' 
+%' \begin{figure}[H]
+%' \centering
+%' \includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
+%' \caption[caption]{The sampling space is the line segment (red), which is the intersection
+%'                   of the 3D simplex (orange) and a hyperplane (blue)}
+%' \end{figure} % figure needs to have stand-alone caption, so make it more
+%' 
+%' \subsection{$4$D space}
+%' 
+%' Just like how the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simplex 
+%' (i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) could be viewed as a $3$D object. Specifically,
+%' the $4$D simplex is the following tetradhedron when viewed from $3$D space, with 
+%' verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.\\
+%' 
+%' % Figure needs to be replaced
+%' % FIGURE NEEDS TO LOOK MORE LIKE A EQUILATERAL 
+%' \begin{figure}[H]
+%' \centering
+%' \includegraphics[width = 3in, height = 2.5in]{img/tetra1.png}
+%' \caption[caption]{4D Simplex Can Live in 3D Space} % NEED SENTENCES EXPLAINING THIS 
+%' \end{figure} %4D simplex is something that theoretically exists in 4D space but can be viewed as a 3D object
+%' 
+%' Now imagine the intersection of the $4$D simplex with one hyperplane in $4$D (1 equation,
+%' or 1 row in $Ax=b$). For a specific $A$ and $b$, we demonstrate the intersection 
+%' in the figure below. The resulting shape is a trapezoid in $4$D space. 
+%' 
+%' $$
+%' A = 
+%' \begin{bmatrix}
+%' 1 & 1 & 1 & 1 \\
+%' 22 & 2 & 2 & 37\\
+%' \end{bmatrix},
+%' \quad
+%' b = 
+%' \begin{bmatrix}
+%' 1\\
+%' 16
+%' \end{bmatrix}
+%' $$
+%' 
+%' \begin{figure}[H]
+%' \centering
+%' \includegraphics[width = 3in, height = 2.5in]{img/tetra2.png}
+%' \caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
+%' \end{figure}
+%' 
+%' In higher dimensions, the same logic applies. 
+%' Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$ (given $N$
+%' variables). Thus, geometrically, our sampling space is: \textbf{the intersection of hyperplanes
+%' with the $N$-simplex}. 
+%' 
+%' % NEW SECTION
+%' % GOING FROM X SPACE TO ALPHA SPACE 
+%' 
+%' % There are 3 steps. first step is to combine simplex equality constraint into Ax = b
+%' % second step is Ax = b solve for null space (we will abuse notation)
+%' % third step is transforming to Ax <= b 
+%' 
+%' % maybe show for example for 3D case
+%' 
+%' \subsection{From $Ax=b$ and the $N$-simplex to $Ax \leq b$}
+%' 
+%' Our sampling space is bounded (i.e. has finite volume in 
+%' $\mathbb{R}^N$). More formally, our sampling space is known as a \textbf{convex-polytope} 
+%' in $\mathbb{R}^N$. Convex-polytopes are commonly 
+%' described in the literature by a generic $Ax \leq b$. Here, we present a simple linear transformation 
+%' which transforms the intersection of $Ax=b$ and the $N$-simplex to the form
+%' $Ax \leq b$. \\
+%' 
+%' First, note that the equality part of the simplex constraint ($\sum x = 1$) could be added as an extra row 
+%' in $Ax = b$
+%' 
+%' $$
+%' A =
+%'   \begin{bmatrix}
+%'    & & ...... & & & \\
+%'    & & ......  & & & \\
+%'    & & ...... & & & \\
+%'    1 & 1 & ...... & 1 & 1 \\
+%' 
+%'   \end{bmatrix}, 
+%' \quad 
+%' b = 
+%'   \begin{bmatrix}
+%'   ... \\
+%'   ... \\
+%'   ... \\
+%'   1 \\
+%'   \end{bmatrix}
+%' $$
+%' 
+%' Second, to find the complete solution to the new $Ax = b$ (i.e. the set of all possible $x$'s that satisfy
+%' $Ax=b$), we must find the Null Space of $A$(all $x$'s that satisfy $Ax=0$), 
+%' then add on any particular solution to $Ax = b$ (This procedure can be found in any 
+%' Linear Algebra textbook). \\ % for review of concepts: linear algebra 
+%' 
+%' Mathematically, if the original $A$ was $M \times N$, then after adding on the extra row from the simplex, 
+%' the basis vectors, each with $N$ components, which span the Null Space of our new $A$ will be: 
+%' 
+%' $$
+%' \Bigg\{
+%' v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
+%' \Bigg\}
+%' $$
+%' 
+%' \noindent Using any particular solution, $v_{particular}$, the complete solution to the new $Ax=b$
+%' will be 
+%' 
+%' $$
+%' \Bigg\{
+%' v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+%' \quad | \quad \alpha_i \in \mathbb{R}
+%' \Bigg\}
+%' $$ \\ 
+%' 
+%' Lastly, we tag on the $x_i \geq 0$ constraints, and with some algebraic manipulations:
+%' 
+%' $$v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+%' \quad \geq
+%' \begin{bmatrix}
+%' 0 \\
+%' 0 \\
+%' ... \\
+%' ... \\
+%' ... \\
+%' 0 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' $$
+%' \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+%' \quad \geq -v_{particular}
+%' $$
+%' 
+%' $$
+%' V\alpha \geq -v_{particular}, \quad \text{where:} \quad
+%' V = 
+%' \begin{bmatrix}
+%' v_1 &
+%' v_2 &
+%' ... &
+%' v_{N-(M+1)} \\
+%' \end{bmatrix}, 
+%' \quad
+%' \alpha = 
+%' \begin{bmatrix}
+%' \alpha_1 \\
+%' \alpha_2 \\
+%' ... \\
+%' \alpha_{N-(M+1)}
+%' \end{bmatrix}
+%' $$
+%' 
+%' \noindent And finally, we arrive at the form $Ax \leq b$.
+%' 
+%' $$
+%' -V\alpha \leq v_{particular}
+%' $$
+%' 
+%' We have performed a \textbf{transformation} from "$x$-space" (
+%' coordinates described by $x_1, x_2, ...$) to "$\alpha$-space" (coordinates described 
+%' by $\alpha_1, \alpha_2, ...$). The geometric object described is still the same convex
+%' polytope. In fact, \texttt{walkr} internally performs this transformation, 
+%' samples the $\alpha$'s, maps them back to "$x$-space, and then
+%' returns the sampled points. \\
+%' 
+%' The user need not be concerned with this transformation affecting the uniformity 
+%' or mixing properties of our MCMC sampling algorithms. This is because the transformation
+%' above is an affine transformation, which preserves uniformity.
+%' Simply put, sampling in either space is equivalent. \\
+%' 
+%' Having understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, 
+%' we are ready to dive into the core of \texttt{walkr}
+%' -- MCMC random walks.
+%' 
+%' \section{Random Walk: How to pick starting points?}
+%' 
+%' % analytic center?
+%' 
+%' MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
+%' generates such starting points using linear programming.
+%' Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which:
+%' 
+%' $$\text{minimizes} \quad |Cx-d|^2$$
+%' $$\text{subject to} \quad Ax \leq b$$
+%' 
+%' Thus, we randomly generate $C$ and $d$ obtaining $x$ which satisfy $Ax \leq b$. We discovered that 
+%' the $x$'s generated this way fall randomly on the boundaries of our convex polytope, due to 
+%' the minimizing property of linear programming. Thus, we repeat this for say,
+%' 10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
+%' 
+%' \section{Random Walk: Hit-and-run}
+%' 
+%' The hit-and-run algorithm is as follows:
+%' 
+%' \begin{enumerate}
+%'   
+%'   \item{Set starting point $x_0$ as current point}
+%'   \item{Randomly generate a direction $\vec{d}$. If we are in $N$ dimensions, then $d$ will 
+%'         be a vector of $N$ components. Specifically, $d$ is a uniformly generated 
+%'         unit vector on the $N$ dimensional unit-sphere}
+%'   \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$.  
+%'         We find end points $s_1$ and $s_2$ of the chord by going through the rows 
+%'         of $Ax_0 \leq b$ one by one, setting the inequality to equality (so we hit the surface). 
+%'         Then, parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
+%'   \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}}
+%'   \item{Set $x_1$ as current point}
+%'   \item{Repeat algorithm until number of desired points sampled}
+%'         
+%' \end{enumerate}
+%' 
+%' Here is a picture of the hit-and-run algorithm: \newpage
+%' 
+%' \begin{figure}[ht]
+%' \centering
+%' \subfigure[Step 1]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
+%' \label{fig:subfigure1}}
+%' \subfigure[Step 2]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
+%' \label{fig:subfigure1}}
+%' \quad
+%' \subfigure[Step 3]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
+%' \label{fig:subfigure2}}
+%' \subfigure[Step 4]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+%' \label{fig:subfigure3}}
+%' \quad
+%' \subfigure[Step 5]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+%' \label{fig:subfigure4}}
+%' %
+%' \caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction
+%'          is selected (Step 2), and the chord along that direction is calculated (Step 3).
+%'          Then, we pick a random point along that chord and move there as our new point (Step 4).
+%'          The algorithm is repeated to sample many points (Step 5)}
+%' \label{fig:figure}
+%' \end{figure}
+%' 
+%' The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
+%' \code{hit-and-run} package on CRAN (\cite{hitandrun}). \code{walkr} serves as a convenient wrapper
+%' with MCMC diagnostics and multiple chains. 
+%' 
+%' %probably also want to discuss important facts about the algorithm here.
+%' 
+%' \section{Random Walk: Dikin Walk}
+%' 
+%' \subsection{Preliminary Definitions}
+%' 
+%' Recall, our sampling space is a convex polytope. We call this convex 
+%' polytope $K$, which can be described in the form $Ax \leq b$. \\
+%' 
+%' For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
+%' the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matrix. \\
+%' 
+%' \noindent \textbf{Log Barrier Function $\phi$:} 
+%' 
+%' $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
+%' 
+%' The log-barrier function of $Ax \leq b$ measures how "extreme" or "close-to-the-boundary" a point 
+%' $x \in K$ is. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
+%' boundary of the polytope $K$. Mathematically, the polytope could be described by: 
+%' 
+%' $$Ax \leq b$$
+%' $$b - Ax \geq 0$$
+%' 
+%' Also recall that the negative logarithmic graph looks like this: \\
+%' 
+%' 
+%' <<example1, eval = TRUE, fig.width=3, fig.height=3>>=
+%' 
+%' z <- seq(0, 1, 0.0001)
+%' 
+%' plot(-log(z)~z, type = 'l', ylim = c(0,5))
+%' 
+%' @
+%' 
+%' Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
+%' of the convex polytope $K$ (as $(b_i-a_ix) \rightarrow 0$). \\
+%' 
+%' \noindent \textbf{Hessian of Log Barrier $H_x$:} 
+%' 
+%' $$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A \quad , \quad \text{where:}$$
+%' $$D = diag(\frac{1}{b_i - a_i^Tx})$$
+%' 
+%' \textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
+%' 
+%' The Hessian matrix($H_x = \nabla ^2 \phi(x)$) contains all the second derivatives 
+%' of the function $\phi(x)$ with respect to vector $x$. In the land of optimization, 
+%' the Hessian contains information on how the landscape is shaped, and also on extreme values of 
+%' the landscape. To develop a better understanding of our intuition for the Hessian, we 
+%' can think of it as a generalized notion of the second derivative. \\
+%' 
+%' Let $z$ denote $b_i - a_ix$.
+%' Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks like this: \\
+%' 
+%' <<example1_5, eval = TRUE, fig.width = 3, fig.height = 3>>=
+%' 
+%' z <- seq(0, 1, 0.0001)
+%' 
+%' plot((1/z^2)~z, type = 'l', ylim = c(0,50))
+%' 
+%' @
+%' 
+%' As we could see from the plot, as $z \rightarrow 0$ ($x \rightarrow \text{boundary}$), the rate at 
+%' which the Hessian increases becomes faster and faster. %Thus, the Hessian of the log-barrier is 
+%' %a function that quantifies how quickly 
+%' 
+%' \noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
+%' 
+%' $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
+%' 
+%' \begin{center}
+%' $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
+%' \end{center}
+%' 
+%' The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
+%' "Hessian norm" as the notion of length. The "Hessian norm" we could think as a $\delta y$ on 
+%' the previous $\frac{1}{z^2}$ graph. For $x_0$ that are far away from the boundary, given
+%' an allowed $\delta y$ (captured in $r$), the range for allowed value of $z$ is very large.
+%' This corresponds to having a large ellipsoid. \\
+%' 
+%' To rephrase, the Dikin Ellipsoid is the collection of all points whose difference with 
+%' the current point($y-x_0$) is within the unit threshhold of $r=1$. When the center $x_0$ of the Dikin Ellipsoid 
+%' is far from the boundary of the polytope, the ellipsoid is larger, as a large $\delta (z-x)$ corresponds
+%' to a small $\delta y$. As the center point $x_0$ approaches the boundary 
+%' of the polytope, the ellipsoid becomes smaller and smaller. Therefore, the ellipsoid is able to reshape 
+%' itself as it surveys through the polytope $K$, biasing away from the corners of the region(\cite{kannan}).
+%' 
+%' \subsection{Algorithm \texttt{Dikin}}
+%' 
+%' \begin{enumerate}
+%' 
+%'   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
+%'   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
+%'   \item{Pick a random point $y$ from $D_{x_0}$}
+%'   \item{If $x_0 \notin D_{y}$, then reject $y$ (be careful, this condition is counter-intuitive)}
+%'   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
+%'         (the big picture is that the ratio of the determinants are equal
+%'          to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
+%'          the geometric argument would be that 
+%'          this way the Dikin walk can avoid extreme corners of the region)}
+%'   \item{repeat until obtained number of desired points}
+%' 
+%' \end{enumerate}
+%' \newpage
+%' 
+%' \begin{figure}[ht]
+%' \centering
+%' \subfigure[Step 1]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
+%' \label{fig:subfigure1}}
+%' \subfigure[Step 2]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
+%' \label{fig:subfigure2}}
+%' \quad
+%' \subfigure[Step 3 Case I]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
+%' \label{fig:subfigure3}}
+%' \subfigure[Step 3 Case II]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
+%' \label{fig:subfigure4}}
+%' \quad
+%' \subfigure[Step 4]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
+%' \label{fig:subfigure5}}
+%' \subfigure[Step 5]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
+%' \label{fig:subfigure6}}
+%' 
+%' %
+%' \caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
+%'          An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
+%'          If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
+%'          If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
+%'          accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
+%'          Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
+%'          Algorithm repeats (Step 5)}
+%'          
+%' \label{fig:figure}
+%' \end{figure}
+%' 
+%' \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
+%' 
+%' Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
+%' 
+%' \begin{enumerate}
+%' 
+%'   \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
+%'   \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
+%'     \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
+%'             {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
+%'             \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
+%'             \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
+%'   \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
+%'         of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
+%'   \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
+%' 
+%' \end{enumerate}
+%' 
+%' \subsection{Important Theorem}
+%' 
+%' In algorithm \texttt{Dikin}, what if the point $y$ we accept is outside 
+%' of our polytope $K$? Luckily, there is no need to worry about that because of the following theorem: \\
+%' 
+%' \noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
+%' if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
+%' at $x_0$ with radius $1$ will always be contained in $K$. \\
+%' 
+%' Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
+%' within the polytope $K$.
+%' 
+%' \section{Using \texttt{walkr} to sample points}
+%' 
+%' %% this is helpful : http://yihui.name/knitr/options/
+%' 
+%' 
+%' \texttt{walkr} has one main function \code{walkr} which sample points. \\
+%' 
+%' First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
+%' for a 5 dimensional case:
+%' 
+%' <<example2, eval = T>>=
+%' A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
+%' b <- 0.5
+%' A
+%' b
+%' @
+%' 
+%' The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
+%' if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
+%' simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
+%' 
+%' <<example3, eval = FALSE>>=
+%' A <- matrix(1, ncol = 5)
+%' @
+%' 
+%' After we have \code{A} and \code{B}, we are now ready for sampling. \texttt{walkr} has the following
+%' parameters:
+%' 
+%' \begin{itemize}
+%' 
+%'   \item{ \code{A} is the right hand side of the matrix equation $Ax=b$}
+%'   \item{ \code{b} is the left hand side of the matrix equation $Ax=b$}
+%'   \item{ \code{method} is the method of sampling -- can be either \code{"hit-and-"run"} or 
+%'          \code{"dikin"}}
+%'   \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is stored into the final sample}
+%'   \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
+%'   \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
+%'         of the list which \code{walkr} eventually returns}
+%'   \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
+%'          a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
+%'          then a single matrix of points is returned. A column is a sampled point.}
+%' 
+%' \end{itemize}
+%' 
+%' \code{walkr} warns the user if the chains have not mixed "well-enough" or have not converged
+%' to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{gelman}). 
+%' 
+%' <<example4, eval = TRUE>>=
+%' ## sampling from the 3D simplex
+%' library(walkr)
+%' A <- matrix(1, ncol = 3)
+%' b <- 1
+%' answer <- walkr(A = A, b = b, points = 10, method = "hit-and-run", 
+%'                 thin = 1, burn = 0, chains = 5, ret.format = "list")
+%' answer
+%' @
+%' 
+%' As we see from the code chunk above, \code{walkr} returns a warning message that the $\hat{R}$ are not satisfying, since we only have 10 points. However, if we run the chain for long (or increasing thinning), 
+%' then the statistical tests pass.
+%' 
+%' <<example5, eval = TRUE>>=
+%' answer <- walkr(A = A, b = b, points = 1000, method = "hit-and-run", 
+%'                 thin = 1, burn = 0, chains = 5, ret.format = "list")
+%' @
+%' 
+%' Moreover, \code{walkr} provides an easy to use wrapper function \code{explore\_walkr} which
+%' calls \code{shinystan} to diagnose and visualize the MCMC chains. Note that the \code{"ret.format"}
+%' must be a \code{"list"}.
+%' 
+%' <<example5_5, eval = FALSE>>=
+%' explore_walkr(answer)
+%' @
+%' 
+%' %% ATTACH SCREENSHOT HERE
+%' 
+%' \section{Dikin versus Hitandrun}
+%' %reference here:{http://www.mit.edu/~har/Dikin.pdf}
+%' \begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
+%'   \hline
+%'    &  \texttt{hit-and-run} & \texttt{Dikin Walk} \\ \hline
+%'   Uniform Sampling & Yes, needs $O(N^3)$ points, where $N$ is the dimension of the polytope & 
+%'   No, concentrates in the    interior\\ \hline
+%'   Mixing & $O(\frac{N^2R^2}{r^2})$ *, slows down substantially as dimension of polytope increases and 
+%'   polytope becomes "skinnier" & $O(MN)$, where $A$ is $M \times N$; much stronger mixing. \\ \hline
+%'   Cost of One Step & $O(MN)$ & $O(MN^2)$, in practice, one step of Dikin is much more 
+%'   costly than hit-and-run\\ \hline
+%'   Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
+%'   not high\\ \hline
+%' 
+%' \end{tabular} \\
+%' 
+%' *$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
+%' largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
+%' as the polytope is "skinnier"(\cite{kannan}). \\
+%' 
+%' As we can in the two trace-plots below, the mixing for Dikin is much better than hit-and-run
+%' given the same set of parameters
+%' 
+%' <<example7, eval = TRUE, fig.width=5, fig.height=3>>=
+%' set.seed(314)
+%' N <- 50
+%' A <- matrix(sample(c(0,3), N, replace = T), nrow = 1)
+%' A <- rbind(A, matrix(sample(c(0,3), N, replace = T), nrow = 1))
+%' b <- c(0.7, 0.3)
+%' 
+%' answer_hitandrun <- walkr(A = A, b = b, points = 500, method = "hit-and-run", 
+%'                  thin = 10, burn = 0, chains = 1)
+%' answer_dikin <- walkr(A = A, b = b, points = 500, method = "dikin", 
+%'                  thin = 10, burn = 0, chains = 1)
+%' 
+%' plot(y = answer_hitandrun[50,], x = 1:500, 
+%'      xlab = "random walk", ylab = "value", type = 'l', 
+%'      main = "Hit-and-run Mixing",
+%'      ylim = c(0, 0.2))
+%' plot(y = answer_dikin[50,], x = 1:500, 
+%'      xlab = "random walk", ylab = "value", type = 'l',
+%'      main = "Dikin Mixing", 
+%'      ylim = c(0, 0.2))
+%' @
+%' 
+%' As mentioned before, Dikin samples more in the interior of the polytope $K$.
+%' 
+%' % # <<example8, eval = TRUE, fig.width = 3, fig.height = 4>>=
+%' % # A <- matrix(c(2,0,3,0), ncol = 4)
+%' % # b <- 0.5
+%' % # set.seed(314)
+%' % # z1 <- walkr(A = A, b = b, points = 1000, method = "dikin")
+%' % # z2 <- walkr(A = A, b = b, points = 1000, method = "hit-and-run")
+%' % # library(scatterplot3d)
+%' % # scatterplot3d(x = z1[2,], y = z1[3, ], z = z1[4, ], pch = 19, scale.y = 2, main = "Dikin")
+%' % # scatterplot3d(x = z2[2,], y = z2[3, ], z = z2[4, ], pch = 19, scale.y = 2, main = "Hit-and-Run")
+%' % # @
+%' 
+%' 
+%' \section{Conclusion}
+%' 
+%' \code{walkr} samples $x$ that satisfy the underdetermined matrix equation $Ax=b$, every component
+%' of $x$ is non-negative, and every component sum to $1$. \code{walkr} internally performs the affine
+%' transformation which transforms $Ax=b$ and the simplex constraints into the $Ax \leq b$ form. Then, 
+%' \code{walkr} samples points under this transform, takes the inverse transform, and finally
+%' returns the $x$'s sampled.
+%' 
+%' The two methods that the user may specify is \code{"dikin"} and \code{"hit-and-run"}. Hit-and-run
+%' is a widely used sampling method that converges to the uniform sampling asymptotically, but 
+%' fails to mix well in higher dimensions. Dikin generates a nearly uniform sample, but mixes stronger than
+%' hit-and-run, especially in higher dimensions. In addition, \code{walkr} will warn the user if the 
+%' mixing is not strong enough according to the Gelman-Rubin Diagnostics.
+%' 
+%' \section{Authors}
+%' 
+%' \address{Andy Yao\\
+%' Mathematics and Physics\\
+%' Williams College \\
+%' Williamstown, MA, USA\\}
+%' \email{andy.yao17@gmail.com}
+%' 
+%' \address{David Kane\\
+%' Managing Director \\
+%' Hutchin Hill Capital\\
+%' 101 Federal Street, Boston, USA\\}
+%' \email{dave.kane@gmail.com}
 
 \bibliography{walkr}
 
