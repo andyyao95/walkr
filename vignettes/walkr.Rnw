@@ -71,279 +71,311 @@ $$x_1 + x_2 + x_3 + ... + x_N = 1$$
 $$x_i \geq 0, \qquad \forall i \in \text{\{$1, 2, ..., N$\}}$$ 
 
 It is a $N-1$ dimensional object living in $N$ dimensional space. For example, the $3$D Simplex 
-is a $2$ dimensional triangle in $3$D space (reference figure here). \\ %insert 3d simplex figure
+is a $2$ dimensional triangle in $3$D space. %(reference figure here). \\ %insert 3d simplex figure
 
 The intersection of the complete solution to $Ax=b$ and the $N$-Simplex is a 
-convex polytope. This convex polytope quickly becomes extremely complex, 
-as its number of vertices grow combinatorically with $N$. Sampling from such a convex polytope 
+convex polytope. Sampling from such a convex polytope 
 is a difficult problem, and the common approach is to run Monte Carlo Markov Chains (MCMC) 
-in the interior of the polytope. \\
-
-\pkg{walkr} contains two MCMC random walks. Our first random walk is hit-and-run. 
+in the interior of the polytope. \pkg{walkr} contains two MCMC random walks. Our first random walk is hit-and-run. 
 Hit-and-run is a widely used MCMC sampling method that guarantees uniform sampling asympotically, 
 but mixes slower and slower as the dimensions of $A$ increase (cite hitandrun here). 
 Our second random walk is the Dikin Walk, which generates a nearly uniform sample and exhibits 
-much stronger mixing (\cite{kannan}). 
-\code{walkr} uses \code{Rcpp}(\cite{rcpp}) and \code{RcppEigen}(\cite{rcppeigen}) % skip space between Rcpp and \cite
-for its core matrix calculations which take up most of the run-time.
+much stronger mixing (\cite{kannan}). \\
 
-% reference to the 2 algorithms itself belong in the introduction
-% walkr package can be considered an extension to the hitandrun package 
+It is also important to know whether a MCMC chain has converged to a stationary
+distribution or has mixed well. Often times, graphical tools such as 
+trace-plots and statistical measures such as the Gelman-Rubin Statistical Tests 
+serve as a valuable assessment of the chains. Therefore, \pkg{walkr} also provides
+statistical diagnostics and visualization of the random walks through a wrapper 
+to \pkg{shinystan}.
 
-\texttt{walkr} also provides statistical diagnostics of the mixing and convergence
-properties of a MCMC random walk. 
+\section{Sampling Space: 3D Case}
 
-% ^^^ make this a paragraph. How do you know mixing. how do you you're not getting into corners
-% we generally use multiple chains 
-% you can tell when this HAVENT mixed
-% easier to tell its screwed up 
-% harder to tell that its not screwed up at all
+Let's begin with the simplest case -- one linear constraint in 3 dimensional space.
 
-%  INSTEAD: \section{Simple Examples}
+$$x_1 + x_3 = 0.5$$
 
-% in order to fix ideas, lets go through 3D and 4D examples
+We can express this in terms of matrix equation $Ax=b$, where:
 
-%
+$$
+A = 
+\begin{bmatrix}
+1 & 0 & 1 \\
+\end{bmatrix},
+\quad
+b = 0.5,
+\quad
+x = 
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+x_3 \\
+\end{bmatrix}
+$$ 
 
-%' \section{Mathematical Background of Sampling Space}
-%' 
-%' In this section, we go through the mathematical background of the space from which 
-%' we are sampling -- the intersection of the $N$-simplex and hyperplanes. The reader does not need to 
-%' read this section in order to use our package or understand the sampling algorithms. 
-%' However, this section should provide the reader a better sense of what the sample space 
-%' is geometrically and mathematically. 
-%' 
-%' 
-%' % THIS SECTION, JUST REMOVE. JUST EXPLAIN MORE CLEARLY IN INTRODUCTION
-%' 
-%' 
-%' \subsection{Sampling space: simple 3D case}
-%' 
-%' Let's begin with the simplest case -- one linear constraint in 3 dimensional space.
-%' 
-%' $$x_1 + x_3 = 0.5$$
-%' 
-%' We can express this in terms of matrix equation $Ax=b$, where:
-%' 
-%' $$
-%' A = 
-%' \begin{bmatrix}
-%' 1 & 0 & 1 \\
-%' \end{bmatrix},
-%' \quad
-%' b = 0.5,
-%' \quad
-%' x = 
-%' \begin{bmatrix}
-%' x_1 \\
-%' x_2 \\
-%' x_3 \\
-%' \end{bmatrix}
-%' $$ 
-%' 
-%' % instead of "following graph" ==> in figure (\ref{figure label}), something like that 
-%' 
-%' In the following graph, we draw the intersection of the two. 
-%' The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents 
-%' the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) 
-%' is the red line segment, which is our sampling space.
-%' 
-%' % The figure below should be replaced with one that is better drawn
-%' 
-%' \begin{figure}[H]
-%' \centering
-%' \includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
-%' \caption[caption]{The sampling space is the line segment (red), which is the intersection
-%'                   of the 3D simplex (orange) and a hyperplane (blue)}
-%' \end{figure} % figure needs to have stand-alone caption, so make it more
-%' 
-%' \subsection{$4$D space}
-%' 
-%' Just like how the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simplex 
-%' (i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) could be viewed as a $3$D object. Specifically,
-%' the $4$D simplex is the following tetradhedron when viewed from $3$D space, with 
-%' verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.\\
-%' 
-%' % Figure needs to be replaced
-%' % FIGURE NEEDS TO LOOK MORE LIKE A EQUILATERAL 
-%' \begin{figure}[H]
-%' \centering
-%' \includegraphics[width = 3in, height = 2.5in]{img/tetra1.png}
-%' \caption[caption]{4D Simplex Can Live in 3D Space} % NEED SENTENCES EXPLAINING THIS 
-%' \end{figure} %4D simplex is something that theoretically exists in 4D space but can be viewed as a 3D object
-%' 
-%' Now imagine the intersection of the $4$D simplex with one hyperplane in $4$D (1 equation,
-%' or 1 row in $Ax=b$). For a specific $A$ and $b$, we demonstrate the intersection 
-%' in the figure below. The resulting shape is a trapezoid in $4$D space. 
-%' 
-%' $$
-%' A = 
-%' \begin{bmatrix}
-%' 1 & 1 & 1 & 1 \\
-%' 22 & 2 & 2 & 37\\
-%' \end{bmatrix},
-%' \quad
-%' b = 
-%' \begin{bmatrix}
-%' 1\\
-%' 16
-%' \end{bmatrix}
-%' $$
-%' 
-%' \begin{figure}[H]
-%' \centering
-%' \includegraphics[width = 3in, height = 2.5in]{img/tetra2.png}
-%' \caption[caption]{Intersection of a 4D Simplex and a Hyperplane}
-%' \end{figure}
-%' 
-%' In higher dimensions, the same logic applies. 
-%' Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$ (given $N$
-%' variables). Thus, geometrically, our sampling space is: \textbf{the intersection of hyperplanes
-%' with the $N$-simplex}. 
-%' 
-%' % NEW SECTION
-%' % GOING FROM X SPACE TO ALPHA SPACE 
-%' 
-%' % There are 3 steps. first step is to combine simplex equality constraint into Ax = b
-%' % second step is Ax = b solve for null space (we will abuse notation)
-%' % third step is transforming to Ax <= b 
-%' 
-%' % maybe show for example for 3D case
-%' 
-%' \subsection{From $Ax=b$ and the $N$-simplex to $Ax \leq b$}
-%' 
-%' Our sampling space is bounded (i.e. has finite volume in 
-%' $\mathbb{R}^N$). More formally, our sampling space is known as a \textbf{convex-polytope} 
-%' in $\mathbb{R}^N$. Convex-polytopes are commonly 
-%' described in the literature by a generic $Ax \leq b$. Here, we present a simple linear transformation 
-%' which transforms the intersection of $Ax=b$ and the $N$-simplex to the form
-%' $Ax \leq b$. \\
-%' 
-%' First, note that the equality part of the simplex constraint ($\sum x = 1$) could be added as an extra row 
-%' in $Ax = b$
-%' 
-%' $$
-%' A =
-%'   \begin{bmatrix}
-%'    & & ...... & & & \\
-%'    & & ......  & & & \\
-%'    & & ...... & & & \\
-%'    1 & 1 & ...... & 1 & 1 \\
-%' 
-%'   \end{bmatrix}, 
-%' \quad 
-%' b = 
-%'   \begin{bmatrix}
-%'   ... \\
-%'   ... \\
-%'   ... \\
-%'   1 \\
-%'   \end{bmatrix}
-%' $$
-%' 
-%' Second, to find the complete solution to the new $Ax = b$ (i.e. the set of all possible $x$'s that satisfy
-%' $Ax=b$), we must find the Null Space of $A$(all $x$'s that satisfy $Ax=0$), 
-%' then add on any particular solution to $Ax = b$ (This procedure can be found in any 
-%' Linear Algebra textbook). \\ % for review of concepts: linear algebra 
-%' 
-%' Mathematically, if the original $A$ was $M \times N$, then after adding on the extra row from the simplex, 
-%' the basis vectors, each with $N$ components, which span the Null Space of our new $A$ will be: 
-%' 
-%' $$
-%' \Bigg\{
-%' v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
-%' \Bigg\}
-%' $$
-%' 
-%' \noindent Using any particular solution, $v_{particular}$, the complete solution to the new $Ax=b$
-%' will be 
-%' 
-%' $$
-%' \Bigg\{
-%' v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-%' \quad | \quad \alpha_i \in \mathbb{R}
-%' \Bigg\}
-%' $$ \\ 
-%' 
-%' Lastly, we tag on the $x_i \geq 0$ constraints, and with some algebraic manipulations:
-%' 
-%' $$v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-%' \quad \geq
-%' \begin{bmatrix}
-%' 0 \\
-%' 0 \\
-%' ... \\
-%' ... \\
-%' ... \\
-%' 0 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' $$
-%' \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-%' \quad \geq -v_{particular}
-%' $$
-%' 
-%' $$
-%' V\alpha \geq -v_{particular}, \quad \text{where:} \quad
-%' V = 
-%' \begin{bmatrix}
-%' v_1 &
-%' v_2 &
-%' ... &
-%' v_{N-(M+1)} \\
-%' \end{bmatrix}, 
-%' \quad
-%' \alpha = 
-%' \begin{bmatrix}
-%' \alpha_1 \\
-%' \alpha_2 \\
-%' ... \\
-%' \alpha_{N-(M+1)}
-%' \end{bmatrix}
-%' $$
-%' 
-%' \noindent And finally, we arrive at the form $Ax \leq b$.
-%' 
-%' $$
-%' -V\alpha \leq v_{particular}
-%' $$
-%' 
-%' We have performed a \textbf{transformation} from "$x$-space" (
-%' coordinates described by $x_1, x_2, ...$) to "$\alpha$-space" (coordinates described 
-%' by $\alpha_1, \alpha_2, ...$). The geometric object described is still the same convex
-%' polytope. In fact, \texttt{walkr} internally performs this transformation, 
-%' samples the $\alpha$'s, maps them back to "$x$-space, and then
-%' returns the sampled points. \\
-%' 
-%' The user need not be concerned with this transformation affecting the uniformity 
-%' or mixing properties of our MCMC sampling algorithms. This is because the transformation
-%' above is an affine transformation, which preserves uniformity.
-%' Simply put, sampling in either space is equivalent. \\
-%' 
-%' Having understood that the intersection of $Ax=b$ with the unit-simplex is a convex polytope, 
-%' we are ready to dive into the core of \texttt{walkr}
-%' -- MCMC random walks.
-%' 
-%' \section{Random Walk: How to pick starting points?}
-%' 
-%' % analytic center?
-%' 
-%' MCMC random walks need a starting point, $x_0$, in the interior of the convex polytope. \texttt{walkr}
-%' generates such starting points using linear programming.
-%' Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which:
-%' 
-%' $$\text{minimizes} \quad |Cx-d|^2$$
-%' $$\text{subject to} \quad Ax \leq b$$
-%' 
-%' Thus, we randomly generate $C$ and $d$ obtaining $x$ which satisfy $Ax \leq b$. We discovered that 
-%' the $x$'s generated this way fall randomly on the boundaries of our convex polytope, due to 
-%' the minimizing property of linear programming. Thus, we repeat this for say,
-%' 10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
-%' 
+In figure~\ref{fig:3dcase}, we draw the intersection of the two. 
+The orange equilateral triangle represents the 3D simplex, and the blue rectangle represents 
+the plane $w_1+w_3=0.5$. The intersection of the hyperplane (blue) with the simplex (orange) 
+is the red line segment, which is our sampling space.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
+\caption[caption]{The orange triangle is the $3$D-simplex. The blue plane is the hyperplane $
+                  x_1+x_3=0.5$. The red line is their intersection, which is the 
+                  space we're interested in sampling from}
+\label{fig:3dcase}
+\end{figure} 
+
+\section{Sampling Space: $4$D space}
+
+Just like how the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simplex 
+(i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) could be viewed as a $3$D object (figure~\ref{fig:tetra1}). 
+Specifically, the $4$D simplex is the following tetradhedron when viewed from $3$D space, with 
+verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.\\
+
+% Figure needs to be replaced
+% FIGURE NEEDS TO LOOK MORE LIKE A EQUILATERAL 
+\begin{figure}[H]
+\centering
+\includegraphics[width = 3in, height = 2.5in]{img/tetra1.png}
+\caption[caption]{The 4D simplex exists in 4D space, but can be viewed as a 3D object. Specifically, the
+                  4D simplex is a tetrahedron, with its bottom as a equilateral triangle.}
+\label{fig:tetra1}
+\end{figure} 
+
+Now imagine the intersection of the $4$D simplex with one hyperplane in $4$D (1 equation,
+or 1 row in $Ax=b$). For a specific $A$ and $b$, we demonstrate the intersection 
+in the figure below. The resulting shape is a trapezoid in $4$D space. 
+
+$$
+A = 
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+22 & 2 & 2 & 37\\
+\end{bmatrix},
+\quad
+b = 
+\begin{bmatrix}
+1\\
+16
+\end{bmatrix}
+$$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 3in, height = 2.5in]{img/tetra2.png}
+\caption[caption]{The 4D simplex is the tetrahedron. The hyperplane cuts through the tetrahedron, forming 
+                  a trapezoid as the intersection (in red). This trapezoid is our sampling space, as 
+                  it is the intersection of the hyperplane with the 4D simplex} %%% need to label points!!
+\end{figure}
+
+In higher dimensions, the same logic applies. 
+Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$ (given $N$
+variables). Thus, geometrically, our sampling space is: \textbf{the intersection of hyperplanes
+with the $N$-simplex}. 
+
+% There are 3 steps. first step is to combine simplex equality constraint into Ax = b
+% second step is Ax = b solve for null space (we will abuse notation)
+% third step is transforming to Ax <= b 
+% 
+% maybe show for example for 3D case
+
+\section{From $x$-space to $\alpha$-space}
+
+Our sampling space is a bounded (i.e. has finite volume in 
+$\mathbb{R}^N$) convex polytope. In the literature, convex-polytopes are commonly
+described by a generic $Ax \leq b$. In this section, we present
+a 3 step procedure which transforms the intersection of $Ax=b$ and the $N$-simplex 
+into the $Ax \leq b$ form (\textbf{note}: the $A$ and $b$ in $Ax \leq b$ is 
+not the same as those which we began with in $Ax=b$. We use $A$ and $b$ 
+in both occasions because it is standard notation in the literature for describing
+both an underdetermined matrix equation and convex polytope.)
+
+\subsection{Step 1: Combining Simplex Equality with $Ax=b$}
+
+Recall that $A$ in $Ax=b$ is $M \times N$: 
+
+$$
+A_{M \times N} = 
+\underbrace{
+  \begin{bmatrix}
+   & & & & & & \\
+   & & & ... & & & \\
+   & & & & & & \\
+  \end{bmatrix}
+}_\text{N columns (variables)}
+\Bigg\}\text{{M rows (constraints)}}
+$$
+
+First, the equality part of the simplex constraint ($x_1+x_2+...+x_N=1$) could be 
+added as an extra row in $Ax=b$. Let's call this new matrix $A'$:
+
+$$
+A' =
+  \begin{bmatrix}
+   & & ...... & & & \\
+   & & ......  & & & \\
+   & & ...... & & & \\
+   1 & 1 & ...... & 1 & 1 \\
+
+  \end{bmatrix}, 
+\quad 
+b' = 
+  \begin{bmatrix}
+  ... \\
+  ... \\
+  ... \\
+  1 \\
+  \end{bmatrix}
+$$
+
+\subsection{Step 2: Solving for the Null Space -- Transforming to Alpha-Space}
+
+Second, we find all possible $x$'s that satisfy $A'x = b'$. To do so, we must first 
+compute the Null-Space of $A'$ and then add on any particular solution that satisfy
+$A'x=b'$ (For a review of finding Null Space and complete solution, one could 
+refer to Leon's Linear Algebra textbook).\\ %(\cite{leon})) 
+
+The Null Space of $A'$ can be represented by $N-(M+1)$ basis vectors, since we have
+$N$ variables and $M+1$ constraints in $A'$. Every basis vector, $v_i$, has 
+$N$ components:
+
+$$
+\text{basis vectors} = 
+\Bigg\{
+v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
+\Bigg\}
+$$
+
+Once we have the basis vectors, we could express the set of all $x$'s that satisfy $A'x=b'$
+in terms of coefficients $\alpha_i$. The intuition would be that the basis vectors
+form a coordinate system in the complete solution space, and that the coefficients $\alpha_i$'s
+represent linear combinations of basis vectors to cover the whole space. The complete
+solution to $A'x=b'$ could be expressed as the set: 
+
+$$
+\Bigg\{ x = 
+v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+\quad | \quad \alpha_i \in \mathbb{R}
+\Bigg\}
+$$ \\
+
+Here, it is very important to note that a \textbf{transformation} has taken place. The $v_i$ basis vectors 
+and $v_{particular}$ are fixed vectors. The variable has turned from $x$'s in the original $Ax=b$ into 
+coefficients $\alpha_i$'s. 
+
+\subsection{Step 3: Including the Simplex Inequalities}
+
+Lastly, we add the inequality constraints from the $N$-Simplex. Namely, we require 
+every element of vector $x$ to be $\geq 0$: 
+
+$$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+\quad \geq
+\begin{bmatrix}
+0 \\
+0 \\
+... \\
+... \\
+... \\
+0 \\
+\end{bmatrix}
+$$
+
+Now, we express all coefficients $\alpha_i$ as a vector $\vec{\alpha}$:
+
+$$\vec{\alpha} =
+\begin{bmatrix}
+\alpha_1 \\
+\alpha_2 \\
+... \\
+\alpha_{N-(M+1)}
+\end{bmatrix}
+$$
+
+We could also express the set of basis vectors as columns of matrix $V$:  
+
+$$
+V = 
+\begin{bmatrix}
+v_1 &
+v_2 &
+... &
+v_{N-(M+1)} \\
+\end{bmatrix}
+$$
+
+Therefore, the inequality now becomes:
+
+$$
+v_{particular} + V\vec{\alpha} \geq 
+\begin{bmatrix}
+0 \\
+0 \\
+... \\
+... \\
+... \\
+0 \\
+\end{bmatrix}
+$$
+
+$$
+V\vec{\alpha} \geq -v_{particular}
+$$
+
+$$
+-V\vec{\alpha} \leq v_{particular}
+$$
+
+Voila! Here is the generic $Ax \leq b$ representation of a convex polytope (note again
+that the $A$ and $b$ in $Ax \leq b$ are different from those in $Ax=b$). We have performed
+a \textbf{transformation} from $x$-space to $\alpha$-space. In fact, \pkg{walkr} internally performs 
+this transformation, samples the $\alpha$'s, then maps them back to "$x$-space. \\
+
+The user need not be concerned with this transformation affecting the uniformity 
+or mixing properties of our MCMC sampling algorithms. This is because the transformation
+above is an affine transformation, which preserves uniformity.
+Simply put, sampling in either space is equivalent. \\
+
+
+\section{Sampling Algorithms}
+
+\textbf{Important:} Before we move on to sampling algorithms, we clear up on some nomenclature. 
+First, as established above, the sampling space is a convex polytope. We shall refer to this convex 
+polytope as $K$. Moreover, because 
+
+\subsection{Picking a Starting Point}
+
+MCMC random walks need a starting point, $x_0$, in the convex polytope. \texttt{walkr}
+generates such starting points using linear programming.
+Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which: % cite the package
+
+$$\text{minimizes} \quad |Cx-d|^2$$
+$$\text{subject to} \quad Ax \leq b$$
+
+We randomly generate $C$ and $d$, thereby obtaining $x$ which satisfy $Ax \leq b$. 
+-walkr generates 30 points and then takes the average
+
+note that we're sampling alphas 
+
+note that we're taking average of those points. those points ought to be still in the convex polytope
+
+talk about the complexity of picking starting points 
+
+We discovered that 
+the $x$'s generated this way fall randomly on the boundaries of our convex polytope, due to 
+the minimizing property of linear programming. Thus, we repeat this for say,
+10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
+
+introduce chains 
+we need different start pointings 
+
+% NOTE: OUGHT TO UNDERSTAND AND EXPLAIN THE STARTING POINT BETTER 
+% is there a literature about starting points? for MCMC 
+
 %' \section{Random Walk: Hit-and-run}
 %' 
-%' The hit-and-run algorithm is as follows:
+%' The hit-and-run algorithm:
 %' 
 %' \begin{enumerate}
 %'   
@@ -361,7 +393,7 @@ properties of a MCMC random walk.
 %'         
 %' \end{enumerate}
 %' 
-%' Here is a picture of the hit-and-run algorithm: \newpage
+%' Here is a picture of the hit-and-run algorithm: \newpage %%%%% \fig{ref}
 %' 
 %' \begin{figure}[ht]
 %' \centering
@@ -390,13 +422,19 @@ properties of a MCMC random walk.
 %' \label{fig:figure}
 %' \end{figure}
 %' 
-%' The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
-%' \code{hit-and-run} package on CRAN (\cite{hitandrun}). \code{walkr} serves as a convenient wrapper
-%' with MCMC diagnostics and multiple chains. 
+%' %The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
+%' %\code{hit-and-run} package on CRAN (\cite{hitandrun}).
+%' 
+%' walkr uses the har function from the hitandrun packge on CRAN (citation) to implement hit-and-run. 
 %' 
 %' %probably also want to discuss important facts about the algorithm here.
 %' 
+%' %examine properties of hit-and-run, include citation for 
+%' %also talk about problems with hit-and-run
+%' 
 %' \section{Random Walk: Dikin Walk}
+%' 
+%' %Dikin walk is an alternatively way of sampling. It samples 
 %' 
 %' \subsection{Preliminary Definitions}
 %' 
@@ -412,10 +450,10 @@ properties of a MCMC random walk.
 %' 
 %' The log-barrier function of $Ax \leq b$ measures how "extreme" or "close-to-the-boundary" a point 
 %' $x \in K$ is. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
-%' boundary of the polytope $K$. Mathematically, the polytope could be described by: 
+%' boundary of the polytope $K$. Mathematically, the polytope could be described by: %quote better
 %' 
 %' $$Ax \leq b$$
-%' $$b - Ax \geq 0$$
+%' $$b - Ax \geq 0$$  %%% 3D CASE OF THE 
 %' 
 %' Also recall that the negative logarithmic graph looks like this: \\
 %' 
@@ -459,9 +497,9 @@ properties of a MCMC random walk.
 %' which the Hessian increases becomes faster and faster. %Thus, the Hessian of the log-barrier is 
 %' %a function that quantifies how quickly 
 %' 
-%' \noindent \textbf{Definition - Dikin Ellipsoid $D_{x_0}^r$} \\
+%' \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
 %' 
-%' $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ is defined as: 
+%' Define $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ as: 
 %' 
 %' \begin{center}
 %' $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
@@ -478,7 +516,7 @@ properties of a MCMC random walk.
 %' is far from the boundary of the polytope, the ellipsoid is larger, as a large $\delta (z-x)$ corresponds
 %' to a small $\delta y$. As the center point $x_0$ approaches the boundary 
 %' of the polytope, the ellipsoid becomes smaller and smaller. Therefore, the ellipsoid is able to reshape 
-%' itself as it surveys through the polytope $K$, biasing away from the corners of the region(\cite{kannan}).
+%' itself as it surveys through the polytope $K$, biasing away from the corners of the region.
 %' 
 %' \subsection{Algorithm \texttt{Dikin}}
 %' 
@@ -533,42 +571,44 @@ properties of a MCMC random walk.
 %' \label{fig:figure}
 %' \end{figure}
 %' 
-%' \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
 %' 
-%' Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
+%' %% INCLUDE THIS IN THE DIKIN ELLIPSOID HELP PAGE
 %' 
-%' \begin{enumerate}
+%' % \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
+%' % 
+%' % Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
+%' % 
+%' % \begin{enumerate}
+%' % 
+%' %   \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
+%' %   \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
+%' %     \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
+%' %             {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
+%' %             \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
+%' %             \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
+%' %   \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
+%' %         of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
+%' %   \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
+%' % 
+%' % \end{enumerate}
 %' 
-%'   \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
-%'   \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
-%'     \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
-%'             {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
-%'             \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
-%'             \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
-%'   \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
-%'         of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
-%'   \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
+%' % \subsection{Important Theorem}   ==> JUST BE ONE SENTENCE IN ALGORITHM DIKIN
+%' % 
+%' % In algorithm \texttt{Dikin}, what if the point $y$ we accept is outside 
+%' % of our polytope $K$? Luckily, there is no need to worry about that because of the following theorem: \\
+%' % 
+%' % \noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
+%' % if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
+%' % at $x_0$ with radius $1$ will always be contained in $K$. \\
+%' % 
+%' % Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
+%' % within the polytope $K$.
 %' 
-%' \end{enumerate}
-%' 
-%' \subsection{Important Theorem}
-%' 
-%' In algorithm \texttt{Dikin}, what if the point $y$ we accept is outside 
-%' of our polytope $K$? Luckily, there is no need to worry about that because of the following theorem: \\
-%' 
-%' \noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
-%' if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
-%' at $x_0$ with radius $1$ will always be contained in $K$. \\
-%' 
-%' Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
-%' within the polytope $K$.
-%' 
-%' \section{Using \texttt{walkr} to sample points}
+%' \section{Using \texttt{walkr}} %%% MADE FLOW BETTER 
 %' 
 %' %% this is helpful : http://yihui.name/knitr/options/
 %' 
-%' 
-%' \texttt{walkr} has one main function \code{walkr} which sample points. \\
+%' \pkg{walkr} has one main function \code{walkr} which samples points. \\
 %' 
 %' First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
 %' for a 5 dimensional case:
@@ -576,8 +616,6 @@ properties of a MCMC random walk.
 %' <<example2, eval = T>>=
 %' A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
 %' b <- 0.5
-%' A
-%' b
 %' @
 %' 
 %' The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
@@ -652,7 +690,7 @@ properties of a MCMC random walk.
 %'   Rejection Sampling & No & Yes (see probability formula and $x \notin D_y$), but rejection rate 
 %'   not high\\ \hline
 %' 
-%' \end{tabular} \\
+%' \end{tabular} \\ 
 %' 
 %' *$R$ is the radius of the smallest ball that contains the polytope $K$. $r$ is the radius of the 
 %' largest ball that is contained within the polytope $K$. Thus, $\frac{R}{r}$ increases 
@@ -710,21 +748,23 @@ properties of a MCMC random walk.
 %' fails to mix well in higher dimensions. Dikin generates a nearly uniform sample, but mixes stronger than
 %' hit-and-run, especially in higher dimensions. In addition, \code{walkr} will warn the user if the 
 %' mixing is not strong enough according to the Gelman-Rubin Diagnostics.
-%' 
-%' \section{Authors}
-%' 
-%' \address{Andy Yao\\
-%' Mathematics and Physics\\
-%' Williams College \\
-%' Williamstown, MA, USA\\}
-%' \email{andy.yao17@gmail.com}
-%' 
-%' \address{David Kane\\
-%' Managing Director \\
-%' Hutchin Hill Capital\\
-%' 101 Federal Street, Boston, USA\\}
-%' \email{dave.kane@gmail.com}
 
+%% world is not perfect? no. ideally we would like something to do blah blah blah 
+
+% \section{Authors}
+% 
+% \address{Andy Yao\\
+% Mathematics and Physics\\
+% Williams College \\
+% Williamstown, MA, USA\\}
+% \email{andy.yao17@gmail.com}
+% 
+% \address{David Kane\\
+% Managing Director \\
+% Hutchin Hill Capital\\
+% 101 Federal Street, Boston, USA\\}
+% \email{dave.kane@gmail.com}
+% 
 \bibliography{walkr}
 
 \end{article}
