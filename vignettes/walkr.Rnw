@@ -691,7 +691,7 @@ mixing is not strong enough according to the Gelman-Rubin Diagnostics.
 Mathematics and Physics\\
 Williams College \\
 Williamstown, MA, USA\\}
-\email{ay3@williams.edu}
+\email{andy.yao17@gmail.com}
 
 \address{David Kane\\
 Managing Director \\
