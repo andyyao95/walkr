@@ -7,6 +7,8 @@
 vignettes/*log
 vignettes/*gz
 vignettes/*aux
+vignettes/*brf
+vignettes/*pdf
 vignettes/*tex
 vignettes/*sty
 vignettes/*aux
