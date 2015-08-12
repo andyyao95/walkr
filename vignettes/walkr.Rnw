@@ -449,14 +449,8 @@ the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matr
 $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 
 The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
-$x \in K$ is. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
-boundary of the polytope $K$. Mathematically, the polytope could be described by: 
-
-$$Ax \leq b$$
-$$b - Ax \geq 0$$  %%% 3D CASE OF THE 
-
-Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
-of the convex polytope $K$ (as $(b_i-a_ix) \rightarrow 0$). \\
+$x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero. 
+The value of $\phi$ gets larger and larger as $a_i^Tx$ gets closer and closer to $b_i$. 
 
 \noindent \textbf{Hessian of Log Barrier $H_x$:} 
 
@@ -469,14 +463,8 @@ The Hessian matrix($H_x = \nabla ^2 \phi(x)$) contains all the second derivative
 of the function $\phi(x)$ with respect to vector $x$. In the land of optimization, 
 the Hessian contains information on how the landscape is shaped, and also on extreme values of 
 the landscape. To develop a better understanding of our intuition for the Hessian, we 
-can think of it as a generalized notion of the second derivative. \\
-
-Let $z$ denote $b_i - a_ix$.
-Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks like this: \\
-
-As we could see from the plot, as $z \rightarrow 0$ ($x \rightarrow \text{boundary}$), the rate at 
-which the Hessian increases becomes faster and faster. %Thus, the Hessian of the log-barrier is 
-%a function that quantifies how quickly 
+can think of it as a generalized notion of the second derivative. The second derivative of $-\log(z)$ 
+is $\frac{1}{z^2}$, which also tends to infinity as $z$ tends to zero. 
 
 \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
 
@@ -487,26 +475,30 @@ $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\
 \end{center}
 
 The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
-"Hessian norm" as the notion of length. The "Hessian norm" we could think as a $\delta y$ on 
-the previous $\frac{1}{z^2}$ graph. For $x_0$ that are far away from the boundary, given
-an allowed $\delta y$ (captured in $r$), the range for allowed value of $z$ is very large.
-This corresponds to having a large ellipsoid. \\
+"Hessian norm" as the notion of length. The "Hessian norm" we could think as a $\Delta \frac{1}{z^2}$ on 
+the $\frac{1}{z^2}$ graph. For $x_0$'s that are far away from the boundary, given
+an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values of $y-x_0$ is very large.
+This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
+then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable.\\
 
 To rephrase, the Dikin Ellipsoid is the collection of all points whose difference with 
 the current point($y-x_0$) is within the unit threshhold of $r=1$. When the center $x_0$ of the Dikin Ellipsoid 
-is far from the boundary of the polytope, the ellipsoid is larger, as a large $\delta (z-x)$ corresponds
-to a small $\delta y$. As the center point $x_0$ approaches the boundary 
+is far from the boundary of the polytope, the ellipsoid is larger. As the center point $x_0$ approaches the boundary 
 of the polytope, the ellipsoid becomes smaller and smaller. Therefore, the ellipsoid is able to reshape 
 itself as it surveys through the polytope $K$, biasing away from the corners of the region.
 
-\subsection{Algorithm \texttt{Dikin}}
+\subsection{Algorithm Dikin}
 
 \begin{enumerate}
 
   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
   \item{Pick a random point $y$ from $D_{x_0}$}
-  \item{If $x_0 \notin D_{y}$, then reject $y$ (be careful, this condition is counter-intuitive)}
+  \item{If $x_0 \notin D_{y}$, then reject $y$. This is counter-intuitive because normally we would 
+        think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
+        this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
+        potential point $y$, then we reject the point $y$.} %% I don't know why the other way around doesn't work...
+                                                            %% probably some stats thing related to bias
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
         (the big picture is that the ratio of the determinants are equal
          to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
@@ -515,7 +507,6 @@ itself as it surveys through the polytope $K$, biasing away from the corners of 
   \item{repeat until obtained number of desired points}
 
 \end{enumerate}
-\newpage
 
 \begin{figure}[ht]
 \centering
@@ -539,8 +530,6 @@ itself as it surveys through the polytope $K$, biasing away from the corners of 
 \subfigure[Step 5]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
 \label{fig:subfigure6}}
-
-%
 \caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
          An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
          If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
@@ -552,46 +541,52 @@ itself as it surveys through the polytope $K$, biasing away from the corners of 
 \label{fig:figure}
 \end{figure}
 
-%' \section{Using \texttt{walkr}} %%% MADE FLOW BETTER 
+\section{Using \texttt{walkr}}
+
+%% this is helpful : http://yihui.name/knitr/options/
+
+The \pkg{walkr} package has one main function \code{walkr} which samples points. \code{walkr} has the following parameters:
+
+\begin{itemize}
+
+  \item{ \code{A} is the right hand side of the matrix equation $Ax=b$}
+  \item{ \code{b} is the left hand side of the matrix equation $Ax=b$}
+  \item{ \code{method} is the method of sampling -- can be either \code{"hit-and-"run"} or 
+         \code{"dikin"}}
+  \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is stored into the final sample}
+  \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
+  \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
+        of the list which \code{walkr} eventually returns}
+  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
+         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
+         then a single matrix of points is returned. A column is a sampled point.}
+
+\end{itemize}
+
+\subsection{Simple 3D Simplex}
+
+To sample from the 3D simplex, the user can simply specify the simplex 
+equation in $Ax=b$, as \code{walkr} will remove linearly dependent rows internally.
+
+<<example1, eval = T>>==
+library(walkr)
+A <- matrix(1, ncol = 3)
+b <- 1
+sampled_points <- walkr(A = A, b = b, points = 1000, 
+                        method = "hit-and-run", chains = 5, ret.format = "list")
+@
+
+Now, \code{sampled\_points} contain 1000 points from the $3$D simplex. We can visualize the MCMC random walks 
+by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface from \pkg{shinystan}.
+
+<<example, eval = F>>=
+explore_walkr(sampled_points)
+@
+
+\subsection{Higher Dimensions with Constraints}
+
+%' Sampling from
 %' 
-%' %% this is helpful : http://yihui.name/knitr/options/
-%' 
-%' \pkg{walkr} has one main function \code{walkr} which samples points. \\
-%' 
-%' First, the user must specify the $A$ and $b$ in the $Ax=b$ hyperplanes equation. For example,
-%' for a 5 dimensional case:
-%' 
-%' <<example2, eval = T>>=
-%' A <- matrix(c(1, 0, 1, 0, 1), ncol = 5)
-%' b <- 0.5
-%' @
-%' 
-%' The \texttt{walkr} function takes care of the intersection with the simplex for the user. However,
-%' if the user just want to sample from the simplex with no hyperplanes, she can simply specify the
-%' simplex equation, as \texttt{walkr} will remove linearly dependent rows internally.
-%' 
-%' <<example3, eval = FALSE>>=
-%' A <- matrix(1, ncol = 5)
-%' @
-%' 
-%' After we have \code{A} and \code{B}, we are now ready for sampling. \texttt{walkr} has the following
-%' parameters:
-%' 
-%' \begin{itemize}
-%' 
-%'   \item{ \code{A} is the right hand side of the matrix equation $Ax=b$}
-%'   \item{ \code{b} is the left hand side of the matrix equation $Ax=b$}
-%'   \item{ \code{method} is the method of sampling -- can be either \code{"hit-and-"run"} or 
-%'          \code{"dikin"}}
-%'   \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is stored into the final sample}
-%'   \item{ \code{burn} is the burning parameter. The first \code{burn} points are deleted from the final sample}
-%'   \item{ \code{chains} is the number of chains we want to sample. Every chain is an element 
-%'         of the list which \code{walkr} eventually returns}
-%'   \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
-%'          a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
-%'          then a single matrix of points is returned. A column is a sampled point.}
-%' 
-%' \end{itemize}
 %' 
 %' \code{walkr} warns the user if the chains have not mixed "well-enough" or have not converged
 %' to a stationary distribution according to the Gelman-Rubin Diagnostics (\cite{gelman}). 
@@ -621,9 +616,9 @@ itself as it surveys through the polytope $K$, biasing away from the corners of 
 %' <<example5_5, eval = FALSE>>=
 %' explore_walkr(answer)
 %' @
-%' 
-%' %% ATTACH SCREENSHOT HERE
-%' 
+
+%% ATTACH SCREENSHOT HERE
+
 %' \section{Dikin versus Hitandrun}
 %' %reference here:{http://www.mit.edu/~har/Dikin.pdf}
 %' \begin{tabular}{ |p{3cm}|p{5cm}|p{5cm}|}
