@@ -337,273 +337,221 @@ or mixing properties of our MCMC sampling algorithms. This is because the transf
 above is an affine transformation, which preserves uniformity.
 Simply put, sampling in either space is equivalent. \\
 
+\textbf{NOTE: SHOULD INCLUDE 3D EXAMPLE HERE}
 
 \section{Sampling Algorithms}
 
-\textbf{Important:} Before we move on to sampling algorithms, we clear up on some nomenclature. 
+\textbf{Important:} Before moving to sampling algorithms, we clear up on some nomenclature. 
 First, as established above, the sampling space is a convex polytope. We shall refer to this convex 
-polytope as $K$. Moreover, because 
+polytope as $K$. Moreover, because it is very standard notation in the math and sampling literature to 
+describe a convex polytope as $Ax \leq b$, we describe $K$ with $Ax \leq b$. However, we keep in mind that
+the $A$, $x$, and $b$ are not the same as those in the original problem statement of $Ax=b$ and $N$-simplex. 
+Instead, as described in the section above, we are actually sampling coefficients $\alpha$'s, and then
+eventually transforming it back to $x$-space. Again, $Ax \leq b$ describe the polytope in terms of 
+transformed coordinates $\alpha$.
 
-\subsection{Picking a Starting Point}
+\subsection{Picking Starting Points}
 
-MCMC random walks need a starting point, $x_0$, in the convex polytope. \texttt{walkr}
+MCMC random walks need a starting point, $x_0$, in the convex polytope. \pkg{walkr}
 generates such starting points using linear programming.
-Specifically, the \texttt{lsei} function of \texttt{limSolve} finds $x$ which: % cite the package
+Specifically, the \texttt{lsei} function of the \pkg{limSolve} package (cite it) finds $x$ which: 
 
 $$\text{minimizes} \quad |Cx-d|^2$$
-$$\text{subject to} \quad Ax \leq b$$
+$$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
 
-We randomly generate $C$ and $d$, thereby obtaining $x$ which satisfy $Ax \leq b$. 
--walkr generates 30 points and then takes the average
+We randomly generate $C$ and $d$, obtaining points that minize the random objective function. 
+Because we are performing a minimization, the points that are obtained this way often fall
+onto the boundaries of our polytope $K$. Therefore, we repeat the process 30 times in \pkg{walkr}
+and then take an average of those points. This averaged point ought to be still in the 
+polytope $K$ because our polytope is convex. This procedure generates one starting point $x_0$. \\
 
-note that we're sampling alphas 
+Often times in MCMC random walks, it is beneficial to have multiple starting points at 
+different locations in $K$. We call each random walk at a starting point a single chain.
+For example, if we have 5 different starting points, each running its own random walk, 
+we would have 5 chains. Once we have multiple chains, we could examine whether the chains have
+all converged to the same stationary distribution. The correlation between different chains
+is also of interest. Ideally, we hope to see a low correlation which reflects that
+the chains are mixing well with each other.
 
-note that we're taking average of those points. those points ought to be still in the convex polytope
 
-talk about the complexity of picking starting points 
+\section{Random Walk: Hit-and-run}
 
-We discovered that 
-the $x$'s generated this way fall randomly on the boundaries of our convex polytope, due to 
-the minimizing property of linear programming. Thus, we repeat this for say,
-10 times, and then take an average of the $x$'s generated. This averaged point is $x_0$, our starting point.
+We point out that the $Ax \leq b$ described below is the transformed polytope
+in $\alpha$-space (discussed in section above). The $A$, $x$, and $b$ are different from
+those in the original $Ax=b$ and $N$-Simplex. Once we sampled points, we perform the transformation
+which maps the points back into the original $x$-space. 
 
-introduce chains 
-we need different start pointings 
+\begin{enumerate}
+  
+  \item{Set starting point $x_0$ as current point}
+  \item{Randomly generate a direction $\vec{d}$. If we are in $N$ dimensions, then $d$ will 
+        be a vector of $N$ components. Specifically, $d$ is a uniformly generated 
+        unit vector on the $N$ dimensional unit-sphere}
+  \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$.  
+        We find end points $s_1$ and $s_2$ of the chord by going through the rows 
+        of $Ax_0 \leq b$ one by one, setting the inequality to equality (so we hit the surface). 
+        Then, parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
+  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}}
+  \item{Set $x_1$ as current point}
+  \item{Repeat algorithm until number of desired points sampled}
+        
+\end{enumerate}
 
-% NOTE: OUGHT TO UNDERSTAND AND EXPLAIN THE STARTING POINT BETTER 
-% is there a literature about starting points? for MCMC 
+\begin{figure}[ht]
+\centering
+\subfigure[Step 1]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
+\label{fig:subfigure1}}
+\quad
+\subfigure[Step 3]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
+\label{fig:subfigure2}}
+\subfigure[Step 4]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+\label{fig:subfigure3}}
+\quad
+\subfigure[Step 5]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+\label{fig:subfigure4}}
+%
+\caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction
+         is selected (Step 2), and the chord along that direction is calculated (Step 3).
+         Then, we pick a random point along that chord and move there as our new point (Step 4).
+         The algorithm is repeated to sample many points (Step 5)}
+\label{fig:hitandrun}
+\end{figure}
 
-%' \section{Random Walk: Hit-and-run}
-%' 
-%' The hit-and-run algorithm:
-%' 
-%' \begin{enumerate}
-%'   
-%'   \item{Set starting point $x_0$ as current point}
-%'   \item{Randomly generate a direction $\vec{d}$. If we are in $N$ dimensions, then $d$ will 
-%'         be a vector of $N$ components. Specifically, $d$ is a uniformly generated 
-%'         unit vector on the $N$ dimensional unit-sphere}
-%'   \item{Find the chord $S$ through $x_0$ along the directions $\vec{d}$ and $-\vec{d}$.  
-%'         We find end points $s_1$ and $s_2$ of the chord by going through the rows 
-%'         of $Ax_0 \leq b$ one by one, setting the inequality to equality (so we hit the surface). 
-%'         Then, parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, where $t \in [0,1]$}
-%'   \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}}
-%'   \item{Set $x_1$ as current point}
-%'   \item{Repeat algorithm until number of desired points sampled}
-%'         
-%' \end{enumerate}
-%' 
-%' Here is a picture of the hit-and-run algorithm: \newpage %%%%% \fig{ref}
-%' 
-%' \begin{figure}[ht]
-%' \centering
-%' \subfigure[Step 1]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
-%' \label{fig:subfigure1}}
-%' \subfigure[Step 2]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
-%' \label{fig:subfigure1}}
-%' \quad
-%' \subfigure[Step 3]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
-%' \label{fig:subfigure2}}
-%' \subfigure[Step 4]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-%' \label{fig:subfigure3}}
-%' \quad
-%' \subfigure[Step 5]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
-%' \label{fig:subfigure4}}
-%' %
-%' \caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction
-%'          is selected (Step 2), and the chord along that direction is calculated (Step 3).
-%'          Then, we pick a random point along that chord and move there as our new point (Step 4).
-%'          The algorithm is repeated to sample many points (Step 5)}
-%' \label{fig:figure}
-%' \end{figure}
-%' 
-%' %The core implementation of the hit-and-run algorithm calls the \code{har} function from the 
-%' %\code{hit-and-run} package on CRAN (\cite{hitandrun}).
-%' 
-%' walkr uses the har function from the hitandrun packge on CRAN (citation) to implement hit-and-run. 
-%' 
-%' %probably also want to discuss important facts about the algorithm here.
-%' 
-%' %examine properties of hit-and-run, include citation for 
-%' %also talk about problems with hit-and-run
-%' 
-%' \section{Random Walk: Dikin Walk}
-%' 
-%' %Dikin walk is an alternatively way of sampling. It samples 
-%' 
-%' \subsection{Preliminary Definitions}
-%' 
-%' Recall, our sampling space is a convex polytope. We call this convex 
-%' polytope $K$, which can be described in the form $Ax \leq b$. \\
-%' 
-%' For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
-%' the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matrix. \\
-%' 
-%' \noindent \textbf{Log Barrier Function $\phi$:} 
-%' 
-%' $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
-%' 
-%' The log-barrier function of $Ax \leq b$ measures how "extreme" or "close-to-the-boundary" a point 
-%' $x \in K$ is. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
-%' boundary of the polytope $K$. Mathematically, the polytope could be described by: %quote better
-%' 
-%' $$Ax \leq b$$
-%' $$b - Ax \geq 0$$  %%% 3D CASE OF THE 
-%' 
-%' Also recall that the negative logarithmic graph looks like this: \\
-%' 
-%' 
-%' <<example1, eval = TRUE, fig.width=3, fig.height=3>>=
-%' 
-%' z <- seq(0, 1, 0.0001)
-%' 
-%' plot(-log(z)~z, type = 'l', ylim = c(0,5))
-%' 
-%' @
-%' 
-%' Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
-%' of the convex polytope $K$ (as $(b_i-a_ix) \rightarrow 0$). \\
-%' 
-%' \noindent \textbf{Hessian of Log Barrier $H_x$:} 
-%' 
-%' $$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A \quad , \quad \text{where:}$$
-%' $$D = diag(\frac{1}{b_i - a_i^Tx})$$
-%' 
-%' \textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
-%' 
-%' The Hessian matrix($H_x = \nabla ^2 \phi(x)$) contains all the second derivatives 
-%' of the function $\phi(x)$ with respect to vector $x$. In the land of optimization, 
-%' the Hessian contains information on how the landscape is shaped, and also on extreme values of 
-%' the landscape. To develop a better understanding of our intuition for the Hessian, we 
-%' can think of it as a generalized notion of the second derivative. \\
-%' 
-%' Let $z$ denote $b_i - a_ix$.
-%' Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks like this: \\
-%' 
-%' <<example1_5, eval = TRUE, fig.width = 3, fig.height = 3>>=
-%' 
-%' z <- seq(0, 1, 0.0001)
-%' 
-%' plot((1/z^2)~z, type = 'l', ylim = c(0,50))
-%' 
-%' @
-%' 
-%' As we could see from the plot, as $z \rightarrow 0$ ($x \rightarrow \text{boundary}$), the rate at 
-%' which the Hessian increases becomes faster and faster. %Thus, the Hessian of the log-barrier is 
-%' %a function that quantifies how quickly 
-%' 
-%' \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
-%' 
-%' Define $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ as: 
-%' 
-%' \begin{center}
-%' $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
-%' \end{center}
-%' 
-%' The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
-%' "Hessian norm" as the notion of length. The "Hessian norm" we could think as a $\delta y$ on 
-%' the previous $\frac{1}{z^2}$ graph. For $x_0$ that are far away from the boundary, given
-%' an allowed $\delta y$ (captured in $r$), the range for allowed value of $z$ is very large.
-%' This corresponds to having a large ellipsoid. \\
-%' 
-%' To rephrase, the Dikin Ellipsoid is the collection of all points whose difference with 
-%' the current point($y-x_0$) is within the unit threshhold of $r=1$. When the center $x_0$ of the Dikin Ellipsoid 
-%' is far from the boundary of the polytope, the ellipsoid is larger, as a large $\delta (z-x)$ corresponds
-%' to a small $\delta y$. As the center point $x_0$ approaches the boundary 
-%' of the polytope, the ellipsoid becomes smaller and smaller. Therefore, the ellipsoid is able to reshape 
-%' itself as it surveys through the polytope $K$, biasing away from the corners of the region.
-%' 
-%' \subsection{Algorithm \texttt{Dikin}}
-%' 
-%' \begin{enumerate}
-%' 
-%'   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
-%'   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
-%'   \item{Pick a random point $y$ from $D_{x_0}$}
-%'   \item{If $x_0 \notin D_{y}$, then reject $y$ (be careful, this condition is counter-intuitive)}
-%'   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
-%'         (the big picture is that the ratio of the determinants are equal
-%'          to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
-%'          the geometric argument would be that 
-%'          this way the Dikin walk can avoid extreme corners of the region)}
-%'   \item{repeat until obtained number of desired points}
-%' 
-%' \end{enumerate}
-%' \newpage
-%' 
-%' \begin{figure}[ht]
-%' \centering
-%' \subfigure[Step 1]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
-%' \label{fig:subfigure1}}
-%' \subfigure[Step 2]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
-%' \label{fig:subfigure2}}
-%' \quad
-%' \subfigure[Step 3 Case I]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
-%' \label{fig:subfigure3}}
-%' \subfigure[Step 3 Case II]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
-%' \label{fig:subfigure4}}
-%' \quad
-%' \subfigure[Step 4]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
-%' \label{fig:subfigure5}}
-%' \subfigure[Step 5]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
-%' \label{fig:subfigure6}}
-%' 
-%' %
-%' \caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
-%'          An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
-%'          If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
-%'          If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
-%'          accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
-%'          Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
-%'          Algorithm repeats (Step 5)}
-%'          
-%' \label{fig:figure}
-%' \end{figure}
-%' 
-%' 
-%' %% INCLUDE THIS IN THE DIKIN ELLIPSOID HELP PAGE
-%' 
-%' % \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
-%' % 
-%' % Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
-%' % 
-%' % \begin{enumerate}
-%' % 
-%' %   \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
-%' %   \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
-%' %     \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
-%' %             {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
-%' %             \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
-%' %             \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
-%' %   \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
-%' %         of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
-%' %   \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
-%' % 
-%' % \end{enumerate}
-%' 
-%' % \subsection{Important Theorem}   ==> JUST BE ONE SENTENCE IN ALGORITHM DIKIN
-%' % 
-%' % In algorithm \texttt{Dikin}, what if the point $y$ we accept is outside 
-%' % of our polytope $K$? Luckily, there is no need to worry about that because of the following theorem: \\
-%' % 
-%' % \noindent \textbf{Theorem} -- If $x_0 \in K$, then $D_{x_0}^1 \subseteq K$. That is, 
-%' % if our starting point $x_0$ is in our polytope $K$, then the Dikin Ellipsoid centered 
-%' % at $x_0$ with radius $1$ will always be contained in $K$. \\
-%' % 
-%' % Thus, if we set $r=1$ (or $r \leq 1$), then our algorithm will guarantee to sample points only 
-%' % within the polytope $K$.
-%' 
+\pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package on CRAN (\cite{hitandrun}) 
+to implement hit-and-run. \\
+
+The hit-and-run algorithm has pros and cons. Describe pros and cons here (properties also).
+
+\section{Random Walk: Dikin Walk}
+
+Dikin walk is another method of MCMC random walks. In higher dimensions, the Dikin walk mixes much stronger
+than hit-and-run does. blah blah explain more about why this is good/bad. ``At the cost of uniformity''. 
+
+\subsection{Preliminary Definitions}
+
+Recall, our sampling space is a convex polytope. We call this convex 
+polytope $K$, which can be described in the form $Ax \leq b$. We point out that this $Ax \leq b$ 
+is the transformed polytope in $\alpha$-space (discussed in transformation section above). 
+The $A$, $x$, and $b$ are different from those in the original $Ax=b$ and $N$-Simplex.\\
+
+For the definitions below, let $a_i$ represent a row in $A$, $x_i$, $b_i$ represent 
+the $i^{th}$ element of $x$ and $b$. Also recall that $A$ is a $M \times N$ matrix. \\
+
+\noindent \textbf{Log Barrier Function $\phi$:} 
+
+$$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
+
+The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
+$x \in K$ is. This is because the value of $\phi$ tends to $\infty$ as $x$ tends to the 
+boundary of the polytope $K$. Mathematically, the polytope could be described by: 
+
+$$Ax \leq b$$
+$$b - Ax \geq 0$$  %%% 3D CASE OF THE 
+
+Thus, the higher the value of the log-barrier function ($\phi(x)$), the closer the point $x$ is to the boundary
+of the convex polytope $K$ (as $(b_i-a_ix) \rightarrow 0$). \\
+
+\noindent \textbf{Hessian of Log Barrier $H_x$:} 
+
+$$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A \quad , \quad \text{where:}$$
+$$D = diag(\frac{1}{b_i - a_i^Tx})$$
+
+\textbf{Note:} $H_x$ is a $N \times N$ linear operator. $D$ is a $M \times M$ diagonal matrix.\\
+
+The Hessian matrix($H_x = \nabla ^2 \phi(x)$) contains all the second derivatives 
+of the function $\phi(x)$ with respect to vector $x$. In the land of optimization, 
+the Hessian contains information on how the landscape is shaped, and also on extreme values of 
+the landscape. To develop a better understanding of our intuition for the Hessian, we 
+can think of it as a generalized notion of the second derivative. \\
+
+Let $z$ denote $b_i - a_ix$.
+Note that the second derivative of $-\log(z)$ is $\frac{1}{z^2}$, which looks like this: \\
+
+As we could see from the plot, as $z \rightarrow 0$ ($x \rightarrow \text{boundary}$), the rate at 
+which the Hessian increases becomes faster and faster. %Thus, the Hessian of the log-barrier is 
+%a function that quantifies how quickly 
+
+\noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
+
+Define $D_{x_0}^r$, the Dikin Ellipsoid centered at $x_0$ with radius $r$ as: 
+
+\begin{center}
+$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
+\end{center}
+
+The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
+"Hessian norm" as the notion of length. The "Hessian norm" we could think as a $\delta y$ on 
+the previous $\frac{1}{z^2}$ graph. For $x_0$ that are far away from the boundary, given
+an allowed $\delta y$ (captured in $r$), the range for allowed value of $z$ is very large.
+This corresponds to having a large ellipsoid. \\
+
+To rephrase, the Dikin Ellipsoid is the collection of all points whose difference with 
+the current point($y-x_0$) is within the unit threshhold of $r=1$. When the center $x_0$ of the Dikin Ellipsoid 
+is far from the boundary of the polytope, the ellipsoid is larger, as a large $\delta (z-x)$ corresponds
+to a small $\delta y$. As the center point $x_0$ approaches the boundary 
+of the polytope, the ellipsoid becomes smaller and smaller. Therefore, the ellipsoid is able to reshape 
+itself as it surveys through the polytope $K$, biasing away from the corners of the region.
+
+\subsection{Algorithm \texttt{Dikin}}
+
+\begin{enumerate}
+
+  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.}
+  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$}
+  \item{Pick a random point $y$ from $D_{x_0}$}
+  \item{If $x_0 \notin D_{y}$, then reject $y$ (be careful, this condition is counter-intuitive)}
+  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
+        (the big picture is that the ratio of the determinants are equal
+         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
+         the geometric argument would be that 
+         this way the Dikin walk can avoid extreme corners of the region)}
+  \item{repeat until obtained number of desired points}
+
+\end{enumerate}
+\newpage
+
+\begin{figure}[ht]
+\centering
+\subfigure[Step 1]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
+\label{fig:subfigure2}}
+\quad
+\subfigure[Step 3 Case I]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
+\label{fig:subfigure3}}
+\subfigure[Step 3 Case II]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
+\label{fig:subfigure4}}
+\quad
+\subfigure[Step 4]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
+\label{fig:subfigure5}}
+\subfigure[Step 5]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
+\label{fig:subfigure6}}
+
+%
+\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
+         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
+         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
+         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
+         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
+         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
+         Algorithm repeats (Step 5)}
+         
+\label{fig:figure}
+\end{figure}
+
 %' \section{Using \texttt{walkr}} %%% MADE FLOW BETTER 
 %' 
 %' %% this is helpful : http://yihui.name/knitr/options/

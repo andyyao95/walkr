@@ -77,6 +77,29 @@ dikin_walk <- function(A,
     ## as.numeric converts the expression into an atom, so we get boolean
     ## it's just checking (z-x)^T %*% H_x %*% (z-x) <= r^2  
   
+#     \subsection{How to pick a random point uniformly from a Dikin Ellipsoid?}
+#     
+#     Let's say, we now have $D_{x}^r$, the Dikin Ellipsoid centered at $x$ with radius $r$. 
+#     
+#     \begin{enumerate}
+#     
+#     \item{generate $\zeta$ from the $n$ dimensional Standard Gaussian (i.e. \texttt{zeta = rnorm(n,0,1)})}
+#     \item{normalize $\zeta$ to be on the $n$ dimensional ball with radius $r$, that is:}
+#     \subitem{$\zeta \quad = \quad <x_1,x_2,...,x_n> \quad \rightarrow \quad <\frac{rx_1}
+#     {\sqrt{x_1^2+x_2^2+...+x_n^2}}, 
+#     \frac{rx_2}{\sqrt{x_1^2+x_2^2+...+x_n^2}}, ...... , 
+#     \frac{rx_n}{\sqrt{x_1^2+x_2^2+...+x_n^2}}>$}
+#     \item{Solve for $d$ in the matrix equation $H_x d = A^TD\zeta$ (note, as long as $x_0$ is not on the boundary
+#     of our polytope $K$, $H_x$ will be non-singular, thus, $d$ will always be unique)}
+#     \item{$y = x_0 + d$ is our randomly sampled point from $D_x^r$}
+#     
+#     \end{enumerate}
+#     
+#     
+#     1) will clean this up later
+#     2) should move these 3 functions into separate files with documentation...
+#     
+    
     return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x), (z-x)))) <= r^2)
     
   } 
