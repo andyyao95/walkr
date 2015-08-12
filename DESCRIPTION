@@ -8,18 +8,19 @@ Author:  as.person(c(
                 "Andy Yao <ay3@williams.edu> [aut]"
               ))
 Maintainer:  Andy Yao <ay3@williams.edu>
-Depends:     R (>= 3.2.1) 
+Depends:     R (>= 3.1) 
 Suggests:    testthat, knitr
 Imports:     hitandrun, 
              limSolve, 
              MASS,
              Rcpp (>= 0.11.6),
              shinystan
-Description: Samples from the intersection of the n-simplex and m hyperplanes using MCMC random walks. 
-             Specifically, the sampling space is described by the underdetermined matrix Ax = b, 
-             such that every element of x must be non-negative and sum to 1. 
-             The current MCMC methods supported are Dikin Walk and Hit-and-Run. The package also provide
-             tools to examine and visualize the convergence properties of the random walks.
+Description: Samples from the intersection of the n-simplex and m hyperplanes using 
+             MCMC random walks. The sampling space is described by the underdetermined 
+             matrix Ax = b, such that every element of x must be non-negative and 
+             sum to 1. The two MCMC methods supported are Hit-and-Run and  Dikin 
+             Walk. The package also provide tools to examine and visualize the 
+             convergence properties of the random walks.
 License:     GPL-3
 LinkingTo:   Rcpp, RcppEigen
 VignetteBuilder: knitr
