@@ -1,6 +1,6 @@
 # walkr
 **walkr** uses random walks to sample points from the intersection of 
-the $N$ simplex with $M$ hyperplanes. Mathematically, the sampling space is all vectors $x$ 
+the \eqn{N} simplex with $M$ hyperplanes. Mathematically, the sampling space is all vectors $x$ 
 that satisfy $Ax=b$, $\sum x = 1$, and $x_i \geq 0$. The sampling algorithms implemented 
 are hit-and-run and Dikin walk, both of which are MCMC (Monte-Carlo Markov Chain) random 
 walks. **walkr** also provide tools to examine the convergence
