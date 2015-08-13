@@ -8,11 +8,7 @@ This is my first submission!
 * win-builder (devel and release)
 
 ## R CMD check results
-There were no ERRORs or WARNINGs.    
-
-There was 1 NOTE: 
-* checking CRAN incoming feasibility ... NOTE Maintainer: ‘Andy Yao <andy.yao17@gmail.com>’ New submission
-
+There were no ERRORs or WARNINGs or NOTES.    
 
 ## Downstream dependencies
 None
