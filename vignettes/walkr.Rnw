@@ -35,7 +35,6 @@ described by $\sum\limits_{i=1}^N {x_i} = 1$ and $x_i \geq 0$. The intersection 
 these two spaces is a convex polytope. The \code{R} package \pkg{walkr} samples from this intersection using  %%% SPECIAL FORMAT FOR R 
 two Monte-Carlo Markov Chain (MCMC) methods: hit-and-run and Dikin walk. \pkg{walkr}
 also provide tools to examine sample quality.
-% DESCRIPTION should mirror this abstract very similarly
 }
 
 \section{Introduction} 
@@ -121,8 +120,6 @@ Just as the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simple
 Specifically, the $4$D simplex is the following tetradhedron when viewed from $3$D space, with 
 verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.
 
-% Figure needs to be replaced
-% FIGURE NEEDS TO LOOK MORE LIKE A EQUILATERAL 
 \begin{figure}[H]
 \centering
 \includegraphics[width = 3in, height = 2.5in]{img/tetra1.png}
@@ -138,13 +135,11 @@ in Figure (below). The resulting shape is a trapezoid in $4$D space.
 $$
 A = 
 \begin{bmatrix}
-1 & 1 & 1 & 1 \\
 22 & 2 & 2 & 37\\
 \end{bmatrix},
 \quad
 b = 
 \begin{bmatrix}
-1\\
 16
 \end{bmatrix}
 $$
@@ -213,8 +208,8 @@ $$
 \subsection{Step 2: Solving for the Null Space -- Transforming to $\alpha$-space}
 
 Second, we find all possible $x$'s that satisfy $A'x = b'$. To do so, we must first 
-compute the null-space of $A'$ and then add on any particular solution that satisfy
-$A'x=b'$. See Leon's Linear Algebra textbook for a review of these basic results. %(\cite{leon})) 
+compute the null space of $A'$ and then add on any particular solution that satisfy
+$A'x=b'$. See Leon's Linear Algebra textbook for a review of these basic results (\cite{leon}).
 
 The Null Space of $A'$ can be represented by $N-(M+1)$ basis vectors, since we have
 $N$ variables and $M+1$ constraints in $A'$. Every basis vector, $v_i$, has 
@@ -311,7 +306,7 @@ of $Ax=b$ and the $N$-simplex to the general $Ax \leq b$ form. This is necessary
 sample algorithms we are going to present rely on the fact that the polytope is described
 in the $Ax \leq b$ form. 
 
-\textbf{NOTE: SHOULD INCLUDE 4D EXAMPLE HERE}
+%\textbf{NOTE: SHOULD INCLUDE 4D EXAMPLE HERE}
 
 \section{Algorithms}
 
@@ -401,12 +396,15 @@ which maps the points back into the original $x$-space.
 \pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package on CRAN (\cite{hitandrun}) 
 to implement hit-and-run. \\
 
-The hit-and-run algorithm has pros and cons. Describe pros and cons here (properties also).
+The hit-and-run algorithm asymptotically generates an uniform sample in the convex polytope. The cost
+of each step for hit-and-run is also relatively inexpensive. However, as the dimensions of the polytope
+increases, the mixing of hit-and-run becomes increasingly slower. 
 
 \section{Dikin Walk}
 
 Dikin walk is another method of MCMC random walks. In higher dimensions, the Dikin walk mixes much stronger
-than hit-and-run does. blah blah explain more about why this is good/bad. ``At the cost of uniformity''. 
+than hit-and-run does. This desirable mixing effect is due to the fact that Dikin walk favors points
+that are far away from the edges of the polytope, thereby sampling a ``nearly uniform'' sample (\cite{kannan}).
 
 \subsection{Definitions}
 

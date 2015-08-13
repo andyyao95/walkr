@@ -15,12 +15,12 @@ Imports:     hitandrun,
              MASS,
              Rcpp (>= 0.11.6),
              shinystan
-Description: Samples from the intersection of the n-simplex and m hyperplanes using 
-             MCMC random walks. The sampling space is described by the underdetermined 
-             matrix Ax = b, such that every element of x must be non-negative and 
-             sum to 1. The two MCMC methods supported are Hit-and-Run and  Dikin 
-             Walk. The package also provide tools to examine and visualize the 
-             convergence properties of the random walks.
+Description: Consider the intersection of two spaces: the complete solution space
+             to Ax = b and the N-Simplex. The intersection of these two spaces is 
+             a convex polytope. The package walkr samples from this 
+             intersection using two Monte-Carlo Markov Chain (MCMC) methods: 
+             hit-and-run and Dikin walk. Walkr also provide tools to examine sample 
+             quality.
 License:     GPL-3
 URL:         https://github.com/andyyao95/walkr
 BugReports:  https://github.com/andyyao95/walkr/issues
