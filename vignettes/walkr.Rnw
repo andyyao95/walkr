@@ -56,7 +56,15 @@ $$x_1 + x_2 + x_3 + ... + x_N = 1$$
 $$x_i \geq 0, \qquad \forall i \in \text{\{$1, 2, ..., N$\}}$$ 
 
 The $N$-simplex is a $N-1$ dimensional object living in $N$ dimensional space. For example, the $3$D simplex 
-is a $2$ dimensional triangle in $3$D space. %(reference figure here). \\ %insert 3d simplex figure
+is a $2$ dimensional triangle in $3$D space (Figure~\ref{fig:simplex3D}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 3.5in, height = 2.5in]{img/simplex3D.png}
+\caption[caption]{The $3$D simplex is a $2$ dimensional triangle in $3$ dimensional space. The vertices
+                  of the simplex are $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$.}
+\label{fig:simplex3D} 
+\end{figure} 
 
 The intersection of the complete solution of $Ax=b$ and the $N$-simplex is a non-negative
 convex polytope. Sampling from such a convex polytope is a difficult problem, and the common approach is to 
@@ -145,8 +153,10 @@ $$
 \centering
 \includegraphics[width = 3in, height = 2.5in]{img/tetra2.png}
 \caption[caption]{The 4D simplex is the tetrahedron. The hyperplane cuts through the tetrahedron, forming 
-                  a trapezoid as the intersection (in red). This trapezoid is our sampling space, as 
-                  it is the intersection of the hyperplane with the 4D simplex} %%% need to label points!!
+                  a trapezoid as the intersection (in red). This trapezoid is our sample space, as 
+                  it is the intersection of the hyperplane with the 4D simplex. The vertices
+                  of the trapezoid are ($0.7,0.3,0,0$), ($0.7,0,0.3,0$), ($0,0.6,0,0.4$),
+                  and ($0,0,0.6,0.4$)} 
 \end{figure}
 
 In higher dimensions, the same logic applies. Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$ (given $N$
