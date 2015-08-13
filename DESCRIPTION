@@ -26,4 +26,3 @@ URL:         https://github.com/andyyao95/walkr
 BugReports:  https://github.com/andyyao95/walkr/issues
 LinkingTo:   Rcpp, RcppEigen
 VignetteBuilder: knitr
-Repository: CRAN
