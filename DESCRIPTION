@@ -8,7 +8,7 @@ Author:  as.person(c(
                 "Andy Yao <andy.yao17@gmail.com> [aut]"
               ))
 Maintainer:  Andy Yao <andy.yao17@gmail.com>
-Depends:     R (>= 3.1) 
+Depends:     R (>= 3.1), ggplot2
 Suggests:    testthat, knitr
 Imports:     hitandrun, 
              limSolve, 
@@ -22,6 +22,8 @@ Description: Samples from the intersection of the n-simplex and m hyperplanes us
              Walk. The package also provide tools to examine and visualize the 
              convergence properties of the random walks.
 License:     GPL-3
+URL:         https://github.com/andyyao95/walkr
+BugReports:  https://github.com/andyyao95/walkr/issues
 LinkingTo:   Rcpp, RcppEigen
 VignetteBuilder: knitr
 Repository: CRAN

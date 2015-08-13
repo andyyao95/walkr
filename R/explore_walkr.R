@@ -13,7 +13,7 @@
 #' @return a shiny interface that display the diagnostics of the MCMC random walk
 #' @export
 #' @importFrom shinystan launch_shinystan as.shinystan
-#' 
+#' @import ggplot2
 
 explore_walkr <- function(x) {
   
