@@ -3,7 +3,7 @@ Consider the intersection of two spaces: the complete solution space
 to Ax = b and the N-Simplex. The intersection of these two spaces is 
 a convex polytope. **walkr** samples from this 
 intersection using two Monte-Carlo Markov Chain (MCMC) methods: 
-hit-and-run and Dikin walk. Walkr also provide tools to examine sample 
+hit-and-run and Dikin walk. **walkr** also provide tools to examine sample 
 quality.
 
 # Getting Started
