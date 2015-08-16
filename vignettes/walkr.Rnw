@@ -225,22 +225,23 @@ $$
 
 \subsection{Step 2: solving for the null space -- transforming to $\alpha$-space}
 
-Having $A'x =b'$, we need to parametrize all possible $x$'s that satisfy this matrix equation, because 
-just from the implicit form $A'x=b'$ we have no idea how to select $x$'s that will satisfy this equation. 
-
-Find $x$'s that satisfy $A'x = b'$ by computing the null space of $A'$ and then adding on a particular solution. 
-See \cite{leon} for a review of the specifics of finding null spaces and particular solutions.
 
 
+% Having $A'x =b'$, we need to parametrize all possible $x$'s that satisfy this matrix equation, because 
+% just from the implicit form $A'x=b'$ we have no idea how to select $x$'s that will satisfy this equation. 
 
-% recall that the null space of A' is defined as all the x's that satisfy 
-% Ax = 0 , and then particualr solution 
-% we need the null space because of blah blah bllah 
-% 
+Find $x$'s that satisfy $A'x = b'$. First, solve for the null space of $A'$.
+Recall that the null space of $A'$ is defined as the set of all $x$'s that satisfy $A'x=0$. The null space is 
+spanned by $N-(M+1)$ basis vectors, which form a coordinate system for the null space. Any vector formed by 
+a linear combination of the basis vectors will still be in the null space. Once we have the null space, 
+we add on a particular solution to the null space. The null space we can think of as constructing a coordinate
+system for $A'x=0$', and the particular solution to $A'x=b'$ we can think of as an offset from the origin 
+of that coordinate system. For a review of the specifics of finding null spaces and particular solutions,
+one can refer to \cite{leon}.
 
-The null space of $A'$ can be represented by $N-(M+1)$ basis vectors, since we have
-$N$ variables and $M+1$ constraints in $A'$. Every basis vector, $v_i$, has 
-$N$ components:
+The null space of $A'$ can be represented by $N-(M+1)$ basis vectors. Because $A'$ is $M+1 \times N$ ($M+1 < N$),
+the dimensions of the null space will be $N-(M+1)$. Because we are in $\mathbb{R}^N$, every basis vector, 
+$v_i$, has $N$ components:
 
 $$
 \text{basis vectors} = 
@@ -261,607 +262,607 @@ v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)
 \quad | \quad \alpha_i \in \mathbb{R}
 \Bigg\}
 $$ 
-
-\subsection{Step 3: including the simplex inequalities}
-
-We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be $\geq 0$: 
-
-$$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-\quad \geq
-\begin{bmatrix}
-0 \\
-0 \\
-... \\
-... \\
-... \\
-0 \\
-\end{bmatrix}
-$$
-
-We express all coefficients $\alpha_i$ as a vector $\alpha$:
-
-$$\alpha =
-\begin{bmatrix}
-\alpha_1 \\
-\alpha_2 \\
-... \\
-\alpha_{N-(M+1)}
-\end{bmatrix}
-$$
-
-We can also express the set of basis vectors as columns of matrix $V$:  
-
-$$
-V = 
-\begin{bmatrix}
-v_1 &
-v_2 &
-... &
-v_{N-(M+1)} \\
-\end{bmatrix}
-$$
-
-Therefore, the inequality now becomes:
-
-$$
-v_{particular} + V\alpha \geq 
-\begin{bmatrix}
-0 \\
-0 \\
-... \\
-... \\
-... \\
-0 \\
-\end{bmatrix}
-$$
-
-$$
-V\alpha \geq -v_{particular}
-$$
-
-$$
--V\alpha \leq v_{particular}
-$$
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% recall we began with $Ax=b$ and the N-simplex looking for the solution. The first thing we had to do 
-%% was to bring in ... A' part
-%% and then we had to set up the null space 
-%% 1) get V soley from A 
-%% and then particular comes from Ax=b
-%% and then we add on the inequalities
-
-%% next paragraph:
-%% going forward, we will not use the $-V\alpha=vp$ notation, instead we will use notation $Ax \leq b$. Recall
-%% that this is 
-%% but because the literature uses 
-%% EXPLAIN WHY WE'RE GOING BACK TO AX \LEQ B 
-%%%%%%%%%%%%%%%%%%%%%%% ==> MOVE THIS SECTION TO AFTER EXAMPLES
-Here we arrive at the generic $Ax \leq b$ representation of a convex polytope (note again
-that the $A$ and $b$ in $Ax \leq b$ are different from those in $Ax=b$). We have performed
-a \textbf{transformation} from $x$-space to $\alpha$-space, going from describing the polytope 
-in terms of the intersection of $Ax=b$ and the $N$-simplex to the general $Ax \leq b$ form.
-This is necessary because the following sample algorithms we are going to present rely on the fact that the 
-polytope is described in the $Ax \leq b$ form. Therefore, \pkg{walkr} internally performs 
-this transformation, samples $\alpha$, then maps it back to $x$-space.
-
-
-\subsection{Four dimensional transformation example}
-
-Consider a four dimensional example drawn from Figure~\ref{fig:tetra2}. 
-
-$$
-A = 
-\begin{bmatrix}
-22 & 2 & 2 & 37\\
-\end{bmatrix},
-\quad
-b = 
-\begin{bmatrix}
-16
-\end{bmatrix}
-$$
-
-\textbf{Step 1:} Add an extra row in $Ax=b$ to capture the equality part of the simplex constraint.
-
-$$
-A' = 
-\begin{bmatrix}
-22 & 2 & 2 & 37\\
-1 & 1 & 1 & 1 \\
-\end{bmatrix},
-\quad
-b' = 
-\begin{bmatrix}
-16 \\
-1 \\
-\end{bmatrix}
-$$
-
-\textbf{Step 2:} The null space basis contain 2 vectors, as $M-(N+1) = 4 - (1+1) = 2$ is the dimension of our solution space.
-The null space basis vectors (to three decimal places) are:
-
-$$
-v_1 = 
-\begin{bmatrix}
--0.103 \\
--0.680 \\
-0.723 \\
-0.059 \\
-\end{bmatrix},
-\quad
-v_2 = 
-\begin{bmatrix}
--0.833 \\
-0.265 \\
-0.092 \\
-0.476
-\end{bmatrix}
-$$
-
-A particular solution to $A'x=b'$ is (any particular solution would work):
-
-$$
-v_{particular} = 
-\begin{bmatrix}
-0.212 \\
-0.147 \\
-0.359 \\
-0.274 \\
-\end{bmatrix}
-$$
-
-\textbf{Step 3:} We add on the simplex inequalities:
-
-$$
-v_{particular} + \alpha_1 v_1 + \alpha_2 v_2 
-\geq
-\begin{bmatrix}
-0 \\
-0 \\
-0 \\ 
-0 \\
-\end{bmatrix}
-$$
-
-Finally, we re-express the inequalities as $-V\alpha \leq v_{particular}$, which is of the form $Ax \leq b$
-
-$$
-V = 
-\begin{bmatrix}
--0.103 & -0.833\\
--0.680 & 0.265\\
-0.723 & 0.092\\
-0.059 & 0.476\\
-\end{bmatrix}
-$$
-
-$$
-\alpha =
-\begin{bmatrix}
-\alpha_1 \\
-\alpha_2 \\
-\end{bmatrix}
-$$
-
-$$-V\alpha = 
-\begin{bmatrix}
-0.103 & 0.833\\
-0.680 & -0.265\\
--0.723 & -0.092\\
--0.059 & -0.476\\
-\end{bmatrix}
-\begin{bmatrix}
-\alpha_1 \\
-\alpha_2 \\
-\end{bmatrix}
-\leq
-\begin{bmatrix}
-0.212 \\
-0.147 \\
-0.359 \\
-0.274 \\
-\end{bmatrix}
-= v_{particular} %%%%%%%%%% switch to 2 lines
-$$
-
-
-%% before talking about using notation
-%% TALK ABOUT HOW WE MAP BACK
-
-\section{Algorithms}
-
-\textbf{Important:} Before moving to sampling algorithms, we clear up on some nomenclature. 
-First, as established above, the sampling space is a convex polytope. We shall refer to this convex 
-polytope as $K$. %% restate the problem 
-%% defined non-negative convex polytope K to be the solution to Ax \leq b 
-%% put another footnote
-
-%% both hitandrun and dikin require a starting point
-%% overview of MCMC chains/ mixing 
-
-
-Moreover, because it is standard notation in the literature to 
-describe a convex polytope as $Ax \leq b$, we describe $K$ with $Ax \leq b$. 
-In fact, the $Ax \leq b$ form is necessary to perform the sampling algorithms. We keep in mind that
-the $A$, $x$, and $b$ are not the same as those in the original problem statement of $Ax=b$ and $N$-simplex. 
-Instead, as described in the section above, we actually sample coefficients $\alpha$'s, 
-eventually transforming $\alpha$'s back to $x$-space. Again, $Ax \leq b$ in this section describes the 
-polytope in terms of transformed coordinates $\alpha$. %% reduce this substantially cuz redundant 
-
-\subsection{Starting point}
-
-MCMC random walks need a starting point, $x_0$ in $K$. \pkg{walkr}
-generates starting points using linear programming.
-Specifically, the \texttt{lsei} function of the \pkg{limSolve} package (\cite{limsolve}) finds $x$ which: 
-
-$$\text{minimizes} \quad |Cx-d|^2$$
-$$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
-
-We randomly generate matrix $C$ and vector $d$. Solving this system generates an $x$ 
-which will usually fall on the boundaries of polytope $K$. We repeat this process 30 times in 
-\pkg{walkr} and take an average of those points, which ought to be still in the %%% awkward, do the convex thing in separate sentence
-polytope $K$ because it is convex. This procedure generates one starting point $x_0$. \\
-
-
-%% 3-4 sentences talking about starting point/mixing 
-
-\section{Hit-and-run} 
-
-%jones 1985 provides an overview of the hit-and-run algorithm, as follows:
-
-\begin{enumerate}
-  
-  \item{Set starting point $x_0$ as current point.}
-  \item{Generate a random direction $d$ from the $N$ dimensional unit-sphere.}
-  \item{Find the chord $S$ through $x_0$ along the directions $d$ and $-d$. 
-        Define end points $s_1$ and $s_2$ as the intersection of the chord $S$
-        with the edges of $K$. Because $K$ is convex, we chord $S$ will only 
-        intersect it at two points. Parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, 
-        where $t \in [0,1]$.}
-  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}.}
-  \item{Set $x_1$ as current point.}
-  \item{Repeat algorithm until number of desired points sampled.}
-        
-\end{enumerate}
-
-\begin{figure}[ht]
-\centering
-\subfigure[Step 1]{%  %%% change all the step 1 to blank 
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
-\label{fig:subfigure1}}
-\subfigure[Step 2]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
-\label{fig:subfigure1}}
-\quad
-\subfigure[Step 3]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
-\label{fig:subfigure2}}
-\subfigure[Step 4]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-\label{fig:subfigure3}}
-\quad
-\subfigure[Step 5]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
-\label{fig:subfigure4}}
-%
-\caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction  %%% (a) instead of 
-         is selected (Step 2), and the chord along that direction is calculated (Step 3).           %% step 1
-         Then, we pick a random point along that chord and move there as our new point (Step 4).
-         The algorithm is repeated to sample many points (Step 5).} %%% REMEMBER TO DO FOR DIKIN ALSO
-\label{fig:hitandrun}
-\end{figure}
-
-\pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package (\cite{hitandrun}) 
-to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform sample in the convex polytope. The cost
-of each step for hit-and-run is also relatively inexpensive. However, as the dimensions of $K$
-increases, the mixing of hit-and-run becomes increasingly slower.
-
-%% explain more about why it is slower
-%% exactly what does mixing slower mean 
-%% we will have often chains that "get stuck in corners" and don't overlap 
-%% with each other 
-%% GO INTO DETAILS ==> the intuition. reiteration 
-%% even start talking about significant problem of A going up 
-
-\section{Dikin walk}
-
-%% as parallel to hit-and-run as similar as possible 
-
-%% this is the second of the two MCMC 
-
-
-%begin with:
-
-A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.  
-%second sentence: A dikin walk begins from a random starting and then creates ellipsoid blah blah
-%third sentence: the shape of the ellipsoid depends on the Ax \leq b 
-%fourth   : the closer the point is to the edge 
-% fifth : unlike hit-and-run, the Dikin walk does not sample uniformly thorughout K. Instead 
-%         it is biased towards points that are away from the edge.
-% this bias allows the chains to mix more quickly than with hit-and-run, and therefore, 
-% to work better in higher dimensions. 
-
-% We call this convex polytope $K$, which can be described in the form $Ax \leq b$. We point out that this $Ax \leq b$ 
-% is the transformed polytope in $\alpha$-space (discussed in transformation section above). 
-% The $A$, $x$, and $b$ are different from those in the original $Ax=b$ and $N$-Simplex.
-% 
-% For the definitions below, let $a_i$ represent a row in $A$. Let $x_i$, $b_i$ represent 
-% the $i^{th}$ element of $x$ and $b$ respectively. Let $A$ (the one in $Ax \leq b$) be 
-% of size $m \times n$ (not the same as $M \times N$).   ==> rid of these two paragraphs
-
-%WHAT BELONGS HERE:
-
-% for non-negataive convex poyltope K, defiend as all x for which Ax <= b, define a_i as the ith row of A. 
-% define x_i and b_i as the i_th element of x and b respectively. The dimensions of A are m = N, n = N-(M+1),
-% where M and N are the dimensions of A in Ax=b, the original statement of the problem. 
-
-% cite the original dikin walk paper in the beginning 
-
-\noindent \textbf{Log Barrier Function $\phi$:} 
-
-$$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
-
-The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
-$x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero. 
-The value of $\phi$ gets larger and larger as $a_i^Tx$ gets closer and closer to $b_i$. 
-
-% highlight that a_i^Tx must be smaller than b_i 
-% explain what happens when 
-
-% that's why its a barrier function, because we can't ever reach there
-% it's exactly because of this, we cannot start at the boundary 
-% the log barrier function equals infinity on the edge of $K$ 
-
-% say about starting points
-
-\noindent \textbf{Hessian of Log Barrier $H_x$:} 
-
-$$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A, \quad \text{where:}$$
-$$D = diag(\frac{1}{b_i - a_i^Tx})$$    % change D^2 to D, include the square
-
-$H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix. 
-The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
-to the vector $x$. The Hessian describes the shape of the landscape.
-
-%% maybe describe more about the hessian
-%% the cloes you are to the edge, the individual elemetns become
-%% very large 
-
-%% point 1: the closer you are to the edge, the diag elements of the 
-%% point 2: 
-
-%% explore more about the determinant, the intuition
-
-%%1. hessian as the norm
-%%2. hessian as volume of ellipsoid 
-
-\noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
-
-Define the Dikin Ellipsoid, $D_{x_0}^r$, centered at $x_0$ with radius $r$ as: 
-
-\begin{center}
-$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
-\end{center}
-
-The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
-``Hessian norm'' as the notion of length. The ``Hessian norm'' we could think as a $\Delta \frac{1}{z^2}$ on 
-the $\frac{1}{z^2}$ graph. For $x_0$'s that are far away from the boundary, given
-an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values of $y-x_0$ is very large.
-This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
-then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable -- a smaller
-Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuition above
-%% leave note to self: maybe add the 4D stuff
-
-
-%% GO THROUGH ALL THE MATH WE TALKED ABOUT ABOVE IN THIS NEW SPACE 
-%% the hessian at x and hessian at y 
-%% and then draw ellipse 
-
-
-%% SAMPLE ALPHAS FROM LIKE A CERTAIN ELLIPSOID 
-%% and then map back 
-
-\subsection{Algorithm}
-
-\begin{enumerate}
-                         %need to fix this, because we CANNOT be on the edge to start with 
-  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.} % reference log barrier, explain in detail
-  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  % that it blows up
-  \item{Pick a random point $y$ from $D_{x_0}$.}
-  \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
-        think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
-        this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
-        potential point $y$, then we reject the point $y$.} %% I don't know why the other way around doesn't work...
-                                                            %% probably some stats thing related to bias
-                        % step 4 is necessary 
-                        % explain why this exists
-                        % just do the hessian
-  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
-        ( is that the ratio of the determinants are equal
-         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
-         the geometric argument would be that %% why do we care about ratio 
-         this way the Dikin walk can avoid extreme corners of the region)}
-         
-         %% somewhere mention r <= 1 
-         
-         The ratio of the determinants is equal .... ratio of $y$ and $x_0$. 
-         
-         2 cases: when volume of y is bigger than or equal to volume of x0. if thats case, we accept. 
-         if however, y is smaller than x, we're ready to take it some of the time, but the further 
-         away it is, the less likely we want to do it. 
-         
-         
-         
-         
-         
-  \item{Repeat until obtained number of desired points.} %% same sentence as hit-and-run
-
-\end{enumerate}
-
-\begin{figure}[ht]
-\centering
-\subfigure[Step 1]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
-\label{fig:subfigure1}}
-\subfigure[Step 2]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
-\label{fig:subfigure2}}
-\quad    %% EXPLICITY CONSTRUCT D_y 
-\subfigure[Step 3 Case I]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
-\label{fig:subfigure3}}
-\subfigure[Step 3 Case II]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
-\label{fig:subfigure4}}
-\quad
-\subfigure[Step 4]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
-\label{fig:subfigure5}}
-\subfigure[Step 5]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
-\label{fig:subfigure6}}
-\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
-         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
-         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
-         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate!!
-         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
-         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
-         Algorithm repeats (Step 5).} %% cannot begin with a point on the edge 
-         
-\label{fig:figure}
-\end{figure}
-
-
-%% need a few paragraphs here
-
-% 1. Why is dikin better
-% 2. Histograms == > SHOW A FIGURE, BUT NO R CODE ==> LABEL GRAPH  (A = matrix(1, ncol = 2))
-% 2D line of how dikin is more concentrated than hitandrun
-
-%% TALK ABOUT WALKR IMPLEMENTS DIKIN USING RCPP AND RCPPEIGEN
-%% 
-
-% 3. There are techniques to improve the sampling. a)thining b) burn-in, spend a paragraph each of those things 
-% explain how a standard setting for burn-in is x (default settings for thin and burn-in) 
-% LOOK AT STAN, WHAT REASONABLE VALUES ARE (cite the stan manual)
-
-%% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
-%% this indicates mixing. Cite the Gelman Rubin Article. 
-
-\section{Using \texttt{walkr}}
-
-%% this is helpful : http://yihui.name/knitr/options/
-
-
-The \pkg{walkr} package has one main function \code{walkr} which samples points. \code{walkr} has the following parameters:
-
-\begin{itemize}
-
-  \item{ \code{A} is the left hand side of the matrix equation $Ax=b$.}
-  \item{ \code{b} is the right hand side of the matrix equation $Ax=b$.}
-  \item{ \code{points} is the number of points you want.}
-  \item{ \code{method} is the method of sampling: either \code{"hit-and-run"} or 
-         \code{"dikin"}.}
-  \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is returned.} %put -th as superscript
-  \item{ \code{burn} is the burn-in parameter. The first \code{burn} points are deleted from the final sample.} % make as a percentage of the total percentage
-  \item{ \code{chains} is the number of indepedent random walks we create, each
-          from a different starting point. By default, walkr returns a matrix 
-          which consists of the individual chains combined together. Every chain is an element 
-          of the list which \code{walkr} eventually returns.}
-  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
-         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
-         then a single matrix of points is returned. A column is a sampled point.}
-
-\end{itemize}
-
-Consider the 3D simplex: 
-
-<<example1, eval = TRUE>>==
-library(walkr)
-A <- matrix(1, ncol = 3)
-b <- 1
-sampled_points <- walkr(A = A, b = b, points = 1000, 
-                        method = "hit-and-run", chains = 5, ret.format = "matrix")
-@
-
-%% library(scatterplot3D)
-%% plot those points 
-
-Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
-$Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
-In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
-it specializes in solving a special kind of convex polytopes, one created by the intersection of $Ax=b$
-and the $N$-simplex. 
-
-<<example3, eval = TRUE>>=
-set.seed(314)
-A <- matrix(sample(c(0,1,2), 40, replace = TRUE), ncol = 20)
-b <- c(0.5, 0.3)
-sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, 
-                        method = "hit-and-run", ret.format = "list")
-
-@
-
-\code{walkr} warns the user if the chains have not mixed ``well-enough'' according to the 
-rhat values. We can ensure better mixing by either increasing the amount of thinning or by 
-using Dikin instead of hit-and-run. 
-% don't need to set the seed again 
-<<example4, eval = TRUE>>=
-sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 100, ## SPLIT INTO TWO CHUNKS 
-                        method = "hit-and-run", ret.format = "list")         ## 1 way is to increase thining
-sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,  ## another way is to change thin
-                        method = "dikin", ret.format = "list")
-@
-
-Dikin walk only required \code{thin} to be $10$, whereas %% if we ran hitandrun with a thin of 10, that code would've 
-%% produced a warning. This is a sign of dikin mixing faster than hit-and-run. 
-hit-and-run needed a \code{thin} parameter of $100$. This is a sign that Dikin mixes faster 
-than hit-and-run does. As dimensions ramp up to the hundreds, this rapid mixing behavior 
-of Dikin compared to hit-and-run is even more obvious. %%%%%% make this better 
-
-Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
-random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
-from \pkg{shinystan}. %Note that when calling \code{explore\_walkr}, 
-
-
-%Note that the value of \code{"ret.format"} argument must be \code{"list"}.
-% SOMETHING DIRECT: EXPLORE_WALKR REQUIRES THE RET.FORMAT TO BE LIST. 
-% say that there is a function called explore_walkr. don't have to 
-%Figure~\ref{fig:traceplot} shows the traceplots of a particular parameter.
-
-\section{Conclusion}
-
-\pkg{walkr} uses MCMC random walks to sample $x$ from the intersection of two spaces. 
-The first space is the complete solution space to the underdetermined matrix equation $Ax=b$, 
-where $A$ is a $M \times N$ matrix, with $M < N$.  The second space is the $N$-simplex, 
-described by equation $x_1+x_2+...+x_N=1$ and inequalities
-$x_i \geq 0$. This intersection is a convex polytope. 
-
-\pkg{walkr} implements two MCMC sampling algorithms: hit-and-run and Dikin walk. The package also 
-provides convergence diagnostics, as well as a link to the \pkg{
-shinystan} package which enables visualization. Hit-and-run is a MCMC algorithm 
-that guarantees uniform convergence asymptotically and has a relatively low computation cost for
-one step. However, as the dimension of our convex polytope increases, hit-and-run mixes increasingly
-slower. Dikin walk is an alternative MCMC algorithm that samples nearly uniformly, favoring 
-points away from the edges of the polytope. While Dikin walk is only nearly uniform, it exhibits
-much stronger mixing in high dimensions than hit-and-run does.  %%% AWKWARD
-
-%% third paragraph
-%% which we talk about problems and extensions 
-%% problems: 
-The major problem for the major problem is that run-time becomes unwieldy as the number of columns $N$ in $A$ increases.
-In applications, we recommend using Dikin Walk instead of hit-and-run for values of $N$ greater than 50. 
-Further research is required for larger values of $N$. 
-
-What are the possible next steps? 
--1. trying to this on multiple cores, like matrix multiplication could be parallelized
--the major reason that it takes so long 
--hit-and-run asympottically uniform! 
--the most expensive
--THUS, possible of parellization??
-
--2. algorithms that are biased towards certain portions of the space, the same way that the dikin walk is biased
-- towards the center of the space. 
+%' 
+%' \subsection{Step 3: including the simplex inequalities}
+%' 
+%' We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be $\geq 0$: 
+%' 
+%' $$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+%' \quad \geq
+%' \begin{bmatrix}
+%' 0 \\
+%' 0 \\
+%' ... \\
+%' ... \\
+%' ... \\
+%' 0 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' We express all coefficients $\alpha_i$ as a vector $\alpha$:
+%' 
+%' $$\alpha =
+%' \begin{bmatrix}
+%' \alpha_1 \\
+%' \alpha_2 \\
+%' ... \\
+%' \alpha_{N-(M+1)}
+%' \end{bmatrix}
+%' $$
+%' 
+%' We can also express the set of basis vectors as columns of matrix $V$:  
+%' 
+%' $$
+%' V = 
+%' \begin{bmatrix}
+%' v_1 &
+%' v_2 &
+%' ... &
+%' v_{N-(M+1)} \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' Therefore, the inequality now becomes:
+%' 
+%' $$
+%' v_{particular} + V\alpha \geq 
+%' \begin{bmatrix}
+%' 0 \\
+%' 0 \\
+%' ... \\
+%' ... \\
+%' ... \\
+%' 0 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' $$
+%' V\alpha \geq -v_{particular}
+%' $$
+%' 
+%' $$
+%' -V\alpha \leq v_{particular}
+%' $$
+%' %%%%%%%%%%%%%%%%%%%%%%%%
+%' %% recall we began with $Ax=b$ and the N-simplex looking for the solution. The first thing we had to do 
+%' %% was to bring in ... A' part
+%' %% and then we had to set up the null space 
+%' %% 1) get V soley from A 
+%' %% and then particular comes from Ax=b
+%' %% and then we add on the inequalities
+%' 
+%' %% next paragraph:
+%' %% going forward, we will not use the $-V\alpha=vp$ notation, instead we will use notation $Ax \leq b$. Recall
+%' %% that this is 
+%' %% but because the literature uses 
+%' %% EXPLAIN WHY WE'RE GOING BACK TO AX \LEQ B 
+%' %%%%%%%%%%%%%%%%%%%%%%% ==> MOVE THIS SECTION TO AFTER EXAMPLES
+%' Here we arrive at the generic $Ax \leq b$ representation of a convex polytope (note again
+%' that the $A$ and $b$ in $Ax \leq b$ are different from those in $Ax=b$). We have performed
+%' a \textbf{transformation} from $x$-space to $\alpha$-space, going from describing the polytope 
+%' in terms of the intersection of $Ax=b$ and the $N$-simplex to the general $Ax \leq b$ form.
+%' This is necessary because the following sample algorithms we are going to present rely on the fact that the 
+%' polytope is described in the $Ax \leq b$ form. Therefore, \pkg{walkr} internally performs 
+%' this transformation, samples $\alpha$, then maps it back to $x$-space.
+%' 
+%' 
+%' \subsection{Four dimensional transformation example}
+%' 
+%' Consider a four dimensional example drawn from Figure~\ref{fig:tetra2}. 
+%' 
+%' $$
+%' A = 
+%' \begin{bmatrix}
+%' 22 & 2 & 2 & 37\\
+%' \end{bmatrix},
+%' \quad
+%' b = 
+%' \begin{bmatrix}
+%' 16
+%' \end{bmatrix}
+%' $$
+%' 
+%' \textbf{Step 1:} Add an extra row in $Ax=b$ to capture the equality part of the simplex constraint.
+%' 
+%' $$
+%' A' = 
+%' \begin{bmatrix}
+%' 22 & 2 & 2 & 37\\
+%' 1 & 1 & 1 & 1 \\
+%' \end{bmatrix},
+%' \quad
+%' b' = 
+%' \begin{bmatrix}
+%' 16 \\
+%' 1 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' \textbf{Step 2:} The null space basis contain 2 vectors, as $M-(N+1) = 4 - (1+1) = 2$ is the dimension of our solution space.
+%' The null space basis vectors (to three decimal places) are:
+%' 
+%' $$
+%' v_1 = 
+%' \begin{bmatrix}
+%' -0.103 \\
+%' -0.680 \\
+%' 0.723 \\
+%' 0.059 \\
+%' \end{bmatrix},
+%' \quad
+%' v_2 = 
+%' \begin{bmatrix}
+%' -0.833 \\
+%' 0.265 \\
+%' 0.092 \\
+%' 0.476
+%' \end{bmatrix}
+%' $$
+%' 
+%' A particular solution to $A'x=b'$ is (any particular solution would work):
+%' 
+%' $$
+%' v_{particular} = 
+%' \begin{bmatrix}
+%' 0.212 \\
+%' 0.147 \\
+%' 0.359 \\
+%' 0.274 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' \textbf{Step 3:} We add on the simplex inequalities:
+%' 
+%' $$
+%' v_{particular} + \alpha_1 v_1 + \alpha_2 v_2 
+%' \geq
+%' \begin{bmatrix}
+%' 0 \\
+%' 0 \\
+%' 0 \\ 
+%' 0 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' Finally, we re-express the inequalities as $-V\alpha \leq v_{particular}$, which is of the form $Ax \leq b$
+%' 
+%' $$
+%' V = 
+%' \begin{bmatrix}
+%' -0.103 & -0.833\\
+%' -0.680 & 0.265\\
+%' 0.723 & 0.092\\
+%' 0.059 & 0.476\\
+%' \end{bmatrix}
+%' $$
+%' 
+%' $$
+%' \alpha =
+%' \begin{bmatrix}
+%' \alpha_1 \\
+%' \alpha_2 \\
+%' \end{bmatrix}
+%' $$
+%' 
+%' $$-V\alpha = 
+%' \begin{bmatrix}
+%' 0.103 & 0.833\\
+%' 0.680 & -0.265\\
+%' -0.723 & -0.092\\
+%' -0.059 & -0.476\\
+%' \end{bmatrix}
+%' \begin{bmatrix}
+%' \alpha_1 \\
+%' \alpha_2 \\
+%' \end{bmatrix}
+%' \leq
+%' \begin{bmatrix}
+%' 0.212 \\
+%' 0.147 \\
+%' 0.359 \\
+%' 0.274 \\
+%' \end{bmatrix}
+%' = v_{particular} %%%%%%%%%% switch to 2 lines
+%' $$
+%' 
+%' 
+%' %% before talking about using notation
+%' %% TALK ABOUT HOW WE MAP BACK
+%' 
+%' \section{Algorithms}
+%' 
+%' \textbf{Important:} Before moving to sampling algorithms, we clear up on some nomenclature. 
+%' First, as established above, the sampling space is a convex polytope. We shall refer to this convex 
+%' polytope as $K$. %% restate the problem 
+%' %% defined non-negative convex polytope K to be the solution to Ax \leq b 
+%' %% put another footnote
+%' 
+%' %% both hitandrun and dikin require a starting point
+%' %% overview of MCMC chains/ mixing 
+%' 
+%' 
+%' Moreover, because it is standard notation in the literature to 
+%' describe a convex polytope as $Ax \leq b$, we describe $K$ with $Ax \leq b$. 
+%' In fact, the $Ax \leq b$ form is necessary to perform the sampling algorithms. We keep in mind that
+%' the $A$, $x$, and $b$ are not the same as those in the original problem statement of $Ax=b$ and $N$-simplex. 
+%' Instead, as described in the section above, we actually sample coefficients $\alpha$'s, 
+%' eventually transforming $\alpha$'s back to $x$-space. Again, $Ax \leq b$ in this section describes the 
+%' polytope in terms of transformed coordinates $\alpha$. %% reduce this substantially cuz redundant 
+%' 
+%' \subsection{Starting point}
+%' 
+%' MCMC random walks need a starting point, $x_0$ in $K$. \pkg{walkr}
+%' generates starting points using linear programming.
+%' Specifically, the \texttt{lsei} function of the \pkg{limSolve} package (\cite{limsolve}) finds $x$ which: 
+%' 
+%' $$\text{minimizes} \quad |Cx-d|^2$$
+%' $$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
+%' 
+%' We randomly generate matrix $C$ and vector $d$. Solving this system generates an $x$ 
+%' which will usually fall on the boundaries of polytope $K$. We repeat this process 30 times in 
+%' \pkg{walkr} and take an average of those points, which ought to be still in the %%% awkward, do the convex thing in separate sentence
+%' polytope $K$ because it is convex. This procedure generates one starting point $x_0$. \\
+%' 
+%' 
+%' %% 3-4 sentences talking about starting point/mixing 
+%' 
+%' \section{Hit-and-run} 
+%' 
+%' %jones 1985 provides an overview of the hit-and-run algorithm, as follows:
+%' 
+%' \begin{enumerate}
+%'   
+%'   \item{Set starting point $x_0$ as current point.}
+%'   \item{Generate a random direction $d$ from the $N$ dimensional unit-sphere.}
+%'   \item{Find the chord $S$ through $x_0$ along the directions $d$ and $-d$. 
+%'         Define end points $s_1$ and $s_2$ as the intersection of the chord $S$
+%'         with the edges of $K$. Because $K$ is convex, we chord $S$ will only 
+%'         intersect it at two points. Parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, 
+%'         where $t \in [0,1]$.}
+%'   \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}.}
+%'   \item{Set $x_1$ as current point.}
+%'   \item{Repeat algorithm until number of desired points sampled.}
+%'         
+%' \end{enumerate}
+%' 
+%' \begin{figure}[ht]
+%' \centering
+%' \subfigure[Step 1]{%  %%% change all the step 1 to blank 
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
+%' \label{fig:subfigure1}}
+%' \subfigure[Step 2]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
+%' \label{fig:subfigure1}}
+%' \quad
+%' \subfigure[Step 3]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
+%' \label{fig:subfigure2}}
+%' \subfigure[Step 4]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+%' \label{fig:subfigure3}}
+%' \quad
+%' \subfigure[Step 5]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+%' \label{fig:subfigure4}}
+%' %
+%' \caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction  %%% (a) instead of 
+%'          is selected (Step 2), and the chord along that direction is calculated (Step 3).           %% step 1
+%'          Then, we pick a random point along that chord and move there as our new point (Step 4).
+%'          The algorithm is repeated to sample many points (Step 5).} %%% REMEMBER TO DO FOR DIKIN ALSO
+%' \label{fig:hitandrun}
+%' \end{figure}
+%' 
+%' \pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package (\cite{hitandrun}) 
+%' to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform sample in the convex polytope. The cost
+%' of each step for hit-and-run is also relatively inexpensive. However, as the dimensions of $K$
+%' increases, the mixing of hit-and-run becomes increasingly slower.
+%' 
+%' %% explain more about why it is slower
+%' %% exactly what does mixing slower mean 
+%' %% we will have often chains that "get stuck in corners" and don't overlap 
+%' %% with each other 
+%' %% GO INTO DETAILS ==> the intuition. reiteration 
+%' %% even start talking about significant problem of A going up 
+%' 
+%' \section{Dikin walk}
+%' 
+%' %% as parallel to hit-and-run as similar as possible 
+%' 
+%' %% this is the second of the two MCMC 
+%' 
+%' 
+%' %begin with:
+%' 
+%' A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.  
+%' %second sentence: A dikin walk begins from a random starting and then creates ellipsoid blah blah
+%' %third sentence: the shape of the ellipsoid depends on the Ax \leq b 
+%' %fourth   : the closer the point is to the edge 
+%' % fifth : unlike hit-and-run, the Dikin walk does not sample uniformly thorughout K. Instead 
+%' %         it is biased towards points that are away from the edge.
+%' % this bias allows the chains to mix more quickly than with hit-and-run, and therefore, 
+%' % to work better in higher dimensions. 
+%' 
+%' % We call this convex polytope $K$, which can be described in the form $Ax \leq b$. We point out that this $Ax \leq b$ 
+%' % is the transformed polytope in $\alpha$-space (discussed in transformation section above). 
+%' % The $A$, $x$, and $b$ are different from those in the original $Ax=b$ and $N$-Simplex.
+%' % 
+%' % For the definitions below, let $a_i$ represent a row in $A$. Let $x_i$, $b_i$ represent 
+%' % the $i^{th}$ element of $x$ and $b$ respectively. Let $A$ (the one in $Ax \leq b$) be 
+%' % of size $m \times n$ (not the same as $M \times N$).   ==> rid of these two paragraphs
+%' 
+%' %WHAT BELONGS HERE:
+%' 
+%' % for non-negataive convex poyltope K, defiend as all x for which Ax <= b, define a_i as the ith row of A. 
+%' % define x_i and b_i as the i_th element of x and b respectively. The dimensions of A are m = N, n = N-(M+1),
+%' % where M and N are the dimensions of A in Ax=b, the original statement of the problem. 
+%' 
+%' % cite the original dikin walk paper in the beginning 
+%' 
+%' \noindent \textbf{Log Barrier Function $\phi$:} 
+%' 
+%' $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
+%' 
+%' The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
+%' $x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero. 
+%' The value of $\phi$ gets larger and larger as $a_i^Tx$ gets closer and closer to $b_i$. 
+%' 
+%' % highlight that a_i^Tx must be smaller than b_i 
+%' % explain what happens when 
+%' 
+%' % that's why its a barrier function, because we can't ever reach there
+%' % it's exactly because of this, we cannot start at the boundary 
+%' % the log barrier function equals infinity on the edge of $K$ 
+%' 
+%' % say about starting points
+%' 
+%' \noindent \textbf{Hessian of Log Barrier $H_x$:} 
+%' 
+%' $$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A, \quad \text{where:}$$
+%' $$D = diag(\frac{1}{b_i - a_i^Tx})$$    % change D^2 to D, include the square
+%' 
+%' $H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix. 
+%' The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
+%' to the vector $x$. The Hessian describes the shape of the landscape.
+%' 
+%' %% maybe describe more about the hessian
+%' %% the cloes you are to the edge, the individual elemetns become
+%' %% very large 
+%' 
+%' %% point 1: the closer you are to the edge, the diag elements of the 
+%' %% point 2: 
+%' 
+%' %% explore more about the determinant, the intuition
+%' 
+%' %%1. hessian as the norm
+%' %%2. hessian as volume of ellipsoid 
+%' 
+%' \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
+%' 
+%' Define the Dikin Ellipsoid, $D_{x_0}^r$, centered at $x_0$ with radius $r$ as: 
+%' 
+%' \begin{center}
+%' $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
+%' \end{center}
+%' 
+%' The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
+%' ``Hessian norm'' as the notion of length. The ``Hessian norm'' we could think as a $\Delta \frac{1}{z^2}$ on 
+%' the $\frac{1}{z^2}$ graph. For $x_0$'s that are far away from the boundary, given
+%' an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values of $y-x_0$ is very large.
+%' This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
+%' then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable -- a smaller
+%' Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuition above
+%' %% leave note to self: maybe add the 4D stuff
+%' 
+%' 
+%' %% GO THROUGH ALL THE MATH WE TALKED ABOUT ABOVE IN THIS NEW SPACE 
+%' %% the hessian at x and hessian at y 
+%' %% and then draw ellipse 
+%' 
+%' 
+%' %% SAMPLE ALPHAS FROM LIKE A CERTAIN ELLIPSOID 
+%' %% and then map back 
+%' 
+%' \subsection{Algorithm}
+%' 
+%' \begin{enumerate}
+%'                          %need to fix this, because we CANNOT be on the edge to start with 
+%'   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.} % reference log barrier, explain in detail
+%'   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  % that it blows up
+%'   \item{Pick a random point $y$ from $D_{x_0}$.}
+%'   \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
+%'         think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
+%'         this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
+%'         potential point $y$, then we reject the point $y$.} %% I don't know why the other way around doesn't work...
+%'                                                             %% probably some stats thing related to bias
+%'                         % step 4 is necessary 
+%'                         % explain why this exists
+%'                         % just do the hessian
+%'   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
+%'         ( is that the ratio of the determinants are equal
+%'          to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
+%'          the geometric argument would be that %% why do we care about ratio 
+%'          this way the Dikin walk can avoid extreme corners of the region)}
+%'          
+%'          %% somewhere mention r <= 1 
+%'          
+%'          The ratio of the determinants is equal .... ratio of $y$ and $x_0$. 
+%'          
+%'          2 cases: when volume of y is bigger than or equal to volume of x0. if thats case, we accept. 
+%'          if however, y is smaller than x, we're ready to take it some of the time, but the further 
+%'          away it is, the less likely we want to do it. 
+%'          
+%'          
+%'          
+%'          
+%'          
+%'   \item{Repeat until obtained number of desired points.} %% same sentence as hit-and-run
+%' 
+%' \end{enumerate}
+%' 
+%' \begin{figure}[ht]
+%' \centering
+%' \subfigure[Step 1]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
+%' \label{fig:subfigure1}}
+%' \subfigure[Step 2]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
+%' \label{fig:subfigure2}}
+%' \quad    %% EXPLICITY CONSTRUCT D_y 
+%' \subfigure[Step 3 Case I]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
+%' \label{fig:subfigure3}}
+%' \subfigure[Step 3 Case II]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
+%' \label{fig:subfigure4}}
+%' \quad
+%' \subfigure[Step 4]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
+%' \label{fig:subfigure5}}
+%' \subfigure[Step 5]{%
+%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
+%' \label{fig:subfigure6}}
+%' \caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
+%'          An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
+%'          If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
+%'          If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate!!
+%'          accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
+%'          Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
+%'          Algorithm repeats (Step 5).} %% cannot begin with a point on the edge 
+%'          
+%' \label{fig:figure}
+%' \end{figure}
+%' 
+%' 
+%' %% need a few paragraphs here
+%' 
+%' % 1. Why is dikin better
+%' % 2. Histograms == > SHOW A FIGURE, BUT NO R CODE ==> LABEL GRAPH  (A = matrix(1, ncol = 2))
+%' % 2D line of how dikin is more concentrated than hitandrun
+%' 
+%' %% TALK ABOUT WALKR IMPLEMENTS DIKIN USING RCPP AND RCPPEIGEN
+%' %% 
+%' 
+%' % 3. There are techniques to improve the sampling. a)thining b) burn-in, spend a paragraph each of those things 
+%' % explain how a standard setting for burn-in is x (default settings for thin and burn-in) 
+%' % LOOK AT STAN, WHAT REASONABLE VALUES ARE (cite the stan manual)
+%' 
+%' %% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
+%' %% this indicates mixing. Cite the Gelman Rubin Article. 
+%' 
+%' \section{Using \texttt{walkr}}
+%' 
+%' %% this is helpful : http://yihui.name/knitr/options/
+%' 
+%' 
+%' The \pkg{walkr} package has one main function \code{walkr} which samples points. \code{walkr} has the following parameters:
+%' 
+%' \begin{itemize}
+%' 
+%'   \item{ \code{A} is the left hand side of the matrix equation $Ax=b$.}
+%'   \item{ \code{b} is the right hand side of the matrix equation $Ax=b$.}
+%'   \item{ \code{points} is the number of points you want.}
+%'   \item{ \code{method} is the method of sampling: either \code{"hit-and-run"} or 
+%'          \code{"dikin"}.}
+%'   \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is returned.} %put -th as superscript
+%'   \item{ \code{burn} is the burn-in parameter. The first \code{burn} points are deleted from the final sample.} % make as a percentage of the total percentage
+%'   \item{ \code{chains} is the number of indepedent random walks we create, each
+%'           from a different starting point. By default, walkr returns a matrix 
+%'           which consists of the individual chains combined together. Every chain is an element 
+%'           of the list which \code{walkr} eventually returns.}
+%'   \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
+%'          a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
+%'          then a single matrix of points is returned. A column is a sampled point.}
+%' 
+%' \end{itemize}
+%' 
+%' Consider the 3D simplex: 
+%' 
+%' <<example1, eval = TRUE>>==
+%' library(walkr)
+%' A <- matrix(1, ncol = 3)
+%' b <- 1
+%' sampled_points <- walkr(A = A, b = b, points = 1000, 
+%'                         method = "hit-and-run", chains = 5, ret.format = "matrix")
+%' @
+%' 
+%' %% library(scatterplot3D)
+%' %% plot those points 
+%' 
+%' Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
+%' $Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
+%' In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
+%' it specializes in solving a special kind of convex polytopes, one created by the intersection of $Ax=b$
+%' and the $N$-simplex. 
+%' 
+%' <<example3, eval = TRUE>>=
+%' set.seed(314)
+%' A <- matrix(sample(c(0,1,2), 40, replace = TRUE), ncol = 20)
+%' b <- c(0.5, 0.3)
+%' sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, 
+%'                         method = "hit-and-run", ret.format = "list")
+%' 
+%' @
+%' 
+%' \code{walkr} warns the user if the chains have not mixed ``well-enough'' according to the 
+%' rhat values. We can ensure better mixing by either increasing the amount of thinning or by 
+%' using Dikin instead of hit-and-run. 
+%' % don't need to set the seed again 
+%' <<example4, eval = TRUE>>=
+%' sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 100, ## SPLIT INTO TWO CHUNKS 
+%'                         method = "hit-and-run", ret.format = "list")         ## 1 way is to increase thining
+%' sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,  ## another way is to change thin
+%'                         method = "dikin", ret.format = "list")
+%' @
+%' 
+%' Dikin walk only required \code{thin} to be $10$, whereas %% if we ran hitandrun with a thin of 10, that code would've 
+%' %% produced a warning. This is a sign of dikin mixing faster than hit-and-run. 
+%' hit-and-run needed a \code{thin} parameter of $100$. This is a sign that Dikin mixes faster 
+%' than hit-and-run does. As dimensions ramp up to the hundreds, this rapid mixing behavior 
+%' of Dikin compared to hit-and-run is even more obvious. %%%%%% make this better 
+%' 
+%' Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
+%' random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
+%' from \pkg{shinystan}. %Note that when calling \code{explore\_walkr}, 
+%' 
+%' 
+%' %Note that the value of \code{"ret.format"} argument must be \code{"list"}.
+%' % SOMETHING DIRECT: EXPLORE_WALKR REQUIRES THE RET.FORMAT TO BE LIST. 
+%' % say that there is a function called explore_walkr. don't have to 
+%' %Figure~\ref{fig:traceplot} shows the traceplots of a particular parameter.
+%' 
+%' \section{Conclusion}
+%' 
+%' \pkg{walkr} uses MCMC random walks to sample $x$ from the intersection of two spaces. 
+%' The first space is the complete solution space to the underdetermined matrix equation $Ax=b$, 
+%' where $A$ is a $M \times N$ matrix, with $M < N$.  The second space is the $N$-simplex, 
+%' described by equation $x_1+x_2+...+x_N=1$ and inequalities
+%' $x_i \geq 0$. This intersection is a convex polytope. 
+%' 
+%' \pkg{walkr} implements two MCMC sampling algorithms: hit-and-run and Dikin walk. The package also 
+%' provides convergence diagnostics, as well as a link to the \pkg{
+%' shinystan} package which enables visualization. Hit-and-run is a MCMC algorithm 
+%' that guarantees uniform convergence asymptotically and has a relatively low computation cost for
+%' one step. However, as the dimension of our convex polytope increases, hit-and-run mixes increasingly
+%' slower. Dikin walk is an alternative MCMC algorithm that samples nearly uniformly, favoring 
+%' points away from the edges of the polytope. While Dikin walk is only nearly uniform, it exhibits
+%' much stronger mixing in high dimensions than hit-and-run does.  %%% AWKWARD
+%' 
+%' %% third paragraph
+%' %% which we talk about problems and extensions 
+%' %% problems: 
+%' The major problem for the major problem is that run-time becomes unwieldy as the number of columns $N$ in $A$ increases.
+%' In applications, we recommend using Dikin Walk instead of hit-and-run for values of $N$ greater than 50. 
+%' Further research is required for larger values of $N$. 
+%' 
+%' What are the possible next steps? 
+%' -1. trying to this on multiple cores, like matrix multiplication could be parallelized
+%' -the major reason that it takes so long 
+%' -hit-and-run asympottically uniform! 
+%' -the most expensive
+%' -THUS, possible of parellization??
+%' 
+%' -2. algorithms that are biased towards certain portions of the space, the same way that the dikin walk is biased
+%' - towards the center of the space. 
 
 \section{Authors}
 
