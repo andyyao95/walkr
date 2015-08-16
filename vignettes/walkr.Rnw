@@ -183,7 +183,12 @@ $b$ is also different. The mathematical literature for linear equations uses $Ax
 on convex polytopes uses $Ax \leq b$, so it seemed best to use the same notation in both places 
 in order to make the connections to existing litearture easier.
 }. 
-In this section, we present a 3 step procedure for doing so. 
+
+Recall that our sample space is the intersection of the complete solution to $Ax=b$ and 
+the $N$-Simplex, which could be represented by three parts. First, the matrix equation 
+$Ax=b$. Second, the simplex equation $x_1+x_2+...+x_N=1$. Third, the simplex 
+non-negative inequalities, $x_i \geq 0$. In this section, we present a 3 step procedure
+to combine all three parts into one single inequality of the form $Ax \leq b$. 
 
 \subsection{Step 1: combining simplex equality with the original $Ax=b$}
 
@@ -225,23 +230,20 @@ $$
 
 \subsection{Step 2: solving for the null space -- transforming to $\alpha$-space}
 
+Find $x$'s that satisfy $A'x = b'$. First, solve for the null space of $A'$, 
+defined as all $x$ that satisfy $A'x=0$. The null space is 
+spanned by $N-(M+1)$ basis vectors, because $A'$ is $M+1 \times N$ ($M+1 < N$) 
+and hence the dimension of the null space is $N-(M+1)$. Any vector formed by 
+a linear combination of the basis vectors will still be in the null space. 
 
-
-% Having $A'x =b'$, we need to parametrize all possible $x$'s that satisfy this matrix equation, because 
-% just from the implicit form $A'x=b'$ we have no idea how to select $x$'s that will satisfy this equation. 
-
-Find $x$'s that satisfy $A'x = b'$. First, solve for the null space of $A'$.
-Recall that the null space of $A'$ is defined as the set of all $x$'s that satisfy $A'x=0$. The null space is 
-spanned by $N-(M+1)$ basis vectors, which form a coordinate system for the null space. Any vector formed by 
-a linear combination of the basis vectors will still be in the null space. Once we have the null space, 
-we add on a particular solution to the null space. The null space we can think of as constructing a coordinate
+Once we have the null space, we add on a particular solution to the null space. 
+The null space we can think of as constructing a coordinate
 system for $A'x=0$', and the particular solution to $A'x=b'$ we can think of as an offset from the origin 
 of that coordinate system. For a review of the specifics of finding null spaces and particular solutions,
 one can refer to \cite{leon}.
 
-The null space of $A'$ can be represented by $N-(M+1)$ basis vectors. Because $A'$ is $M+1 \times N$ ($M+1 < N$),
-the dimensions of the null space will be $N-(M+1)$. Because we are in $\mathbb{R}^N$, every basis vector, 
-$v_i$, has $N$ components:
+The null space of $A'$ can be represented by $N-(M+1)$ basis vectors. Because we are in $\mathbb{R}^N$, 
+every basis vector, $v_i$, has $N$ components:
 
 $$
 \text{basis vectors} = 
@@ -250,10 +252,9 @@ v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
 \Bigg\}
 $$
 
-Once we have the basis vectors, we could express the set of all $x$'s that satisfy $A'x=b'$
-in terms of coefficients $\alpha_i$. The intuition would be that the basis vectors
-form a coordinate system in the complete solution space, and that the coefficients $\alpha_i$'s
-represent linear combinations of basis vectors to cover the whole space. The complete
+Once we have the null space basis vectors and a particular solution, 
+we could express the set of all $x$'s that satisfy $A'x=b'$
+in terms of coefficients $\alpha_i$. The complete
 solution to $A'x=b'$ could be expressed as the set: 
 
 $$
@@ -262,213 +263,260 @@ v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)
 \quad | \quad \alpha_i \in \mathbb{R}
 \Bigg\}
 $$ 
-%' 
-%' \subsection{Step 3: including the simplex inequalities}
-%' 
-%' We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be $\geq 0$: 
-%' 
-%' $$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
-%' \quad \geq
-%' \begin{bmatrix}
-%' 0 \\
-%' 0 \\
-%' ... \\
-%' ... \\
-%' ... \\
-%' 0 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' We express all coefficients $\alpha_i$ as a vector $\alpha$:
-%' 
-%' $$\alpha =
-%' \begin{bmatrix}
-%' \alpha_1 \\
-%' \alpha_2 \\
-%' ... \\
-%' \alpha_{N-(M+1)}
-%' \end{bmatrix}
-%' $$
-%' 
-%' We can also express the set of basis vectors as columns of matrix $V$:  
-%' 
-%' $$
-%' V = 
-%' \begin{bmatrix}
-%' v_1 &
-%' v_2 &
-%' ... &
-%' v_{N-(M+1)} \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' Therefore, the inequality now becomes:
-%' 
-%' $$
-%' v_{particular} + V\alpha \geq 
-%' \begin{bmatrix}
-%' 0 \\
-%' 0 \\
-%' ... \\
-%' ... \\
-%' ... \\
-%' 0 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' $$
-%' V\alpha \geq -v_{particular}
-%' $$
-%' 
-%' $$
-%' -V\alpha \leq v_{particular}
-%' $$
-%' %%%%%%%%%%%%%%%%%%%%%%%%
-%' %% recall we began with $Ax=b$ and the N-simplex looking for the solution. The first thing we had to do 
-%' %% was to bring in ... A' part
-%' %% and then we had to set up the null space 
-%' %% 1) get V soley from A 
-%' %% and then particular comes from Ax=b
-%' %% and then we add on the inequalities
-%' 
-%' %% next paragraph:
-%' %% going forward, we will not use the $-V\alpha=vp$ notation, instead we will use notation $Ax \leq b$. Recall
-%' %% that this is 
-%' %% but because the literature uses 
-%' %% EXPLAIN WHY WE'RE GOING BACK TO AX \LEQ B 
-%' %%%%%%%%%%%%%%%%%%%%%%% ==> MOVE THIS SECTION TO AFTER EXAMPLES
-%' Here we arrive at the generic $Ax \leq b$ representation of a convex polytope (note again
-%' that the $A$ and $b$ in $Ax \leq b$ are different from those in $Ax=b$). We have performed
-%' a \textbf{transformation} from $x$-space to $\alpha$-space, going from describing the polytope 
-%' in terms of the intersection of $Ax=b$ and the $N$-simplex to the general $Ax \leq b$ form.
-%' This is necessary because the following sample algorithms we are going to present rely on the fact that the 
-%' polytope is described in the $Ax \leq b$ form. Therefore, \pkg{walkr} internally performs 
-%' this transformation, samples $\alpha$, then maps it back to $x$-space.
-%' 
-%' 
-%' \subsection{Four dimensional transformation example}
-%' 
-%' Consider a four dimensional example drawn from Figure~\ref{fig:tetra2}. 
-%' 
-%' $$
-%' A = 
-%' \begin{bmatrix}
-%' 22 & 2 & 2 & 37\\
-%' \end{bmatrix},
-%' \quad
-%' b = 
-%' \begin{bmatrix}
-%' 16
-%' \end{bmatrix}
-%' $$
-%' 
-%' \textbf{Step 1:} Add an extra row in $Ax=b$ to capture the equality part of the simplex constraint.
-%' 
-%' $$
-%' A' = 
-%' \begin{bmatrix}
-%' 22 & 2 & 2 & 37\\
-%' 1 & 1 & 1 & 1 \\
-%' \end{bmatrix},
-%' \quad
-%' b' = 
-%' \begin{bmatrix}
-%' 16 \\
-%' 1 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' \textbf{Step 2:} The null space basis contain 2 vectors, as $M-(N+1) = 4 - (1+1) = 2$ is the dimension of our solution space.
-%' The null space basis vectors (to three decimal places) are:
-%' 
-%' $$
-%' v_1 = 
-%' \begin{bmatrix}
-%' -0.103 \\
-%' -0.680 \\
-%' 0.723 \\
-%' 0.059 \\
-%' \end{bmatrix},
-%' \quad
-%' v_2 = 
-%' \begin{bmatrix}
-%' -0.833 \\
-%' 0.265 \\
-%' 0.092 \\
-%' 0.476
-%' \end{bmatrix}
-%' $$
-%' 
-%' A particular solution to $A'x=b'$ is (any particular solution would work):
-%' 
-%' $$
-%' v_{particular} = 
-%' \begin{bmatrix}
-%' 0.212 \\
-%' 0.147 \\
-%' 0.359 \\
-%' 0.274 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' \textbf{Step 3:} We add on the simplex inequalities:
-%' 
-%' $$
-%' v_{particular} + \alpha_1 v_1 + \alpha_2 v_2 
-%' \geq
-%' \begin{bmatrix}
-%' 0 \\
-%' 0 \\
-%' 0 \\ 
-%' 0 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' Finally, we re-express the inequalities as $-V\alpha \leq v_{particular}$, which is of the form $Ax \leq b$
-%' 
-%' $$
-%' V = 
-%' \begin{bmatrix}
-%' -0.103 & -0.833\\
-%' -0.680 & 0.265\\
-%' 0.723 & 0.092\\
-%' 0.059 & 0.476\\
-%' \end{bmatrix}
-%' $$
-%' 
-%' $$
-%' \alpha =
-%' \begin{bmatrix}
-%' \alpha_1 \\
-%' \alpha_2 \\
-%' \end{bmatrix}
-%' $$
-%' 
-%' $$-V\alpha = 
-%' \begin{bmatrix}
-%' 0.103 & 0.833\\
-%' 0.680 & -0.265\\
-%' -0.723 & -0.092\\
-%' -0.059 & -0.476\\
-%' \end{bmatrix}
-%' \begin{bmatrix}
-%' \alpha_1 \\
-%' \alpha_2 \\
-%' \end{bmatrix}
-%' \leq
-%' \begin{bmatrix}
-%' 0.212 \\
-%' 0.147 \\
-%' 0.359 \\
-%' 0.274 \\
-%' \end{bmatrix}
-%' = v_{particular} %%%%%%%%%% switch to 2 lines
-%' $$
-%' 
-%' 
-%' %% before talking about using notation
-%' %% TALK ABOUT HOW WE MAP BACK
-%' 
+
+\subsection{Step 3: including the simplex inequalities}
+
+We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be $\geq 0$: 
+
+$$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
+\quad \geq
+\begin{bmatrix}
+0 \\
+0 \\
+... \\
+... \\
+... \\
+0 \\
+\end{bmatrix}
+$$
+
+We express all coefficients $\alpha_i$ as a vector $\alpha$:
+
+$$\alpha =
+\begin{bmatrix}
+\alpha_1 \\
+\alpha_2 \\
+... \\
+\alpha_{N-(M+1)}
+\end{bmatrix}
+$$
+
+We can also express the set of basis vectors as columns of matrix $V$:  
+
+$$
+V = 
+\begin{bmatrix}
+v_1 &
+v_2 &
+... &
+v_{N-(M+1)} \\
+\end{bmatrix}
+$$
+
+Therefore, the inequality now becomes:
+
+$$
+v_{particular} + V\alpha \geq 
+\begin{bmatrix}
+0 \\
+0 \\
+... \\
+... \\
+... \\
+0 \\
+\end{bmatrix}
+$$
+
+$$
+V\alpha \geq -v_{particular}
+$$
+
+$$
+-V\alpha \leq v_{particular}
+$$
+
+Finally arrive at the desired convex polytope form $Ax \leq b$. 
+
+\subsection{Four dimensional transformation example}
+
+Consider a four dimensional example drawn from Figure~\ref{fig:tetra2}. 
+
+$$
+A = 
+\begin{bmatrix}
+22 & 2 & 2 & 37\\
+\end{bmatrix},
+\quad
+b = 
+\begin{bmatrix}
+16
+\end{bmatrix}
+$$
+
+\textbf{Step 1:} Add an extra row in $Ax=b$ to capture the equality part of the simplex constraint.
+
+$$
+A' = 
+\begin{bmatrix}
+22 & 2 & 2 & 37\\
+1 & 1 & 1 & 1 \\
+\end{bmatrix},
+\quad
+b' = 
+\begin{bmatrix}
+16 \\
+1 \\
+\end{bmatrix}
+$$
+
+\textbf{Step 2:} The null space basis contain 2 vectors, as $M-(N+1) = 4 - (1+1) = 2$ is the dimension of our solution space.
+The null space basis vectors (to three decimal places) are:
+
+$$
+v_1 = 
+\begin{bmatrix}
+-0.103 \\
+-0.680 \\
+0.723 \\
+0.059 \\
+\end{bmatrix},
+\quad
+v_2 = 
+\begin{bmatrix}
+-0.833 \\
+0.265 \\
+0.092 \\
+0.476
+\end{bmatrix}
+$$
+
+A particular solution to $A'x=b'$ is (any particular solution would work):
+
+$$
+v_{particular} = 
+\begin{bmatrix}
+0.212 \\
+0.147 \\
+0.359 \\
+0.274 \\
+\end{bmatrix}
+$$
+
+\textbf{Step 3:} We add on the simplex inequalities:
+
+$$
+v_{particular} + \alpha_1 v_1 + \alpha_2 v_2 
+\geq
+\begin{bmatrix}
+0 \\
+0 \\
+0 \\ 
+0 \\
+\end{bmatrix}
+$$
+
+Finally, we re-express the inequalities as $-V\alpha \leq v_{particular}$, which is of the form $Ax \leq b$
+
+$$
+V = 
+\begin{bmatrix}
+-0.103 & -0.833\\
+-0.680 & 0.265\\
+0.723 & 0.092\\
+0.059 & 0.476\\
+\end{bmatrix}
+$$
+
+$$
+\alpha =
+\begin{bmatrix}
+\alpha_1 \\
+\alpha_2 \\
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+0.103 & 0.833\\
+0.680 & -0.265\\
+-0.723 & -0.092\\
+-0.059 & -0.476\\
+\end{bmatrix}
+\begin{bmatrix}
+\alpha_1 \\
+\alpha_2 \\
+\end{bmatrix}
+\leq
+\begin{bmatrix}
+0.212 \\
+0.147 \\
+0.359 \\
+0.274 \\
+\end{bmatrix}
+$$
+
+$$
+-V\alpha \leq
+v_{particular}
+$$
+
+We sample $\alpha$'s according to our MCMC sampling algorithms below. Then,
+we can map the $\alpha$'s back as $x$'s in the original coordinate system by 
+$$
+x = 
+v_{particular} + 
+V\alpha
+$$
+
+For example, an $\alpha$ we sample could be:
+
+$$
+\alpha = 
+\begin{bmatrix}
+-0.149 \\
+-0.372 \\
+\end{bmatrix}
+$$
+
+Apply map to $\alpha$, obtaining $x$ in the original problem statement. 
+
+$$
+x = 
+v_{particular}+V\alpha
+=
+\begin{bmatrix}
+0.212 \\
+0.147 \\
+0.359 \\
+0.274 \\
+\end{bmatrix}
++
+\begin{bmatrix}
+-0.103 & -0.833\\
+-0.680 & 0.265\\
+0.723 & 0.092\\
+0.059 & 0.476\\
+\end{bmatrix}
+\begin{bmatrix}
+-0.149 \\
+-0.372 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0.539 \\
+0.152 \\
+0.219 \\
+0.090 \\
+\end{bmatrix}
+$$
+
+Indeed, the mapped point satisfies the original $Ax=b$ and the $N$-simplex equation and inequalities. 
+
+Recall that we began with the intersection
+of the complete solution to $Ax = b$ and the $N$-Simplex, represented as three different parts which 
+we dealt with individually. First, we bring in the $x_1+x_2+...+x_N=1$ part of the simplex equation 
+into the matrix equation $Ax=b$. Second, we solve for a particular solution 
+and the the null space of $A$, obtaining the matrix $V$ which 
+contains the basis vectors of the null space of $A$. Finally, we add the inequality constraints $x_i \geq 0$ 
+to obtain $-V\alpha \leq v_{particular}$. 
+
+Going forward, we will not use the $-V \alpha \leq v_{particular}$ notation and will instead
+use the notation $Ax \leq b$. This is a total abuse of notation, as the $A$, $x$ and $b$ 
+in $Ax \leq b$ are actually $-V$, $\alpha$ and $v_{particular}$, which is completely 
+different from the $A$ and $b$ in our initial problem statement. We do this because in the 
+convex polytopes literature, it is standard to represent the polytope as $Ax \leq b$, so
+it seemed best to use the same notation in order to make the connectiosn to existing literature easier. 
+
 %' \section{Algorithms}
 %' 
 %' \textbf{Important:} Before moving to sampling algorithms, we clear up on some nomenclature. 
