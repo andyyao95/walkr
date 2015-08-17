@@ -530,7 +530,7 @@ to $Ax \leq b$, with different $A$, $x$, $b$, see the previous section.
 The two Monte-Carlo Markov Chains (MCMC) sampling methods we implement are hit-and-run
 and Dikin walk. MCMC methods begin at a starting point in $K$ and wanders through $K$
 according to our algorithm. Every MCMC step only depends on the previous step and nothing else.
-Ideally, we want the sample to thoroughly go through the sample space. \\
+Ideally, we want the sample to thoroughly go through the sample space. 
 
 To examine the quality of our sample, we create multiple, independent ``chains'' from 
 different starting points in $K$ and observe their ``mixing''. The chains have mixed well 
@@ -797,32 +797,31 @@ increases, the mixing of hit-and-run becomes increasingly slower.
 %' %% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
 %' %% this indicates mixing. Cite the Gelman Rubin Article. 
 %' 
-%' \section{Using \texttt{walkr}}
-%' 
-%' %% this is helpful : http://yihui.name/knitr/options/
-%' 
-%' 
-%' The \pkg{walkr} package has one main function \code{walkr} which samples points. \code{walkr} has the following parameters:
-%' 
-%' \begin{itemize}
-%' 
-%'   \item{ \code{A} is the left hand side of the matrix equation $Ax=b$.}
-%'   \item{ \code{b} is the right hand side of the matrix equation $Ax=b$.}
-%'   \item{ \code{points} is the number of points you want.}
-%'   \item{ \code{method} is the method of sampling: either \code{"hit-and-run"} or 
-%'          \code{"dikin"}.}
-%'   \item{ \code{thin} is the thinning parameter. Every \code{thin}-th point is returned.} %put -th as superscript
-%'   \item{ \code{burn} is the burn-in parameter. The first \code{burn} points are deleted from the final sample.} % make as a percentage of the total percentage
-%'   \item{ \code{chains} is the number of indepedent random walks we create, each
-%'           from a different starting point. By default, walkr returns a matrix 
-%'           which consists of the individual chains combined together. Every chain is an element 
-%'           of the list which \code{walkr} eventually returns.}
-%'   \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
-%'          a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
-%'          then a single matrix of points is returned. A column is a sampled point.}
-%' 
-%' \end{itemize}
-%' 
+\section{Using \texttt{walkr}}
+
+The \pkg{walkr} package has one main function \code{walkr} which samples points. \code{walkr} has the following parameters:
+
+\begin{itemize}
+
+  \item{ \code{A} is the left hand side of the matrix equation $Ax=b$.}
+  \item{ \code{b} is the right hand side of the matrix equation $Ax=b$.}
+  \item{ \code{points} is the number of points you want.}
+  \item{ \code{method} is the method of sampling: either \code{"hit-and-run"} or 
+         \code{"dikin"}.}
+  \item{ \code{thin} is the thinning parameter. Every \code{thin}\textsuperscript{th} 
+          point is returned. Default is \code{1}.} % stan is 1
+  \item{ \code{burn} is the burn-in parameter (as a percentage).  
+        The first \code{burn} points are deleted from the final sample. Default is \code{0.5}, for 50\%.} % what's stan? 
+  \item{ \code{chains} is the number of indepedent random walks we create, each
+          from a different starting point. By default, walkr returns a matrix 
+          which consists of the individual chains combined together. Every chain is an element 
+          of the list which \code{walkr} eventually returns.}
+  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
+         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
+         then a single matrix of points is returned. A column is a sampled point.}
+
+\end{itemize}
+
 %' Consider the 3D simplex: 
 %' 
 %' <<example1, eval = TRUE>>==
@@ -877,7 +876,7 @@ increases, the mixing of hit-and-run becomes increasingly slower.
 %' % SOMETHING DIRECT: EXPLORE_WALKR REQUIRES THE RET.FORMAT TO BE LIST. 
 %' % say that there is a function called explore_walkr. don't have to 
 %' %Figure~\ref{fig:traceplot} shows the traceplots of a particular parameter.
-%' 
+
 %' \section{Conclusion}
 %' 
 %' \pkg{walkr} uses MCMC random walks to sample $x$ from the intersection of two spaces. 
