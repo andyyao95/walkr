@@ -95,6 +95,10 @@ walkr <- function(A,
     stop("burn must be non-negative")
   }
   
+  if(burn >= 1){
+    stop("burn must be smaller than 100 percent")
+  }
+  
   if(points %% chains != 0){
     stop("chains must be a multiple of points")
   }

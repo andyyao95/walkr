@@ -48,10 +48,15 @@ hit_and_run <- function(A,
   
   for (j in 1:chains) {
     
-    total.points <- (points*thin/chains + burn)
+    ## total points is : points * thin * 1/(1-burn) / chains 
+    ## because burn-in is a percentage, we must take the CEILING function
+    ## to sample more than we need (in the case where dividing by 1-burn
+    ## does not return an integer)
+    
+    total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
     
     result <- t(hitandrun::har(x0[[j]], constr, N = total.points, 
-                               thin = 1, )$samples)
+                               thin = 1)$samples)
     
     ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
     
@@ -60,7 +65,11 @@ hit_and_run <- function(A,
       ## first, delete out the number of points that we want to burn
       ## second, only take every thin-th point
       
-      result <- matrix(result[, (1+burn) : total.points], nrow = 1)
+      ## we take the floor function because we took the ceiling above
+      ## so in the case that multiplying by burn doesn't result in an integer
+      ## we returning the correct number of points
+      
+      result <- matrix(result[, (floor(burn*total.points)+1) : total.points], nrow = 1)
       result <- matrix(result[ , (1:(points/chains))*thin], nrow = 1)
       
     }
@@ -70,7 +79,9 @@ hit_and_run <- function(A,
       ## first, delete out the number of points that we want to burn
       ## second, only take every thin-th point
       
-      result <- result[, (1+burn) : total.points]
+      ## same as above
+      
+      result <- result[, (floor(burn*total.points)+1) : total.points]
       result <- result[ , (1:(points/chains))*thin]
       
     }
