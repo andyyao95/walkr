@@ -517,101 +517,101 @@ different from the $A$ and $b$ in our initial problem statement. We do this beca
 convex polytopes literature, it is standard to represent the polytope as $Ax \leq b$, so
 it seemed best to use the same notation in order to make the connectiosn to existing literature easier. 
 
-%' \section{Algorithms}
-%' 
-%' \textbf{Important:} Before moving to sampling algorithms, we clear up on some nomenclature. 
-%' First, as established above, the sampling space is a convex polytope. We shall refer to this convex 
-%' polytope as $K$. %% restate the problem 
-%' %% defined non-negative convex polytope K to be the solution to Ax \leq b 
-%' %% put another footnote
-%' 
-%' %% both hitandrun and dikin require a starting point
-%' %% overview of MCMC chains/ mixing 
-%' 
-%' 
-%' Moreover, because it is standard notation in the literature to 
-%' describe a convex polytope as $Ax \leq b$, we describe $K$ with $Ax \leq b$. 
-%' In fact, the $Ax \leq b$ form is necessary to perform the sampling algorithms. We keep in mind that
-%' the $A$, $x$, and $b$ are not the same as those in the original problem statement of $Ax=b$ and $N$-simplex. 
-%' Instead, as described in the section above, we actually sample coefficients $\alpha$'s, 
-%' eventually transforming $\alpha$'s back to $x$-space. Again, $Ax \leq b$ in this section describes the 
-%' polytope in terms of transformed coordinates $\alpha$. %% reduce this substantially cuz redundant 
-%' 
-%' \subsection{Starting point}
-%' 
-%' MCMC random walks need a starting point, $x_0$ in $K$. \pkg{walkr}
-%' generates starting points using linear programming.
-%' Specifically, the \texttt{lsei} function of the \pkg{limSolve} package (\cite{limsolve}) finds $x$ which: 
-%' 
-%' $$\text{minimizes} \quad |Cx-d|^2$$
-%' $$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
-%' 
-%' We randomly generate matrix $C$ and vector $d$. Solving this system generates an $x$ 
-%' which will usually fall on the boundaries of polytope $K$. We repeat this process 30 times in 
-%' \pkg{walkr} and take an average of those points, which ought to be still in the %%% awkward, do the convex thing in separate sentence
-%' polytope $K$ because it is convex. This procedure generates one starting point $x_0$. \\
-%' 
-%' 
-%' %% 3-4 sentences talking about starting point/mixing 
-%' 
-%' \section{Hit-and-run} 
-%' 
-%' %jones 1985 provides an overview of the hit-and-run algorithm, as follows:
-%' 
-%' \begin{enumerate}
-%'   
-%'   \item{Set starting point $x_0$ as current point.}
-%'   \item{Generate a random direction $d$ from the $N$ dimensional unit-sphere.}
-%'   \item{Find the chord $S$ through $x_0$ along the directions $d$ and $-d$. 
-%'         Define end points $s_1$ and $s_2$ as the intersection of the chord $S$
-%'         with the edges of $K$. Because $K$ is convex, we chord $S$ will only 
-%'         intersect it at two points. Parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, 
-%'         where $t \in [0,1]$.}
-%'   \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}.}
-%'   \item{Set $x_1$ as current point.}
-%'   \item{Repeat algorithm until number of desired points sampled.}
-%'         
-%' \end{enumerate}
-%' 
-%' \begin{figure}[ht]
-%' \centering
-%' \subfigure[Step 1]{%  %%% change all the step 1 to blank 
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
-%' \label{fig:subfigure1}}
-%' \subfigure[Step 2]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
-%' \label{fig:subfigure1}}
-%' \quad
-%' \subfigure[Step 3]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
-%' \label{fig:subfigure2}}
-%' \subfigure[Step 4]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
-%' \label{fig:subfigure3}}
-%' \quad
-%' \subfigure[Step 5]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
-%' \label{fig:subfigure4}}
-%' %
-%' \caption{The hit-and-run algorithm begins with an interior point $x_0$ (Step 1). A random direction  %%% (a) instead of 
-%'          is selected (Step 2), and the chord along that direction is calculated (Step 3).           %% step 1
-%'          Then, we pick a random point along that chord and move there as our new point (Step 4).
-%'          The algorithm is repeated to sample many points (Step 5).} %%% REMEMBER TO DO FOR DIKIN ALSO
-%' \label{fig:hitandrun}
-%' \end{figure}
-%' 
-%' \pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package (\cite{hitandrun}) 
-%' to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform sample in the convex polytope. The cost
-%' of each step for hit-and-run is also relatively inexpensive. However, as the dimensions of $K$
-%' increases, the mixing of hit-and-run becomes increasingly slower.
-%' 
-%' %% explain more about why it is slower
-%' %% exactly what does mixing slower mean 
-%' %% we will have often chains that "get stuck in corners" and don't overlap 
-%' %% with each other 
-%' %% GO INTO DETAILS ==> the intuition. reiteration 
-%' %% even start talking about significant problem of A going up 
-%' 
+\section{Algorithms}
+
+\textbf{Important:} Before moving to sampling algorithms, we restate our problem.
+Define non-negative convex polytope $K$ to be the solution to $Ax \leq b$
+\footnote{
+Again, the $Ax \leq b$ is different from the $Ax = b$ we began with.
+For a detailed explaination on how we went from $Ax = b$ and the $N$-simplex
+to $Ax \leq b$, with different $A$, $x$, $b$, see the previous section. 
+}. We are interested in sampling from $K$.
+
+The two Monte-Carlo Markov Chains (MCMC) sampling methods we implement are hit-and-run
+and Dikin walk. MCMC methods begin at a starting point in $K$ and wanders through $K$
+according to our algorithm. Every MCMC step only depends on the previous step and nothing else.
+Ideally, we want the sample to thoroughly go through the sample space. \\
+
+To examine the quality of our sample, we create multiple, independent ``chains'' from 
+different starting points in $K$ and observe their ``mixing''. The chains have mixed well 
+if the parameters of different chains have thoroughly moved around the sample space and 
+have overlapped with each other. In this case, sample quality is good. If the chains
+have not mixed well, then we need to run the chains for longer. While good mixing does 
+not guarantee that the sampling is perfect, poor mixing definitely points at an unthorough 
+sample. %% need to correct more...
+
+\subsection{Starting point}
+
+MCMC random walks need a starting point, $x_0$ in $K$. \pkg{walkr}
+generates starting points using linear programming.
+Specifically, the \texttt{lsei} function of the \pkg{limSolve} package (\cite{limsolve}) finds $x$ which: 
+
+$$\text{minimizes} \quad |Cx-d|^2$$
+$$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
+
+We randomly generate matrix $C$ and vector $d$. Solving this system generates an $x$ 
+which will usually fall on the boundaries of polytope $K$. We repeat this process 30 times in 
+\pkg{walkr} and take an average of those points, which generates one starting point $x_0$. 
+
+
+\section{Hit-and-run} 
+
+\cite{vempala} provides an overview of the hit-and-run algorithm, as follows:
+
+\begin{enumerate}
+  
+  \item{Set starting point $x_0$ as current point.}
+  \item{Generate a random direction $d$ from the $N$ dimensional unit-sphere.}
+  \item{Find the chord $S$ through $x_0$ along the directions $d$ and $-d$. 
+        Define end points $s_1$ and $s_2$ as the intersection of the chord $S$
+        with the edges of $K$. Because $K$ is convex, we chord $S$ will only 
+        intersect it at two points. Parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, 
+        where $t \in [0,1]$.}
+  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}.}
+  \item{Set $x_1$ as current point.}
+  \item{Repeat algorithm until number of desired points sampled.}
+        
+\end{enumerate}
+
+\begin{figure}[ht]
+\centering
+\subfigure[ ]{%  %%% change all the step 1 to blank 
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
+\label{fig:subfigure1}}
+\subfigure[ ]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
+\label{fig:subfigure1}}
+\quad
+\subfigure[ ]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
+\label{fig:subfigure2}}
+\subfigure[ ]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+\label{fig:subfigure3}}
+\quad
+\subfigure[ ]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+\label{fig:subfigure4}}
+%
+\caption{The hit-and-run algorithm begins with an interior point $x_0$ (a). A random direction  
+         is selected (b), and the chord along that direction is calculated (c).           
+         Then, we pick a random point along that chord and move there as our new point (d).
+         The algorithm is repeated to sample many points (e).} 
+\label{fig:hitandrun}
+\end{figure}
+
+\pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package (\cite{hitandrun}) 
+to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform sample in the convex polytope. The cost
+of each step for hit-and-run is also relatively inexpensive. However, as the dimensions of $K$
+increases, the mixing of hit-and-run becomes increasingly slower.
+
+%% explain more about why it is slower
+%% exactly what does mixing slower mean 
+%% we will have often chains that "get stuck in corners" and don't overlap 
+%% with each other 
+%% GO INTO DETAILS ==> the intuition. reiteration 
+%% even start talking about significant problem of A going up 
+
 %' \section{Dikin walk}
 %' 
 %' %% as parallel to hit-and-run as similar as possible 
@@ -716,7 +716,7 @@ it seemed best to use the same notation in order to make the connectiosn to exis
 %'                          %need to fix this, because we CANNOT be on the edge to start with 
 %'   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.} % reference log barrier, explain in detail
 %'   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  % that it blows up
-%'   \item{Pick a random point $y$ from $D_{x_0}$.}
+%'   \item{Pick a random point $y$ from $D_{x_0}$.}           %%% (a) instead of step 1 and stuff
 %'   \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
 %'         think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
 %'         this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
@@ -917,13 +917,18 @@ it seemed best to use the same notation in order to make the connectiosn to exis
 \address{Andy Yao\\
 Mathematics and Physics\\
 Williams College \\
-Williamstown, MA, USA\\}
+3123 Paresky Center\\
+Williamstown, MA 01267\\
+United States}
 \email{andy.yao17@gmail.com}
 
 \address{David Kane\\
-Managing Director \\   % fix it to harvard university
-Hutchin Hill Capital\\ %
-101 Federal Street, Boston, USA\\}
+Harvard University \\   
+IQSS\\
+1737 Cambridge Street\\
+CGIS Knafel Building, Room 350\\
+Cambridge, MA 02138\\
+United States}
 \email{dave.kane@gmail.com}
 
 \bibliography{walkr}
