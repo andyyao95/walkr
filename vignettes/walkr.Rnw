@@ -575,21 +575,21 @@ which will usually fall on the boundaries of polytope $K$. We repeat this proces
 
 \begin{figure}[ht]
 \centering
-\subfigure[ ]{%  %%% change all the step 1 to blank 
+\subfigure[ ]{
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
 \label{fig:subfigure1}}
-\subfigure[ ]{%
+\subfigure[ ]{
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
 \label{fig:subfigure1}}
 \quad
-\subfigure[ ]{%
+\subfigure[ ]{
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
 \label{fig:subfigure2}}
-\subfigure[ ]{%
+\subfigure[ ]{
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
 \label{fig:subfigure3}}
 \quad
-\subfigure[ ]{%
+\subfigure[ ]{
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
 \label{fig:subfigure4}}
 %
@@ -600,17 +600,18 @@ which will usually fall on the boundaries of polytope $K$. We repeat this proces
 \label{fig:hitandrun}
 \end{figure}
 
-\pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package (\cite{hitandrun}) 
-to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform sample in the convex polytope. The cost
-of each step for hit-and-run is also relatively inexpensive. However, as the dimensions of $K$
-increases, the mixing of hit-and-run becomes increasingly slower.
+\pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package(\cite{hitandrun})
+to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform
+sample in the convex polytope $K$. However, the mixing of hit-and-run becomes slower 
+with increasing dimensions of $K$. In practice, this slow mixing behavior of hit-and-run
+is observed when we run multiple chains from different starting points. Instead of 
+overlapping with each other, the individual chains stay at their initial
+values. This behavior corresponds to ``getting stuck in corners'' of a ``skinny''
+polytope. To solve this problem, we must let the individual chains run for longer(i.e. 
+sample more points). However, as the dimensions of the polytope increase,
+the number of points we need to sample become infeasible.  %%% should correct this more
 
-%% explain more about why it is slower
-%% exactly what does mixing slower mean 
-%% we will have often chains that "get stuck in corners" and don't overlap 
-%% with each other 
-%% GO INTO DETAILS ==> the intuition. reiteration 
-%% even start talking about significant problem of A going up 
+
 
 %' \section{Dikin walk}
 %' 
