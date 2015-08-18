@@ -613,191 +613,170 @@ the number of points we need to sample become infeasible.  %%% should correct th
 
 
 
-%' \section{Dikin walk}
-%' 
-%' %% as parallel to hit-and-run as similar as possible 
-%' 
-%' %% this is the second of the two MCMC 
-%' 
-%' 
-%' %begin with:
-%' 
-%' A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.  
-%' %second sentence: A dikin walk begins from a random starting and then creates ellipsoid blah blah
-%' %third sentence: the shape of the ellipsoid depends on the Ax \leq b 
-%' %fourth   : the closer the point is to the edge 
-%' % fifth : unlike hit-and-run, the Dikin walk does not sample uniformly thorughout K. Instead 
-%' %         it is biased towards points that are away from the edge.
-%' % this bias allows the chains to mix more quickly than with hit-and-run, and therefore, 
-%' % to work better in higher dimensions. 
-%' 
-%' % We call this convex polytope $K$, which can be described in the form $Ax \leq b$. We point out that this $Ax \leq b$ 
-%' % is the transformed polytope in $\alpha$-space (discussed in transformation section above). 
-%' % The $A$, $x$, and $b$ are different from those in the original $Ax=b$ and $N$-Simplex.
-%' % 
-%' % For the definitions below, let $a_i$ represent a row in $A$. Let $x_i$, $b_i$ represent 
-%' % the $i^{th}$ element of $x$ and $b$ respectively. Let $A$ (the one in $Ax \leq b$) be 
-%' % of size $m \times n$ (not the same as $M \times N$).   ==> rid of these two paragraphs
-%' 
-%' %WHAT BELONGS HERE:
-%' 
-%' % for non-negataive convex poyltope K, defiend as all x for which Ax <= b, define a_i as the ith row of A. 
-%' % define x_i and b_i as the i_th element of x and b respectively. The dimensions of A are m = N, n = N-(M+1),
-%' % where M and N are the dimensions of A in Ax=b, the original statement of the problem. 
-%' 
-%' % cite the original dikin walk paper in the beginning 
-%' 
-%' \noindent \textbf{Log Barrier Function $\phi$:} 
-%' 
-%' $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
-%' 
-%' The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
-%' $x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero. 
-%' The value of $\phi$ gets larger and larger as $a_i^Tx$ gets closer and closer to $b_i$. 
-%' 
-%' % highlight that a_i^Tx must be smaller than b_i 
-%' % explain what happens when 
-%' 
-%' % that's why its a barrier function, because we can't ever reach there
-%' % it's exactly because of this, we cannot start at the boundary 
-%' % the log barrier function equals infinity on the edge of $K$ 
-%' 
-%' % say about starting points
-%' 
-%' \noindent \textbf{Hessian of Log Barrier $H_x$:} 
-%' 
-%' $$H_x = \nabla ^2 \phi(x) = ...... = A^T D^2 A, \quad \text{where:}$$
-%' $$D = diag(\frac{1}{b_i - a_i^Tx})$$    % change D^2 to D, include the square
-%' 
-%' $H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix. 
-%' The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
-%' to the vector $x$. The Hessian describes the shape of the landscape.
-%' 
-%' %% maybe describe more about the hessian
-%' %% the cloes you are to the edge, the individual elemetns become
-%' %% very large 
-%' 
-%' %% point 1: the closer you are to the edge, the diag elements of the 
-%' %% point 2: 
-%' 
-%' %% explore more about the determinant, the intuition
-%' 
-%' %%1. hessian as the norm
-%' %%2. hessian as volume of ellipsoid 
-%' 
-%' \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
-%' 
-%' Define the Dikin Ellipsoid, $D_{x_0}^r$, centered at $x_0$ with radius $r$ as: 
-%' 
-%' \begin{center}
-%' $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
-%' \end{center}
-%' 
-%' The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
-%' ``Hessian norm'' as the notion of length. The ``Hessian norm'' we could think as a $\Delta \frac{1}{z^2}$ on 
-%' the $\frac{1}{z^2}$ graph. For $x_0$'s that are far away from the boundary, given
-%' an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values of $y-x_0$ is very large.
-%' This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
-%' then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable -- a smaller
-%' Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuition above
-%' %% leave note to self: maybe add the 4D stuff
-%' 
-%' 
-%' %% GO THROUGH ALL THE MATH WE TALKED ABOUT ABOVE IN THIS NEW SPACE 
-%' %% the hessian at x and hessian at y 
-%' %% and then draw ellipse 
-%' 
-%' 
-%' %% SAMPLE ALPHAS FROM LIKE A CERTAIN ELLIPSOID 
-%' %% and then map back 
-%' 
-%' \subsection{Algorithm}
-%' 
-%' \begin{enumerate}
-%'                          %need to fix this, because we CANNOT be on the edge to start with 
-%'   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.} % reference log barrier, explain in detail
-%'   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  % that it blows up
-%'   \item{Pick a random point $y$ from $D_{x_0}$.}           %%% (a) instead of step 1 and stuff
-%'   \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
-%'         think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
-%'         this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
-%'         potential point $y$, then we reject the point $y$.} %% I don't know why the other way around doesn't work...
-%'                                                             %% probably some stats thing related to bias
-%'                         % step 4 is necessary 
-%'                         % explain why this exists
-%'                         % just do the hessian
-%'   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
-%'         ( is that the ratio of the determinants are equal
-%'          to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
-%'          the geometric argument would be that %% why do we care about ratio 
-%'          this way the Dikin walk can avoid extreme corners of the region)}
-%'          
-%'          %% somewhere mention r <= 1 
-%'          
-%'          The ratio of the determinants is equal .... ratio of $y$ and $x_0$. 
-%'          
-%'          2 cases: when volume of y is bigger than or equal to volume of x0. if thats case, we accept. 
-%'          if however, y is smaller than x, we're ready to take it some of the time, but the further 
-%'          away it is, the less likely we want to do it. 
-%'          
-%'          
-%'          
-%'          
-%'          
-%'   \item{Repeat until obtained number of desired points.} %% same sentence as hit-and-run
-%' 
-%' \end{enumerate}
-%' 
-%' \begin{figure}[ht]
-%' \centering
-%' \subfigure[Step 1]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
-%' \label{fig:subfigure1}}
-%' \subfigure[Step 2]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
-%' \label{fig:subfigure2}}
-%' \quad    %% EXPLICITY CONSTRUCT D_y 
-%' \subfigure[Step 3 Case I]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
-%' \label{fig:subfigure3}}
-%' \subfigure[Step 3 Case II]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
-%' \label{fig:subfigure4}}
-%' \quad
-%' \subfigure[Step 4]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
-%' \label{fig:subfigure5}}
-%' \subfigure[Step 5]{%
-%' \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
-%' \label{fig:subfigure6}}
-%' \caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
-%'          An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
-%'          If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
-%'          If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate!!
-%'          accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
-%'          Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
-%'          Algorithm repeats (Step 5).} %% cannot begin with a point on the edge 
-%'          
-%' \label{fig:figure}
-%' \end{figure}
-%' 
-%' 
-%' %% need a few paragraphs here
-%' 
-%' % 1. Why is dikin better
-%' % 2. Histograms == > SHOW A FIGURE, BUT NO R CODE ==> LABEL GRAPH  (A = matrix(1, ncol = 2))
-%' % 2D line of how dikin is more concentrated than hitandrun
-%' 
-%' %% TALK ABOUT WALKR IMPLEMENTS DIKIN USING RCPP AND RCPPEIGEN
-%' %% 
-%' 
-%' % 3. There are techniques to improve the sampling. a)thining b) burn-in, spend a paragraph each of those things 
-%' % explain how a standard setting for burn-in is x (default settings for thin and burn-in) 
-%' % LOOK AT STAN, WHAT REASONABLE VALUES ARE (cite the stan manual)
-%' 
-%' %% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
-%' %% this indicates mixing. Cite the Gelman Rubin Article. 
-%' 
+\section{Dikin walk}
+
+A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.
+A Dikin walk begins from a random starting point within the convex polytope $K$ 
+and then creates a Dikin ellipsoid centered at the current point. It then samples
+from the Dikin ellipsoid and if the next step is not extreme, it will mark that as the next
+step. %% correct
+The shape of the Dikin ellipsoid depends on $Ax \leq b$. The closer a point is to the edge, 
+the small the Dikin ellipsoid, ensuring that the Dikin ellipsoid does not leave polytope 
+$K$. Unlike hit-and-run, the Dikin walk does not sample uniformly throughout $K$. Instead,
+it is biased towards points that are way from the edges and corners of $K$ (\cite{kannan}). %should i cite this random fact anyways?
+This bias allows the chains to mix more quickly than hit-and-run, and therefore, 
+to work better in higher dimensions. 
+
+For non-negative convex polytope $K$, defined as all $x$ for which $Ax \leq b$, define $a_i$ 
+as the $i^\text{th}$ row of $A$. Define $x_i$ and $b_i$ as the $i^\text{th}$ element of $x$ and $b$ 
+respectively. The dimensions of $A$ are $m = N$ by $n = N-(M+1)$, where $M$ and $N$ are the dimensions
+of $A$ in $Ax=b$, the original statement of our problem. 
+
+\noindent \textbf{Log Barrier Function $\phi$:} 
+
+$$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
+
+The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
+$x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero.
+Since $Ax \leq b$, then for every row $a_i$ and $b_i$, $b_i > a_i^Tx$. Therefore, 
+as $x$ approaches the boundary of $K$ (as $a_i^Tx$ approaches $b_i$), the value of $\phi$
+approaches infinity. Hence, this is a barrier function, as the value of $\phi$ is 
+infinity of the edge of $K$. It is also exactly because of this that the starting point cannot
+on the boundary of $K$, where $b_i = a_i^Tx$, but be in the interior of $K$. 
+
+\noindent \textbf{Hessian of Log Barrier $H_x$:} 
+
+$$H_x = \nabla ^2 \phi(x) = ...... = A^T D A, \quad \text{where:}$$
+$$D = diag(\frac{1}{{b_i - a_i^Tx}^2})$$  
+
+$H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix. 
+The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
+to the vector $x$. The Hessian describes the shape of the landscape. %% need to send email 
+
+%% maybe describe more about the hessian
+%% the cloes you are to the edge, the individual elemetns become
+%% very large 
+
+%% point 1: the closer you are to the edge, the diag elements of the 
+%% point 2: 
+
+%% explore more about the determinant, the intuition
+
+%%1. hessian as the norm
+%%2. hessian as volume of ellipsoid 
+
+\noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
+
+Define the Dikin Ellipsoid, $D_{x_0}^r$, centered at $x_0$ with radius $r$ as: 
+
+\begin{center}
+$D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
+\end{center}
+
+The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
+``Hessian norm'' as the notion of length. The ``Hessian norm'' we could think as a $\Delta \frac{1}{z^2}$ on 
+the $\frac{1}{z^2}$ graph. For $x_0$'s that are far away from the boundary, given
+an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values of $y-x_0$ is very large.
+This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
+then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable -- a smaller
+Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuition above
+%% leave note to self: maybe add the 4D stuff
+
+
+%% GO THROUGH ALL THE MATH WE TALKED ABOUT ABOVE IN THIS NEW SPACE 
+%% the hessian at x and hessian at y 
+%% and then draw ellipse 
+
+
+%% SAMPLE ALPHAS FROM LIKE A CERTAIN ELLIPSOID 
+%% and then map back 
+
+\subsection{Algorithm}
+
+\begin{enumerate}
+                         %need to fix this, because we CANNOT be on the edge to start with 
+  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.} % reference log barrier, explain in detail
+  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  % that it blows up
+  \item{Pick a random point $y$ from $D_{x_0}$.}           %%% (a) instead of step 1 and stuff
+  \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
+        think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
+        this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
+        potential point $y$, then we reject the point $y$.} 
+                        % step 4 is necessary 
+                        % explain why this exists
+                        % just do the hessian
+  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
+        ( is that the ratio of the determinants are equal
+         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
+         the geometric argument would be that %% why do we care about ratio 
+         this way the Dikin walk can avoid extreme corners of the region)}
+         
+         %% somewhere mention r <= 1 
+         
+         The ratio of the determinants is equal .... ratio of $y$ and $x_0$. 
+         
+         2 cases: when volume of y is bigger than or equal to volume of x0. if thats case, we accept. 
+         if however, y is smaller than x, we're ready to take it some of the time, but the further 
+         away it is, the less likely we want to do it. 
+         
+         
+         
+         
+         
+  \item{Repeat until obtained number of desired points.} %% same sentence as hit-and-run
+
+\end{enumerate}
+
+\begin{figure}[ht]
+\centering
+\subfigure[Step 1]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
+\label{fig:subfigure1}}
+\subfigure[Step 2]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
+\label{fig:subfigure2}}
+\quad    %% EXPLICITY CONSTRUCT D_y 
+\subfigure[Step 3 Case I]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
+\label{fig:subfigure3}}
+\subfigure[Step 3 Case II]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
+\label{fig:subfigure4}}
+\quad
+\subfigure[Step 4]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
+\label{fig:subfigure5}}
+\subfigure[Step 5]{%
+\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
+\label{fig:subfigure6}}
+\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
+         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
+         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
+         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate!!
+         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
+         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
+         Algorithm repeats (Step 5).} %% cannot begin with a point on the edge 
+         
+\label{fig:figure}
+\end{figure}
+
+
+%% need a few paragraphs here
+
+% 1. Why is dikin better
+% 2. Histograms == > SHOW A FIGURE, BUT NO R CODE ==> LABEL GRAPH  (A = matrix(1, ncol = 2))
+% 2D line of how dikin is more concentrated than hitandrun
+
+%% TALK ABOUT WALKR IMPLEMENTS DIKIN USING RCPP AND RCPPEIGEN
+%% 
+
+% 3. There are techniques to improve the sampling. a)thining b) burn-in, spend a paragraph each of those things 
+% explain how a standard setting for burn-in is x (default settings for thin and burn-in) 
+% LOOK AT STAN, WHAT REASONABLE VALUES ARE (cite the stan manual)
+
+%% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
+%% this indicates mixing. Cite the Gelman Rubin Article. 
+
 \section{Using \texttt{walkr}}
 
 The \pkg{walkr} package has one main function \code{walkr} which samples points. \code{walkr} has the following parameters:
@@ -823,60 +802,67 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
 
 \end{itemize}
 
-%' Consider the 3D simplex: 
-%' 
-%' <<example1, eval = TRUE>>==
-%' library(walkr)
-%' A <- matrix(1, ncol = 3)
-%' b <- 1
-%' sampled_points <- walkr(A = A, b = b, points = 1000, 
-%'                         method = "hit-and-run", chains = 5, ret.format = "matrix")
-%' @
-%' 
-%' %% library(scatterplot3D)
-%' %% plot those points 
-%' 
-%' Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
-%' $Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
-%' In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
-%' it specializes in solving a special kind of convex polytopes, one created by the intersection of $Ax=b$
-%' and the $N$-simplex. 
-%' 
-%' <<example3, eval = TRUE>>=
-%' set.seed(314)
-%' A <- matrix(sample(c(0,1,2), 40, replace = TRUE), ncol = 20)
-%' b <- c(0.5, 0.3)
-%' sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, 
-%'                         method = "hit-and-run", ret.format = "list")
-%' 
-%' @
-%' 
-%' \code{walkr} warns the user if the chains have not mixed ``well-enough'' according to the 
-%' rhat values. We can ensure better mixing by either increasing the amount of thinning or by 
-%' using Dikin instead of hit-and-run. 
-%' % don't need to set the seed again 
-%' <<example4, eval = TRUE>>=
-%' sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 100, ## SPLIT INTO TWO CHUNKS 
-%'                         method = "hit-and-run", ret.format = "list")         ## 1 way is to increase thining
-%' sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,  ## another way is to change thin
-%'                         method = "dikin", ret.format = "list")
-%' @
-%' 
-%' Dikin walk only required \code{thin} to be $10$, whereas %% if we ran hitandrun with a thin of 10, that code would've 
-%' %% produced a warning. This is a sign of dikin mixing faster than hit-and-run. 
-%' hit-and-run needed a \code{thin} parameter of $100$. This is a sign that Dikin mixes faster 
-%' than hit-and-run does. As dimensions ramp up to the hundreds, this rapid mixing behavior 
-%' of Dikin compared to hit-and-run is even more obvious. %%%%%% make this better 
-%' 
-%' Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
-%' random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
-%' from \pkg{shinystan}. %Note that when calling \code{explore\_walkr}, 
-%' 
-%' 
-%' %Note that the value of \code{"ret.format"} argument must be \code{"list"}.
-%' % SOMETHING DIRECT: EXPLORE_WALKR REQUIRES THE RET.FORMAT TO BE LIST. 
-%' % say that there is a function called explore_walkr. don't have to 
-%' %Figure~\ref{fig:traceplot} shows the traceplots of a particular parameter.
+Consider the 3D simplex: 
+
+<<example1, eval = TRUE>>=
+library(walkr)
+A <- matrix(1, ncol = 3)
+b <- 1
+set.seed(314)
+sampled_points <- walkr(A = A, b = b, points = 1000, 
+                        method = "hit-and-run", chains = 5, ret.format = "matrix")
+@
+
+We can take a look at the sampled points. 
+
+<<example2, eval = TRUE, fig.height = 5, fig.width = 5>>=
+library(scatterplot3d)
+scatterplot3d(x = sampled_points[1,], y = sampled_points[2,], z = sampled_points[3,], 
+              scale.y = 0.5, xlab = "x1", ylab = "x2", zlab = "x3")
+@
+
+Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
+$Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
+In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
+it specializes in solving a special kind of convex polytopes, one created by the intersection of $Ax=b$
+and the $N$-simplex. 
+
+<<example3, eval = TRUE>>=
+A <- matrix(sample(c(0,1,2), 40, replace = TRUE), ncol = 20)
+b <- c(0.5, 0.3)
+sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, 
+                        method = "hit-and-run", ret.format = "list")
+
+@
+
+\code{walkr} warns the user if the chains have not mixed ``well-enough'' according to the 
+$\hat{R}$ values. We can ensure better mixing by increasing the amount of thinning, and hence 
+the number of total points sampled. 
+
+<<example4, eval = TRUE>>=
+sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 500, 
+                        method = "hit-and-run", ret.format = "list")         
+@
+
+Alternatively, we could use Dikin, which mixes better.
+
+<<example5, eval = TRUE>>=
+sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,  
+                        method = "dikin", ret.format = "list")
+@
+
+Dikin walk only required \code{thin} to be \code{10}. If we ran hit-and-run 
+with a \code{thin} of 10, and even \code{250}, that code would've produced
+a warning. This is a sign of Dikin mixing faster than hit-and-run. For higher
+dimensions of $A$, Dikin requires much fewer points (or equivalently, lower \code{thin}) 
+to pass the $\hat{R}$ test than hit-and-run. 
+
+Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
+random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
+from \pkg{shinystan}. Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
+from \code{walkr} must be \code{"list"}, so we know which points came from which chain. 
+
+%Figure~\ref{fig:traceplot} shows the traceplots of a particular parameter.
 
 %' \section{Conclusion}
 %' 
