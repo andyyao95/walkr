@@ -59,7 +59,7 @@ walkr <- function(A,
                   points, 
                   method = "dikin",
                   thin = 1,
-                  burn = 0,
+                  burn = 0.5,
                   chains = 1,
                   ret.format = "matrix") {
   

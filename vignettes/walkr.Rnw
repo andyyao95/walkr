@@ -830,7 +830,7 @@ and the $N$-simplex.
 <<example3, eval = TRUE>>=
 A <- matrix(sample(c(0,1,2), 40, replace = TRUE), ncol = 20)
 b <- c(0.5, 0.3)
-sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, 
+sampled_points <- walkr(A = A, b = b, points = 10000, chains = 5, 
                         method = "hit-and-run", ret.format = "list")
 
 @
@@ -864,39 +864,47 @@ from \code{walkr} must be \code{"list"}, so we know which points came from which
 
 %Figure~\ref{fig:traceplot} shows the traceplots of a particular parameter.
 
-%' \section{Conclusion}
-%' 
-%' \pkg{walkr} uses MCMC random walks to sample $x$ from the intersection of two spaces. 
-%' The first space is the complete solution space to the underdetermined matrix equation $Ax=b$, 
-%' where $A$ is a $M \times N$ matrix, with $M < N$.  The second space is the $N$-simplex, 
-%' described by equation $x_1+x_2+...+x_N=1$ and inequalities
-%' $x_i \geq 0$. This intersection is a convex polytope. 
-%' 
-%' \pkg{walkr} implements two MCMC sampling algorithms: hit-and-run and Dikin walk. The package also 
-%' provides convergence diagnostics, as well as a link to the \pkg{
-%' shinystan} package which enables visualization. Hit-and-run is a MCMC algorithm 
-%' that guarantees uniform convergence asymptotically and has a relatively low computation cost for
-%' one step. However, as the dimension of our convex polytope increases, hit-and-run mixes increasingly
-%' slower. Dikin walk is an alternative MCMC algorithm that samples nearly uniformly, favoring 
-%' points away from the edges of the polytope. While Dikin walk is only nearly uniform, it exhibits
-%' much stronger mixing in high dimensions than hit-and-run does.  %%% AWKWARD
-%' 
-%' %% third paragraph
-%' %% which we talk about problems and extensions 
-%' %% problems: 
-%' The major problem for the major problem is that run-time becomes unwieldy as the number of columns $N$ in $A$ increases.
-%' In applications, we recommend using Dikin Walk instead of hit-and-run for values of $N$ greater than 50. 
-%' Further research is required for larger values of $N$. 
-%' 
-%' What are the possible next steps? 
-%' -1. trying to this on multiple cores, like matrix multiplication could be parallelized
-%' -the major reason that it takes so long 
-%' -hit-and-run asympottically uniform! 
-%' -the most expensive
-%' -THUS, possible of parellization??
-%' 
-%' -2. algorithms that are biased towards certain portions of the space, the same way that the dikin walk is biased
-%' - towards the center of the space. 
+\section{Conclusion}
+
+The \pkg{walkr} package samples from the intersection of two spaces. 
+The first space is all possible vectors $x$ that satisfy matrix equation $Ax=b$
+($A$ is $M \times N$, with $M < N$), which describes $M$ unbounded hyperplanes
+in $\mathbb{R}^N$. The second space is the $N$-simplex, defined as 
+$x_1 + x_2 + x_3 + ... + x_N = 1$ and $x_i \geq 0$. This intersection of the 
+two spaces is a non-negative convex polytope. 
+
+\pkg{walkr} samples from a non-negative convex polytope using Monte-Carlo
+Markov Chain (MCMC) algorithms. MCMC methods begin at a starting point
+within the convex polytope and ``wanders'' through the polytope according 
+to our algorithms. Every MCMC step depends only on the previous step and nothing
+else. To examine the quality of the samples, we first create multiple random walks
+from different starting points, which we call independent ``chains''. The ``mixing''
+of different chains is one way of examining the quality of the samples. Good mixing
+means that the different chains have thoroughly moved around the sample space and have 
+overlapped with each other. Poor mixing means that the different chains have been stuck
+at their initial values. Although good mixing does not guarantee an ideal sample, 
+poor mixing suggests that more points must be sampled. 
+
+The two MCMC algorithms implemented are hit-and-run and Dikin walk. Hit-and-run
+guarantees an uniform sample asymptotically, but mixes more slowly with 
+increasing columns of $A$. Dikin walk samples ``nearly'' uniformly, avoiding sampling
+points near edges of the polytope, but mixes much faster. 
+
+The major problem with our current implementaton is that run-time becomes unwiedly 
+as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ -- below $50$, 
+hit-and-run and Dikin can both generate a well mixed sample within a few minutes. However,
+for dimensions near $500$, it takes Dikin a few hours to generate a well mixed sample,
+and it would take hit-and-run much longer. In applications, we recommend using 
+Dikin walk instead of hit-and-run for values of $N$ greater than 50. Further research
+is required for larger values of $N$. 
+
+One possible extension to \pkg{walkr} is parallelization. Especially for Dikin, 
+the majority of the run-time is spent on matrix multiplication and inversion. 
+Since matrix multiplication could be parallized, the run-time issue in higher dimensions
+could be solved when multiple cores are used at the same time. Another extension
+would be to seek algorithmic improvements in rapid mixing, in the same way that Dikin walk is 
+biased towards the center of the sample space.
+
 
 \section{Authors}
 
