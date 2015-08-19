@@ -657,11 +657,6 @@ to the vector $x$. The Hessian describes the shape of the landscape. %% need to 
 %% the cloes you are to the edge, the individual elemetns become
 %% very large 
 
-%% point 1: the closer you are to the edge, the diag elements of the 
-%% point 2: 
-
-%% explore more about the determinant, the intuition
-
 %%1. hessian as the norm
 %%2. hessian as volume of ellipsoid 
 
@@ -680,85 +675,78 @@ an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values
 This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
 then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable -- a smaller
 Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuition above
-%% leave note to self: maybe add the 4D stuff
 
+For example, Figure \ref{fig:dikinellip} shows a Dikin ellipsoid in the $3$D-simplex.
 
-%% GO THROUGH ALL THE MATH WE TALKED ABOUT ABOVE IN THIS NEW SPACE 
-%% the hessian at x and hessian at y 
-%% and then draw ellipse 
-
-
-%% SAMPLE ALPHAS FROM LIKE A CERTAIN ELLIPSOID 
-%% and then map back 
+\begin{figure}[H]
+\centering
+\includegraphics[width = 3.5in, height = 2.5in]{img/dikinellip.png}
+\caption[caption]{The Dikin ellipsoid centered at a point in the interior of the 
+                  $3$D-simplex.}
+\label{fig:dikinellip}  %% THIS ELLIPSOID WAS SAMPLED FROM ALPHAS AND THEN MAPPED BACK 
+\end{figure} 
 
 \subsection{Algorithm}
 
 \begin{enumerate}
-                         %need to fix this, because we CANNOT be on the edge to start with 
-  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope.} % reference log barrier, explain in detail
-  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  % that it blows up
-  \item{Pick a random point $y$ from $D_{x_0}$.}           %%% (a) instead of step 1 and stuff
+                
+  \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope and 
+        not on the edge of polytope $K$. If $x_0$ is on the boundary, then $Ax_0 = b$,
+        and consequently, the log-barrier and its Hessian would be infinity. Therefore, 
+        $x_0$ must be in the interior of $K$.} 
+  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  
+  \item{Pick a random point $y$ from $D_{x_0}$.}          
   \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
         think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
         this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
         potential point $y$, then we reject the point $y$.} 
-                        % step 4 is necessary 
-                        % explain why this exists
-                        % just do the hessian
-  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ 
-        ( is that the ratio of the determinants are equal
-         to the ratio of volumes of the ellipsoids centered at $x_0$ and $y$. Thus, 
-         the geometric argument would be that %% why do we care about ratio 
-         this way the Dikin walk can avoid extreme corners of the region)}
-         
-         %% somewhere mention r <= 1 
-         
-         The ratio of the determinants is equal .... ratio of $y$ and $x_0$. 
-         
-         2 cases: when volume of y is bigger than or equal to volume of x0. if thats case, we accept. 
-         if however, y is smaller than x, we're ready to take it some of the time, but the further 
-         away it is, the less likely we want to do it. 
-         
-         
-         
-         
-         
-  \item{Repeat until obtained number of desired points.} %% same sentence as hit-and-run
+  \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$.
+        $\sqrt{\frac{det(H_{y})}{det(H_{x_0})}}$ is equal to $\frac{\text{volume of Dikin ellipsoid centered at 
+        } x_0 }{\text{volume of Dikin ellipsoid centered at } y}$. % need to add: why the transition probability according to volume ratio
+        (We need not worry about the accepted point $y$
+        not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
+        will be fully contained in $K$ (see \cite{kannan} 2.1.4))}
+  \item{Repeat until obtained number of desired points. .} 
 
 \end{enumerate}
 
 \begin{figure}[ht]
 \centering
-\subfigure[Step 1]{%
+\subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
 \label{fig:subfigure1}}
-\subfigure[Step 2]{%
+\subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
 \label{fig:subfigure2}}
-\quad    %% EXPLICITY CONSTRUCT D_y 
-\subfigure[Step 3 Case I]{%
+\quad % construct Dikin ellipsoid -- done
+\subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
 \label{fig:subfigure3}}
-\subfigure[Step 3 Case II]{%
+\subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
 \label{fig:subfigure4}}
 \quad
-\subfigure[Step 4]{%
+\subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
 \label{fig:subfigure5}}
-\subfigure[Step 5]{%
+\subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
 \label{fig:subfigure6}}
-\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (Step 1). 
-         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (Step 2). 
-         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (Step 3 Case I).
-         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate!!
-         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (Step 3 Case II).
-         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (Step 4). 
-         Algorithm repeats (Step 5).} %% cannot begin with a point on the edge 
+\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (a).
+         This point cannot be on the boundary of the polytope, otherwise the log-barrier and 
+         its Hessian would both be infinity.
+         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (b). 
+         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (c).
+         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate
+         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (d).
+         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (e). 
+         Algorithm repeats (f).} 
          
 \label{fig:figure}
 \end{figure}
+
+Dikin 
+
 
 
 %% need a few paragraphs here
@@ -772,7 +760,6 @@ Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuitio
 
 % 3. There are techniques to improve the sampling. a)thining b) burn-in, spend a paragraph each of those things 
 % explain how a standard setting for burn-in is x (default settings for thin and burn-in) 
-% LOOK AT STAN, WHAT REASONABLE VALUES ARE (cite the stan manual)
 
 %% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
 %% this indicates mixing. Cite the Gelman Rubin Article. 
@@ -789,9 +776,9 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
   \item{ \code{method} is the method of sampling: either \code{"hit-and-run"} or 
          \code{"dikin"}.}
   \item{ \code{thin} is the thinning parameter. Every \code{thin}\textsuperscript{th} 
-          point is returned. Default is \code{1}.} % stan is 1
+          point is returned. Default is \code{1}.} % stan is 1 
   \item{ \code{burn} is the burn-in parameter (as a percentage).  
-        The first \code{burn} points are deleted from the final sample. Default is \code{0.5}, for 50\%.} % what's stan? 
+        The first \code{burn} points are deleted from the final sample. Default is \code{0.5}, for 50\%.}  
   \item{ \code{chains} is the number of indepedent random walks we create, each
           from a different starting point. By default, walkr returns a matrix 
           which consists of the individual chains combined together. Every chain is an element 
@@ -904,7 +891,6 @@ Since matrix multiplication could be parallized, the run-time issue in higher di
 could be solved when multiple cores are used at the same time. Another extension
 would be to seek algorithmic improvements in rapid mixing, in the same way that Dikin walk is 
 biased towards the center of the sample space.
-
 
 \section{Authors}
 
