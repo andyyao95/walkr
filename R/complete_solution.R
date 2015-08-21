@@ -30,7 +30,7 @@ complete_solution <- function(A, b) {
   
   ## must have an underdetermined matrix
   
-  stopifnot(ncol(A) > nrow(A))
+  # stopifnot(ncol(A) > nrow(A))
   
   
   ## Initialize the solution as a list 

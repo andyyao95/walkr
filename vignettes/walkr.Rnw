@@ -651,14 +651,7 @@ $$D = diag(\frac{1}{{b_i - a_i^Tx}^2})$$
 
 $H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix. 
 The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
-to the vector $x$. The Hessian describes the shape of the landscape. %% need to send email 
-
-%% maybe describe more about the hessian
-%% the cloes you are to the edge, the individual elemetns become
-%% very large 
-
-%%1. hessian as the norm
-%%2. hessian as volume of ellipsoid 
+to the vector $x$. The Hessian describes the shape of the landscape.
 
 \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
 
@@ -668,13 +661,23 @@ Define the Dikin Ellipsoid, $D_{x_0}^r$, centered at $x_0$ with radius $r$ as:
 $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
 \end{center}
 
-The Dikin Ellipsoid with radius $r = 1$ is the unit ball centered at $x_0$ with respect to the 
-``Hessian norm'' as the notion of length. The ``Hessian norm'' we could think as a $\Delta \frac{1}{z^2}$ on 
-the $\frac{1}{z^2}$ graph. For $x_0$'s that are far away from the boundary, given
-an allowed $\Delta \frac{1}{z^2}$ (captured in $r$), the range of allowed values of $y-x_0$ is very large.
-This corresponds to having a large Dikin ellipsoid. Alternatively, if $x_0$ is near the boundary,
-then given an allowed $\Delta \frac{1}{z^2}$, only a small range of $y-x_0$ is acceptable -- a smaller
-Dikin ellipsoid. %%% this paragraph should be rewritten once we fix the intuition above
+In this context, the Hessian $H_{x_0}$ at $x_0$ is used as a norm, which we call the ``Hessian norm''.
+Therefore, the Dikin Ellipsoid we can think of the collection of all the points around 
+$x_0$ whose difference with $x_0$ ($y-x_0$) is within the unit threshold (i.e. $r=1$)
+with respect to the ``Hessian norm''. In the literature, this norm for vector $v$ is often denoted as 
+$||v||_{x_0}$, meaning the ``Hessian norm'' of vector $v$ with respect to $x_0$. 
+
+The closer the point $x_0$ is to the boundary of polytope $K$,
+the larger the value of the ``Hessian norm'', and thus, the fewer number of points allowed within
+the unit threshold, which leads to a smaller Dikin ellipsoid. On the other hand, the further 
+the point $x_0$ is to the boundary of polytope $K$, the ``Hessian norm'' is smaller and therefore
+the range for allowed points is larger -- a bigger Dikin ellipsoid. 
+
+To see why, consider the single variable case. Recall that the log barrier function is of the form 
+$-\log(x)$. The Hessian is the generalized second derivative, and the second derivative of $-\log(x)$
+is $\frac{1}{x^2}$. Therefore, for vector $v$, Hessian norm at point $x$ would be 
+$||v||^2_{x_0} = \frac{v^2}{x^2}$. The closer $x$ (recall that in our case, $x = a_i^Tx - b_i$) is to 
+zero, the larger the norm. 
 
 For example, Figure \ref{fig:dikinellip} shows a Dikin ellipsoid in the $3$D-simplex.
 
@@ -702,11 +705,19 @@ For example, Figure \ref{fig:dikinellip} shows a Dikin ellipsoid in the $3$D-sim
         potential point $y$, then we reject the point $y$.} 
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$.
         $\sqrt{\frac{det(H_{y})}{det(H_{x_0})}}$ is equal to $\frac{\text{volume of Dikin ellipsoid centered at 
-        } x_0 }{\text{volume of Dikin ellipsoid centered at } y}$. % need to add: why the transition probability according to volume ratio
-        (We need not worry about the accepted point $y$
+        } x_0 }{\text{volume of Dikin ellipsoid centered at } y}$. 
+        Recall that the volume of the ellipsoid reflects how close to the boundary a point is. The closer a point
+        is to the boundary, the smaller its Dikin ellipsoid volume. This transition probability is crucial
+        becaues it avoids the algorithm concentrated in the ``center'' of the polytope. Because we already 
+        know that $x_0 \in D_{y}$, the step from $x_0$ to $y$ is within the allowed threshold, or in other words,
+        not too extreme. If the point $y$ is closer to the boundary than $x_0$ is 
+        (the ratio is greater than 1), we prefer this, so we move there with probability $1$. 
+        If $x_0$ is closer to the boundary than $y$ (ratio smaller than 1), then
+        we accept $y$ depending on how the ratio of the their Dikin ellipsoids' volumes.  % maybe add this as footnote
+        \footnote{We need not worry about the accepted point $y$
         not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
-        will be fully contained in $K$ (see \cite{kannan} 2.1.4))}
-  \item{Repeat until obtained number of desired points. .} 
+        will be fully contained in $K$ (see \cite{kannan} 2.1.4)}}
+  \item{Repeat until obtained number of desired points.} 
 
 \end{enumerate}
 
@@ -745,24 +756,58 @@ For example, Figure \ref{fig:dikinellip} shows a Dikin ellipsoid in the $3$D-sim
 \label{fig:figure}
 \end{figure}
 
-Dikin 
+\newpage
 
+Dikin mixes much faster than hit-and-run does, especially in higher dimensions. This is because 
+the mixing of Dikin is independent of the geometry of the polytope $K$, where as hit-and-run
+mixes slower in ``skinny'' regions of the polytope, tending to get stuck in corners (\cite{kannan}).
+However, the quick mixing comes with a cost of non-uniform sampling, as \cite{kannan} claims
+that the Dikin walk is a ``nearly uniform'' sampling algorithm. 
 
+Because the inherent nature of the log-barrier function and Hessian which prevents the Dikin
+walk from reaching points that are very close to the boundary of $K$, the Dikin walk is concentrated
+at regions that are away from the boundary of $K$. For an illustration, consider the following example. 
 
-%% need a few paragraphs here
+We sample from the $2$D-simplex, which is a line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see
+in the histograms, hit-and-run samples uniformly across 
 
-% 1. Why is dikin better
-% 2. Histograms == > SHOW A FIGURE, BUT NO R CODE ==> LABEL GRAPH  (A = matrix(1, ncol = 2))
-% 2D line of how dikin is more concentrated than hitandrun
+<<example0, eval = T, fig.width = 3, fig.height = 3>>=
+library(walkr, ggplot2)
+A <- matrix(1, ncol = 2)
+b <- 1 
+sample_har <- walkr(A = A, b = b, points = 10000, method = "hit-and-run")
+sample_dikin <- walkr(A = A, b = b, points = 10000, method = "dikin")
 
-%% TALK ABOUT WALKR IMPLEMENTS DIKIN USING RCPP AND RCPPEIGEN
-%% 
+qplot(sample_har[1,], xlab = "x1", main = "Hit-and-run in the 2D simplex")
+qplot(sample_dikin[1,], xlab = "x1", main = "Dikin walk in the 2D simplex")
 
-% 3. There are techniques to improve the sampling. a)thining b) burn-in, spend a paragraph each of those things 
-% explain how a standard setting for burn-in is x (default settings for thin and burn-in) 
+@
 
-%% talk about how we know if we have enough thin and burn-in. Explain Rhat, gelman rubin and stuff. Give formula 
-%% this indicates mixing. Cite the Gelman Rubin Article. 
+The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
+in its Dikin walk implementation for faster matrix multiplication, inversion, and determinant calculation,
+because the majority of the run-time cost for Dikin walk is matrix operations. This improvement in 
+run-time speed is important especially in sampling from $A$ with many columns, corresponding to polytopes in 
+higher dimensions, because in such cases, a larger number of points needed to be sampled in order
+to obtain a well mixed sample. 
+
+To improve the mixing of the sample, there are in general two techniques. First, is to ``thin'' 
+the sample -- every thin\textsuperscript{th} sample is stored. Thinning helps with the mixing of the sample because
+as the dimensions of the polytope increases, the rate at which the individual parameters change, in 
+general, becomes slower. We note that thinning is effectively equivalent to sampling more points
+in total. Second, is to add a ``burn-in'' parameter -- for example, a ``burn-in'' of 50\% means that 
+the first 50\% of the total sample is deleted. This is an effective technique when the starting 
+point is in a corner or narrow region in the polytope. We must give time for the random walk
+to leave the corner and reach other parts of the sample space. 
+
+To quantitatively examine the mixing, we can use the Gelman-Rubin diagnostic on multiple chains 
+from diverse starting points. The general idea is that we measure the variance within each chain
+($W$) and the variance between the chains ($B$). If the variance between the chains is 
+substantially larger than the variance within each chain, then the Gelman-Rubin diagnostic
+($\hat{R}$) indicates that the chains should be ran for longer iterations.
+
+%% a good link --> http://www.people.fas.harvard.edu/~plam/teaching/
+                  %% methods/convergence/convergence_print.pdf
+%% another good link --> https://pymc-devs.github.io/pymc/modelchecking.html
 
 \section{Using \texttt{walkr}}
 
@@ -792,7 +837,6 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
 Consider the 3D simplex: 
 
 <<example1, eval = TRUE>>=
-library(walkr)
 A <- matrix(1, ncol = 3)
 b <- 1
 set.seed(314)
