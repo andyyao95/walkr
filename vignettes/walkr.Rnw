@@ -41,26 +41,26 @@ also provides tools to examine sample quality.
 
 Consider all possible vectors $x$ that satisfy the matrix equation $Ax=b$,
 where $A$ is $M \times N$, $x$ is $N \times 1$, and $b$ is $M \times 1$. 
-The problem is interesting when there are more rows than columns  ($M < N$). 
-If $M = N$, then there is a single solution, and if $M > N$, there then are, in general, no solutions.
+The problem is interesting when there are more rows than columns  ($M < N$).
+In general, if $M = N$, then there is a single solution, and if $M > N$, then there are no solutions.
 If the rows of $A$ are linearly dependent, rows can be eliminated until they are linearly 
-independent without changing the solution space. Assume that the rows of $A$ are linearly independent
-going forward.
+independent without changing the solution space. Therefore, we assume that the rows of $A$ are 
+linearly independent going forward. 
 
 Geometrically, every row in $Ax=b$ describes a hyperplane in $\mathbb{R}^N$. Therefore, $Ax=b$ represents
 the intersection of $M$ unbounded hyperplanes. We bound the sample space by also 
 requiring vector $x$ to be in the $N$-simplex, defined as: 
 
 $$x_1 + x_2 + x_3 + ... + x_N = 1$$
-$$x_i \geq 0, \qquad \forall i \in \text{\{$1, 2, ..., N$\}}$$ 
+$$x_i \geq 0, \qquad \forall \quad i \in \text{\{$1, 2, ..., N$\}}$$ 
 
-The $N$-simplex is a $N-1$ dimensional object living in $N$ dimensional space. For example, the $3$D simplex 
-is a $2$ dimensional equilateral triangle in $3$D space (Figure~\ref{fig:simplex3D}).
+The $N$-simplex is a $N-1$ dimensional object living in $N$ dimensional space. For example, the $3$D-simplex 
+is a two dimensional equilateral triangle in three dimensional space (Figure~\ref{fig:simplex3D}).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width = 3.5in, height = 2.5in]{img/simplex3D.png}
-\caption[caption]{The $3$D simplex is a $2$ dimensional triangle in $3$ dimensional space. The vertices
+\caption[caption]{The $3$D simplex is a two dimensional triangle in three dimensional space. The vertices
                   of the simplex are $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$. $x_1$, $x_2$, and $x_3$ 
                   are all greater than or equal to $0$, and for all points on the simplex, the sum
                   of $x_1$, $x_2$ and $x_3$ equals $1$.}
@@ -69,17 +69,20 @@ is a $2$ dimensional equilateral triangle in $3$D space (Figure~\ref{fig:simplex
 
 The intersection of the complete solution of $Ax=b$ and the $N$-simplex is a non-negative
 convex polytope. Sampling from such an object is a difficult problem, and the common approach is to 
-run Monte-Carlo Markov Chains (MCMC) (\cite{ravi}). MCMC methods begin at a starting point within
+run Monte-Carlo Markov Chains (MCMC) (\cite{ravi}). MCMC methods begin at a starting point in
 the sample space (in our case, a non-negative convex polytope), and randomly ``wanders'' through
 the sample space according to an algorithm. An important feature of MCMC is that every step
-only depends on the previous step and nothing else. MCMC generally involve the creation
+depends only on the previous step and nothing else. 
+
+MCMC sampling generally involve the creation
 of multiple random walks from different starting points, each of which is an independent ``chain''.
 A key aspect of running multiple chains from different starting points is to examine the 
-``mixing'' of the different chains. Good mixing means that the different chains have thoroughly 
-moved around the sample space and have overlapped with each other. It is important to note that
-while good mixing does not guarantee a complete, uniform sample, 
-poor mixing definitely points at an unthorough survey of the space. \pkg{walkr} allows the user to 
-examine the quality of the MCMC samples.
+``mixing'' of the sample. Good mixing means that the different chains 
+(from different starting points) have overlapped with each 
+other, hinting that they have thoroughly moved around the sample space. 
+While good mixing does not guarantee a thorough sample of the space, poor mixing means 
+unthorough sampling, so the random walks need to be run longer to cover more regions of the sample space. 
+\pkg{walkr} allows the user to examine the quality of the MCMC samples.
 
 \pkg{walkr} includes two MCMC algorithms: hit-and-run and Dikin walk.
 Hit-and-run guarantees uniform sampling asympotically, but mixes more slowly
@@ -110,38 +113,37 @@ x_3 \\
 \end{bmatrix}
 $$ 
 
-Figure~\ref{fig:3dcase} shows the intersection of the $3$D simplex with $Ax=b$. 
+Figure~\ref{fig:3dcase} shows the intersection of the $3$D-simplex with $Ax=b$. 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width = 4in, height = 2.5in]{img/3Dcase.png}
 \caption[caption]{The orange triangle is the $3$D-simplex. The blue plane is the hyperplane $
                   x_1+x_3=0.5$. The red line segment is their intersection, which is our sample space. 
-                  The end points of the line segment are $(0,0.5,0.5)$ and $(0.5,0.5,0)$.}
+                  The end points of the line segment are $(0.5,0.5,0)$ and $(0,0.5,0.5)$.}
 \label{fig:3dcase} 
 \end{figure} 
 
 \section{Four dimensional example}
 
-Just as the $3$D simplex is a $2$D surface living in $3$D space, the $4$D simplex 
+Just as the $3$D-simplex is a $2$D surface living in $3$D space, the $4$D-simplex 
 (i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) can be viewed as a $3$D object, as in Figure~\ref{fig:tetra1}. 
-Specifically, the $4$D simplex is a tetradhedron when viewed from $3$D space, with 
+Specifically, the $4$D-simplex is a tetradhedron when viewed from $3$D space, with 
 verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width = 3in, height = 2.5in]{img/tetra1.png}
-\caption[caption]{The 4D simplex exists in 4D space, but can be viewed as a 3D object. Specifically, the
-                  4D simplex is a tetrahedron, with all four sides equilateral triangles.} 
+\caption[caption]{The 4D-simplex exists in 4D space, but can be viewed as a 3D object. Specifically, the
+                  4D-simplex is a tetrahedron, with all four sides equilateral triangles.} 
 \label{fig:tetra1}
 \end{figure} 
 
-Figure~\ref{fig:tetra2} shows the intersection of the $4$D simplex with a specific
+Figure~\ref{fig:tetra2} shows the intersection of the $4$D-simplex with a
 hyperplane (1 equation, or 1 row in $Ax=b$). The resulting convex polytope is a 2D trapezoid in $4$D space. 
-Note that the convex polytope is $4-(1+1)=2$ dimensions. This is because we began with $4$ dimensions,
+Note that this convex polytope is $4-(1+1)=2$ dimensions. This is because we began with $4$ dimensions,
 and the constraint and the simplex each reduced the dimension of the solution space by 1. 
-In general, the dimensions of our polytope will be $N-(M+1)$ dimensional, where the $+1$ comes from
-adding on the $N$-simplex. 
+In general, the resulting polytope will be $N-(M+1)$ dimensional.
 
 $$
 A = 
@@ -158,10 +160,10 @@ $$
 \begin{figure}[H]
 \centering
 \includegraphics[width = 3in, height = 2.5in]{img/tetra2.png}
-\caption[caption]{The 4D simplex is the tetrahedron. The hyperplane $22x_1+2x_2+2x_3+37x_4=16$ cuts through 
-                  the tetrahedron, forming 
+\caption[caption]{The 4D-simplex is a tetrahedron when projected to 3D space. 
+                  The hyperplane $22x_1+2x_2+2x_3+37x_4=16$ cuts through the tetrahedron, forming 
                   a trapezoid as the intersection (in red). This trapezoid is our sample space, as 
-                  it is the intersection of the hyperplane with the 4D simplex. The vertices
+                  it is the intersection of the hyperplane with the 4D-simplex. The vertices
                   of the trapezoid are ($0.7,0.3,0,0$), ($0.7,0,0.3,0$), ($0,0.6,0,0.4$),
                   and ($0,0,0.6,0.4$).} 
 \label{fig:tetra2}
@@ -169,7 +171,7 @@ $$
 
 In higher dimensions, the same logic applies. Each row in $Ax=b$ is a hyperplane living in $\mathbb{R}^N$.
 Geometrically, our sample space is the intersection of $M$ hyperplanes with the $N$-simplex, 
-which will have dimension $N-(M+1)$. 
+which will be $N-(M+1)$ dimensional. 
 
 \section{$x$-space and $\alpha$-space}
 
@@ -178,8 +180,8 @@ are commonly described by a generic $Ax \leq b$. In order to use the sampling al
 first re-express the sample space in the form $Ax \leq b$ (with different $A$, $x$ and $b$)
 \footnote{
 This is a total abuse of notation. The $A$ in $Ax=b$ is very different from the $A$ in
-$Ax \leq b$. The length of $x$ in $Ax = b$ is $N$. The length of $x$ in $Ax \leq b$ is $N-(M+1)$.
-$b$ is also different. The mathematical literature for linear equations uses $Ax = b$, and the litearture
+$Ax \leq b$. $A$ is $N$ by $N-(M+1)$. $x$ and $b$ are also different.
+The mathematical literature for linear equations uses $Ax = b$, and the litearture
 on convex polytopes uses $Ax \leq b$, so it seemed best to use the same notation in both places 
 in order to make the connections to existing litearture easier.
 }. 
@@ -187,15 +189,15 @@ in order to make the connections to existing litearture easier.
 Recall that our sample space is the intersection of the complete solution to $Ax=b$ and 
 the $N$-Simplex, which could be represented by three parts. First, the matrix equation 
 $Ax=b$. Second, the simplex equation $x_1+x_2+...+x_N=1$. Third, the simplex 
-non-negative inequalities, $x_i \geq 0$. In this section, we present a 3 step procedure
+non-negative inequalities, $x_i \geq 0$. In this section, we present a three step procedure
 to combine all three parts into one single inequality of the form $Ax \leq b$. 
 
-\subsection{Step 1: combining simplex equality with the original $Ax=b$}
+\subsection{Step 1: combining the simplex equality with the original $Ax=b$}
 
 Recall that $A$ in $Ax=b$ is $M \times N$: 
 
 $$
-A_{M \times N} = 
+A = 
 \overbrace{
   \begin{bmatrix}
    & & & & & & \\
@@ -232,14 +234,14 @@ $$
 
 Find $x$'s that satisfy $A'x = b'$. First, solve for the null space of $A'$, 
 defined as all $x$ that satisfy $A'x=0$. The null space is 
-spanned by $N-(M+1)$ basis vectors, because $A'$ is $M+1 \times N$ ($M+1 < N$) 
-and hence the dimension of the null space is $N-(M+1)$. Any vector formed by 
+spanned by $N-(M+1)$ basis vectors, because that is the dimension of the sample space
+(our polytope). Any vector formed by 
 a linear combination of the basis vectors will still be in the null space. 
 
 Once we have the null space, we add on a particular solution to the null space. 
 The null space we can think of as constructing a coordinate
 system for $A'x=0$', and the particular solution to $A'x=b'$ we can think of as an offset from the origin 
-of that coordinate system. For a review of the specifics of finding null spaces and particular solutions,
+to fit $A'x = b'$. For a review of the specifics of finding null spaces and particular solutions,
 one can refer to \cite{leon}.
 
 The null space of $A'$ can be represented by $N-(M+1)$ basis vectors. Because we are in $\mathbb{R}^N$, 
@@ -252,8 +254,8 @@ v_1, \quad v_2, \quad v_3, \quad ...... \quad , \quad v_{N-(M+1)}
 \Bigg\}
 $$
 
-Once we have the null space basis vectors and a particular solution, 
-we could express the set of all $x$'s that satisfy $A'x=b'$
+Once we have the null space basis vectors and a particular solution, $v_{particular}$, 
+we can express the set of all $x$'s that satisfy $A'x=b'$
 in terms of coefficients $\alpha_i$. The complete
 solution to $A'x=b'$ could be expressed as the set: 
 
@@ -266,7 +268,8 @@ $$
 
 \subsection{Step 3: including the simplex inequalities}
 
-We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be $\geq 0$: 
+We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be 
+greater equal to $0$: 
 
 $$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
 \quad \geq
@@ -325,7 +328,8 @@ $$
 -V\alpha \leq v_{particular}
 $$
 
-Finally arrive at the desired convex polytope form $Ax \leq b$. 
+Finally, we arrive at the desired convex polytope form $Ax \leq b$, which is 
+$-V\alpha \leq v_{particular}$ in our case.
 
 \subsection{Four dimensional transformation example}
 
@@ -343,7 +347,7 @@ b =
 \end{bmatrix}
 $$
 
-\textbf{Step 1:} Add an extra row in $Ax=b$ to capture the equality part of the simplex constraint.
+\textbf{Step 1:} Add an extra row in $Ax=b$ to capture the simplex equality.
 
 $$
 A' = 
@@ -380,7 +384,7 @@ v_2 =
 \end{bmatrix}
 $$
 
-A particular solution to $A'x=b'$ is (any particular solution would work):
+A particular solution to $A'x=b'$ is (any particular solution works):
 
 $$
 v_{particular} = 
@@ -450,15 +454,15 @@ $$
 v_{particular}
 $$
 
-We sample $\alpha$'s according to our MCMC sampling algorithms below. Then,
-we can map the $\alpha$'s back as $x$'s in the original coordinate system by 
+We sample $\alpha$'s according to our MCMC sampling algorithms. Then,
+we map the $\alpha$'s back as $x$'s in the original coordinate system by:  
 $$
 x = 
 v_{particular} + 
 V\alpha
 $$
 
-For example, an $\alpha$ we sample could be:
+For example, an $\alpha$ we sample can be:
 
 $$
 \alpha = 
@@ -468,7 +472,7 @@ $$
 \end{bmatrix}
 $$
 
-Apply map to $\alpha$, obtaining $x$ in the original problem statement. 
+Apply the map to $\alpha$, obtaining $x$ in the original problem statement. 
 
 $$
 x = 
@@ -503,19 +507,19 @@ $$
 Indeed, the mapped point satisfies the original $Ax=b$ and the $N$-simplex equation and inequalities. 
 
 Recall that we began with the intersection
-of the complete solution to $Ax = b$ and the $N$-Simplex, represented as three different parts which 
-we dealt with individually. First, we bring in the $x_1+x_2+...+x_N=1$ part of the simplex equation 
-into the matrix equation $Ax=b$. Second, we solve for a particular solution 
+of the complete solution to $Ax = b$ and the $N$-simplex, represented as three different parts which 
+we dealt with individually. First, we add the $x_1+x_2+...+x_N=1$ part of the simplex equation 
+as an extra row to $Ax=b$. Second, we solve for a particular solution 
 and the the null space of $A$, obtaining the matrix $V$ which 
-contains the basis vectors of the null space of $A$. Finally, we add the inequality constraints $x_i \geq 0$ 
+contains the basis vectors of $A$'s null space. Finally, we add the inequality constraints $x_i \geq 0$ 
 to obtain $-V\alpha \leq v_{particular}$. 
 
 Going forward, we will not use the $-V \alpha \leq v_{particular}$ notation and will instead
-use the notation $Ax \leq b$. This is a total abuse of notation, as the $A$, $x$ and $b$ 
-in $Ax \leq b$ are actually $-V$, $\alpha$ and $v_{particular}$, which is completely 
-different from the $A$ and $b$ in our initial problem statement. We do this because in the 
+use the notation $Ax \leq b$, to denote the same matrix inequality. 
+This is a total abuse of notation, as the $A$, $x$ and $b$ in $Ax \leq b$ are actually $-V$, 
+$\alpha$ and $v_{particular}$. We do this because in the 
 convex polytopes literature, it is standard to represent the polytope as $Ax \leq b$, so
-it seemed best to use the same notation in order to make the connectiosn to existing literature easier. 
+it seemed best to use the same notation in order to make the connections to existing literature easier. 
 
 \section{Algorithms}
 
@@ -523,22 +527,21 @@ it seemed best to use the same notation in order to make the connectiosn to exis
 Define non-negative convex polytope $K$ to be the solution to $Ax \leq b$
 \footnote{
 Again, the $Ax \leq b$ is different from the $Ax = b$ we began with.
-For a detailed explaination on how we went from $Ax = b$ and the $N$-simplex
+For a detailed explaination on how we went from the intersection of $Ax = b$ and the $N$-simplex
 to $Ax \leq b$, with different $A$, $x$, $b$, see the previous section. 
 }. We are interested in sampling from $K$.
 
-The two Monte-Carlo Markov Chains (MCMC) sampling methods we implement are hit-and-run
+The two Monte-Carlo Markov Chain (MCMC) sampling methods we implement are hit-and-run
 and Dikin walk. MCMC methods begin at a starting point in $K$ and wanders through $K$
-according to our algorithm. Every MCMC step only depends on the previous step and nothing else.
-Ideally, we want the sample to thoroughly go through the sample space. 
+according to our sampling algorithms. Every MCMC step depends only on the previous step and nothing else.
+Ideally, we want to thoroughly sample the polytope $K$.  
 
 To examine the quality of our sample, we create multiple, independent ``chains'' from 
 different starting points in $K$ and observe their ``mixing''. The chains have mixed well 
-if the parameters of different chains have thoroughly moved around the sample space and 
-have overlapped with each other. In this case, sample quality is good. If the chains
-have not mixed well, then we need to run the chains for longer. While good mixing does 
-not guarantee that the sampling is perfect, poor mixing definitely points at an unthorough 
-sample. %% need to correct more...
+if the parameters of different chains have overlapped with each other. If the chains have not mixed well, 
+then we need to run the chains for longer (i.e. sample more points). While good mixing does 
+not guarantee that the sample is perfect, poor mixing definitely points at a low
+quality, unthorough sample.
 
 \subsection{Starting point}
 
@@ -564,8 +567,8 @@ which will usually fall on the boundaries of polytope $K$. We repeat this proces
   \item{Generate a random direction $d$ from the $N$ dimensional unit-sphere.}
   \item{Find the chord $S$ through $x_0$ along the directions $d$ and $-d$. 
         Define end points $s_1$ and $s_2$ as the intersection of the chord $S$
-        with the edges of $K$. Because $K$ is convex, we chord $S$ will only 
-        intersect it at two points. Parametrize the chord along $x_0$ by $s_1 + t(s_2-s_1)$, 
+        with the edges of $K$. Because $K$ is convex, the chord $S$ will only 
+        intersect it at two points. Parametrize the chord $S$ by $s_1 + t(s_2-s_1)$, 
         where $t \in [0,1]$.}
   \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}.}
   \item{Set $x_1$ as current point.}
@@ -593,10 +596,10 @@ which will usually fall on the boundaries of polytope $K$. We repeat this proces
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
 \label{fig:subfigure4}}
 %
-\caption{The hit-and-run algorithm begins with an interior point $x_0$ (a). A random direction  
-         is selected (b), and the chord along that direction is calculated (c).           
-         Then, we pick a random point along that chord and move there as our new point (d).
-         The algorithm is repeated to sample many points (e).} 
+\caption{(a) The hit-and-run algorithm begins with an interior point $x_0$. (b) A random direction  
+         is selected. (c) The chord along that direction is calculated. (d)          
+         Then, we pick a random point along that chord and move there as our new point.
+         (e) The algorithm is repeated to sample many points.} 
 \label{fig:hitandrun}
 \end{figure}
 
@@ -609,21 +612,18 @@ overlapping with each other, the individual chains stay at their initial
 values. This behavior corresponds to ``getting stuck in corners'' of a ``skinny''
 polytope. To solve this problem, we must let the individual chains run for longer(i.e. 
 sample more points). However, as the dimensions of the polytope increase,
-the number of points we need to sample become infeasible.  %%% should correct this more
-
-
+the number of points we need to sample quickly become infeasible.  
 
 \section{Dikin walk}
 
 A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.
 A Dikin walk begins from a random starting point within the convex polytope $K$ 
-and then creates a Dikin ellipsoid centered at the current point. It then samples
-from the Dikin ellipsoid and if the next step is not extreme, it will mark that as the next
-step. %% correct
-The shape of the Dikin ellipsoid depends on $Ax \leq b$. The closer a point is to the edge, 
-the small the Dikin ellipsoid, ensuring that the Dikin ellipsoid does not leave polytope 
-$K$. Unlike hit-and-run, the Dikin walk does not sample uniformly throughout $K$. Instead,
-it is biased towards points that are way from the edges and corners of $K$ (\cite{kannan}). %should i cite this random fact anyways?
+and then creates a Dikin ellipsoid centered at the current point. It then moves around the space
+by sampling from such Dikin ellipsoids, whose shape and size are determined by both the 
+current point and the shape of $K$. 
+
+Unlike hit-and-run, the Dikin walk does not sample uniformly throughout $K$. Instead,
+it is biased towards points that are way from the edges and corners of $K$ (\cite{kannan}). 
 This bias allows the chains to mix more quickly than hit-and-run, and therefore, 
 to work better in higher dimensions. 
 
@@ -638,63 +638,56 @@ $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 
 The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
 $x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero.
-Since $Ax \leq b$, then for every row $a_i$ and $b_i$, $b_i > a_i^Tx$. Therefore, 
+Since $Ax \leq b$, for every row in $Ax \leq b$, $b_i > a_i^Tx$. Therefore, 
 as $x$ approaches the boundary of $K$ (as $a_i^Tx$ approaches $b_i$), the value of $\phi$
-approaches infinity. Hence, this is a barrier function, as the value of $\phi$ is 
-infinity of the edge of $K$. It is also exactly because of this that the starting point cannot
-on the boundary of $K$, where $b_i = a_i^Tx$, but be in the interior of $K$. 
+approaches infinity. Hence, this is a barrier function, because the value of $\phi$ is 
+infinity on the boundary of $K$, where $b_i = a_i^Tx$. 
+It is also exactly because of this that the starting point cannot on the boundary of $K$, 
+but must be in the interior of $K$. 
 
 \noindent \textbf{Hessian of Log Barrier $H_x$:} 
 
 $$H_x = \nabla ^2 \phi(x) = ...... = A^T D A, \quad \text{where:}$$
-$$D = diag(\frac{1}{{b_i - a_i^Tx}^2})$$  
+$$D = diag(\frac{1}{({b_i - a_i^Tx})^2})$$  
 
 $H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix. 
 The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
-to the vector $x$. The Hessian describes the shape of the landscape.
+to the vector $x$. The Hessian describes the shape of the local landscape at $x$.
 
 \noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
 
-Define the Dikin Ellipsoid, $D_{x_0}^r$, centered at $x_0$ with radius $r$ as: 
+Define the Dikin Ellipsoid centered at $x_0$ with radius $r$ as: 
 
 \begin{center}
 $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
 \end{center}
 
-In this context, the Hessian $H_{x_0}$ at $x_0$ is used as a norm, which we call the ``Hessian norm''.
-Therefore, the Dikin Ellipsoid we can think of the collection of all the points around 
+In this context, the Hessian $H_{x_0}$ at $x_0$ is used as a local norm, which we call the ``Hessian norm''.
+The Dikin Ellipsoid with radius $1$ is the collection of all the points around 
 $x_0$ whose difference with $x_0$ ($y-x_0$) is within the unit threshold (i.e. $r=1$)
 with respect to the ``Hessian norm''. In the literature, this norm for vector $v$ is often denoted as 
 $||v||_{x_0}$, meaning the ``Hessian norm'' of vector $v$ with respect to $x_0$. 
 
 The closer the point $x_0$ is to the boundary of polytope $K$,
-the larger the value of the ``Hessian norm'', and thus, the fewer number of points allowed within
-the unit threshold, which leads to a smaller Dikin ellipsoid. On the other hand, the further 
+the larger the value of the ``Hessian norm'', and thus, the smaller the range of 
+allowed points given an unit threshold (i.e. $r=1$), 
+which leads to a smaller Dikin ellipsoid. On the other hand, the further 
 the point $x_0$ is to the boundary of polytope $K$, the ``Hessian norm'' is smaller and therefore
 the range for allowed points is larger -- a bigger Dikin ellipsoid. 
 
 To see why, consider the single variable case. Recall that the log barrier function is of the form 
-$-\log(x)$. The Hessian is the generalized second derivative, and the second derivative of $-\log(x)$
-is $\frac{1}{x^2}$. Therefore, for vector $v$, Hessian norm at point $x$ would be 
-$||v||^2_{x_0} = \frac{v^2}{x^2}$. The closer $x$ (recall that in our case, $x = a_i^Tx - b_i$) is to 
-zero, the larger the norm. 
+$-\log(z)$, where $z = a_i^Tx - b_i$. The Hessian is the generalized second derivative, and the second derivative of $-\log(z)$
+is $\frac{1}{z^2}$. Therefore, for vector $v$, Hessian norm at point $x$ would be 
+$||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to the boundary), the larger the norm. 
 
-For example, Figure \ref{fig:dikinellip} shows a Dikin ellipsoid in the $3$D-simplex.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width = 3.5in, height = 2.5in]{img/dikinellip.png}
-\caption[caption]{The Dikin ellipsoid centered at a point in the interior of the 
-                  $3$D-simplex.}
-\label{fig:dikinellip}  %% THIS ELLIPSOID WAS SAMPLED FROM ALPHAS AND THEN MAPPED BACK 
-\end{figure} 
 
 \subsection{Algorithm}
 
 \begin{enumerate}
                 
   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope and 
-        not on the edge of polytope $K$. If $x_0$ is on the boundary, then $Ax_0 = b$,
+        not on the edge of polytope $K$. If $x_0$ is on the boundary, then $a_ix_0=b_i$ 
+        for some $i$,
         and consequently, the log-barrier and its Hessian would be infinity. Therefore, 
         $x_0$ must be in the interior of $K$.} 
   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  
@@ -771,7 +764,7 @@ at regions that are away from the boundary of $K$. For an illustration, consider
 We sample from the $2$D-simplex, which is a line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see
 in the histograms, hit-and-run samples uniformly across 
 
-<<example0, eval = T, fig.width = 3, fig.height = 3>>=
+<<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE>>=
 library(walkr, ggplot2)
 A <- matrix(1, ncol = 2)
 b <- 1 
@@ -836,7 +829,7 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
 
 Consider the 3D simplex: 
 
-<<example1, eval = TRUE>>=
+<<example1, eval = TRUE, cache = TRUE>>=
 A <- matrix(1, ncol = 3)
 b <- 1
 set.seed(314)
@@ -846,7 +839,7 @@ sampled_points <- walkr(A = A, b = b, points = 1000,
 
 We can take a look at the sampled points. 
 
-<<example2, eval = TRUE, fig.height = 5, fig.width = 5>>=
+<<example2, eval = TRUE, fig.height = 5, fig.width = 5, cache = TRUE>>=
 library(scatterplot3d)
 scatterplot3d(x = sampled_points[1,], y = sampled_points[2,], z = sampled_points[3,], 
               scale.y = 0.5, xlab = "x1", ylab = "x2", zlab = "x3")
@@ -858,7 +851,7 @@ In this way, \pkg{walkr} is not a general tool for sampling from convex polytope
 it specializes in solving a special kind of convex polytopes, one created by the intersection of $Ax=b$
 and the $N$-simplex. 
 
-<<example3, eval = TRUE>>=
+<<example3, eval = TRUE, cache = TRUE>>=
 A <- matrix(sample(c(0,1,2), 40, replace = TRUE), ncol = 20)
 b <- c(0.5, 0.3)
 sampled_points <- walkr(A = A, b = b, points = 10000, chains = 5, 
@@ -870,14 +863,14 @@ sampled_points <- walkr(A = A, b = b, points = 10000, chains = 5,
 $\hat{R}$ values. We can ensure better mixing by increasing the amount of thinning, and hence 
 the number of total points sampled. 
 
-<<example4, eval = TRUE>>=
+<<example4, eval = TRUE, cache = TRUE>>=
 sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 500, 
                         method = "hit-and-run", ret.format = "list")         
 @
 
 Alternatively, we could use Dikin, which mixes better.
 
-<<example5, eval = TRUE>>=
+<<example5, eval = TRUE, cache = TRUE>>=
 sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,  
                         method = "dikin", ret.format = "list")
 @
