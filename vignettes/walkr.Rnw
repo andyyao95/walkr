@@ -688,28 +688,29 @@ $||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to
   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope and 
         not on the edge of polytope $K$. If $x_0$ is on the boundary, then $a_ix_0=b_i$ 
         for some $i$,
-        and consequently, the log-barrier and its Hessian would be infinity. Therefore, 
+        and consequently, the log-barrier and its Hessian would be infinity. 
         $x_0$ must be in the interior of $K$.} 
   \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  
   \item{Pick a random point $y$ from $D_{x_0}$.}          
-  \item{If $x_0 \notin D_{y}$, then reject $y$. Normally we would 
-        think that $y$ must be contained in the Dikin ellipsoid of $x_0$ to be accepted. However, 
-        this step actually says that if the current point $x_0$ is not in the Dikin Ellipsoid of the 
-        potential point $y$, then we reject the point $y$.} 
+  \item{If $x_0 \notin D_{y}$, then reject $y$. In words, 
+        if the current point $x_0$ is not in the Dikin Ellipsoid of the 
+        potential point $y$, then we reject the point $y$.
+        The purpose of this step is to avoid making a step that is too extreme.} 
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$.
         $\sqrt{\frac{det(H_{y})}{det(H_{x_0})}}$ is equal to $\frac{\text{volume of Dikin ellipsoid centered at 
         } x_0 }{\text{volume of Dikin ellipsoid centered at } y}$. 
-        Recall that the volume of the ellipsoid reflects how close to the boundary a point is. The closer a point
-        is to the boundary, the smaller its Dikin ellipsoid volume. This transition probability is crucial
-        becaues it avoids the algorithm concentrated in the ``center'' of the polytope. Because we already 
+        Recall that the volume of the ellipsoid reflects how close to the boundary the center is. The closer the 
+        center is to the boundary, the smaller its Dikin ellipsoid volume. This transition probability is crucial
+        because it avoids the algorithm from concentrating in the ``central region'' of the polytope. 
+        Because we already 
         know that $x_0 \in D_{y}$, the step from $x_0$ to $y$ is within the allowed threshold, or in other words,
         not too extreme. If the point $y$ is closer to the boundary than $x_0$ is 
-        (the ratio is greater than 1), we prefer this, so we move there with probability $1$. 
+        (the ratio of volumes is greater than 1), we prefer this, so we move there with probability $1$. 
         If $x_0$ is closer to the boundary than $y$ (ratio smaller than 1), then
-        we accept $y$ depending on how the ratio of the their Dikin ellipsoids' volumes.  % maybe add this as footnote
+        we accept $y$ depending on the ellipsoids' volumes.  % maybe add this as footnote
         \footnote{We need not worry about the accepted point $y$
         not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
-        will be fully contained in $K$ (see \cite{kannan} 2.1.4)}}
+        will be fully contained in $K$ (see \cite{kannan} section 2.1.4)}}
   \item{Repeat until obtained number of desired points.} 
 
 \end{enumerate}
@@ -736,15 +737,15 @@ $||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to
 \subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
 \label{fig:subfigure6}}
-\caption{The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$ (a).
+\caption{(a) The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$. 
          This point cannot be on the boundary of the polytope, otherwise the log-barrier and 
-         its Hessian would both be infinity.
-         An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$ (b). 
-         If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$ (c).
-         If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then  %%% elaborate
-         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$ (d).
-         Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$ (e). 
-         Algorithm repeats (f).} 
+         its Hessian would both be infinity. 
+         (b) An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$. 
+         (c) If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$. 
+         (d) If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
+         accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$. 
+         (e) Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$.  
+         (f) Algorithm repeats.} 
          
 \label{fig:figure}
 \end{figure}
@@ -752,17 +753,17 @@ $||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to
 \newpage
 
 Dikin mixes much faster than hit-and-run does, especially in higher dimensions. This is because 
-the mixing of Dikin is independent of the geometry of the polytope $K$, where as hit-and-run
-mixes slower in ``skinny'' regions of the polytope, tending to get stuck in corners (\cite{kannan}).
-However, the quick mixing comes with a cost of non-uniform sampling, as \cite{kannan} claims
-that the Dikin walk is a ``nearly uniform'' sampling algorithm. 
-
-Because the inherent nature of the log-barrier function and Hessian which prevents the Dikin
+the mixing of Dikin is independent of the geometry of polytope $K$, whereas hit-and-run
+mixes slower in ``skinny'' regions of $K$, tending to get stuck in corners (\cite{kannan}).
+Dikin's quick mixing comes with a cost of non-uniform sampling, as it generates a 
+``nearly uniform'' sample. Because tthe log-barrier function and Hessian prevents Dikin
 walk from reaching points that are very close to the boundary of $K$, the Dikin walk is concentrated
 at regions that are away from the boundary of $K$. For an illustration, consider the following example. 
 
 We sample from the $2$D-simplex, which is a line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see
-in the histograms, hit-and-run samples uniformly across 
+in the histograms, hit-and-run samples uniformly across the line segment, with 
+values uniformly distributed amongst [$0,1$]. On the other hand, Dikin concentrates in 
+sampling from regions far away from the edges. 
 
 <<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE>>=
 library(walkr, ggplot2)
@@ -777,26 +778,26 @@ qplot(sample_dikin[1,], xlab = "x1", main = "Dikin walk in the 2D simplex")
 @
 
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
-in its Dikin walk implementation for faster matrix multiplication, inversion, and determinant calculation,
-because the majority of the run-time cost for Dikin walk is matrix operations. This improvement in 
-run-time speed is important especially in sampling from $A$ with many columns, corresponding to polytopes in 
-higher dimensions, because in such cases, a larger number of points needed to be sampled in order
+to implement Dikin walk for faster matrix multiplication, inversion, and determinant calculation,
+because most of Dikin walk's run-time cost incurs in matrix operations. This improvement in 
+run-time speed is especially important when sampling from $A$ with many columns, corresponding to polytopes in 
+higher dimensions. In such cases, a larger number of points need to be sampled in order
 to obtain a well mixed sample. 
 
-To improve the mixing of the sample, there are in general two techniques. First, is to ``thin'' 
+To improve the mixing of a sample, there are in general two techniques. First, is to ``thin'' 
 the sample -- every thin\textsuperscript{th} sample is stored. Thinning helps with the mixing of the sample because
 as the dimensions of the polytope increases, the rate at which the individual parameters change, in 
-general, becomes slower. We note that thinning is effectively equivalent to sampling more points
+general, becomes slower. We note that thinning is equivalent to sampling more points
 in total. Second, is to add a ``burn-in'' parameter -- for example, a ``burn-in'' of 50\% means that 
 the first 50\% of the total sample is deleted. This is an effective technique when the starting 
 point is in a corner or narrow region in the polytope. We must give time for the random walk
-to leave the corner and reach other parts of the sample space. 
+to escape the corner and reach other parts of the sample space. 
 
 To quantitatively examine the mixing, we can use the Gelman-Rubin diagnostic on multiple chains 
-from diverse starting points. The general idea is that we measure the variance within each chain
+from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain
 ($W$) and the variance between the chains ($B$). If the variance between the chains is 
 substantially larger than the variance within each chain, then the Gelman-Rubin diagnostic
-($\hat{R}$) indicates that the chains should be ran for longer iterations.
+($\hat{R}$) indicates that the mixing is not well enough and thus, the chains should run for longer iterations.
 
 %% a good link --> http://www.people.fas.harvard.edu/~plam/teaching/
                   %% methods/convergence/convergence_print.pdf
@@ -810,7 +811,8 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
 
   \item{ \code{A} is the left hand side of the matrix equation $Ax=b$.}
   \item{ \code{b} is the right hand side of the matrix equation $Ax=b$.}
-  \item{ \code{points} is the number of points you want.}
+  \item{ \code{points} is the number of points returned. The total number of points sampled
+        may be more than this because of thinning and burn-in.}
   \item{ \code{method} is the method of sampling: either \code{"hit-and-run"} or 
          \code{"dikin"}.}
   \item{ \code{thin} is the thinning parameter. Every \code{thin}\textsuperscript{th} 
@@ -819,11 +821,11 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
         The first \code{burn} points are deleted from the final sample. Default is \code{0.5}, for 50\%.}  
   \item{ \code{chains} is the number of indepedent random walks we create, each
           from a different starting point. By default, walkr returns a matrix 
-          which consists of the individual chains combined together. Every chain is an element 
-          of the list which \code{walkr} eventually returns.}
-  \item{ \code{ret.format} is the return format of the sampled points. If \code{"list"}, then
-         a list of chains is returned, with each chain as a matrix of points. If \code{"matrix"}, 
-         then a single matrix of points is returned. A column is a sampled point.}
+          which consists of the individual chains combined together. Every column is a sampled point.}
+  \item{ \code{ret.format} is the return format of the sampled points. If \code{"matrix"}, 
+         then a single matrix of points is returned. If \code{"list"}, then
+         a list of chains is returned, with each chain as a matrix of points. 
+         Every column is a sampled point.}
 
 \end{itemize}
 
@@ -837,7 +839,7 @@ sampled_points <- walkr(A = A, b = b, points = 1000,
                         method = "hit-and-run", chains = 5, ret.format = "matrix")
 @
 
-We can take a look at the sampled points. 
+We can take a look at the sampled points with a $3$D plot. 
 
 <<example2, eval = TRUE, fig.height = 5, fig.width = 5, cache = TRUE>>=
 library(scatterplot3d)
@@ -848,7 +850,7 @@ scatterplot3d(x = sampled_points[1,], y = sampled_points[2,], z = sampled_points
 Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
 $Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
 In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
-it specializes in solving a special kind of convex polytopes, one created by the intersection of $Ax=b$
+it specializes in solving a special kind of convex polytope -- one created by the intersection of $Ax=b$
 and the $N$-simplex. 
 
 <<example3, eval = TRUE, cache = TRUE>>=
@@ -860,7 +862,7 @@ sampled_points <- walkr(A = A, b = b, points = 10000, chains = 5,
 @
 
 \code{walkr} warns the user if the chains have not mixed ``well-enough'' according to the 
-$\hat{R}$ values. We can ensure better mixing by increasing the amount of thinning, and hence 
+Gelman-Rubin $\hat{R}$ values. We can ensure better mixing by increasing the amount of thinning, and hence 
 the number of total points sampled. 
 
 <<example4, eval = TRUE, cache = TRUE>>=
@@ -876,7 +878,7 @@ sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,
 @
 
 Dikin walk only required \code{thin} to be \code{10}. If we ran hit-and-run 
-with a \code{thin} of 10, and even \code{250}, that code would've produced
+with a \code{thin} of \code{10}, \code{100}, or even \code{250}, that code would've produced
 a warning. This is a sign of Dikin mixing faster than hit-and-run. For higher
 dimensions of $A$, Dikin requires much fewer points (or equivalently, lower \code{thin}) 
 to pass the $\hat{R}$ test than hit-and-run. 
@@ -899,32 +901,32 @@ two spaces is a non-negative convex polytope.
 
 \pkg{walkr} samples from a non-negative convex polytope using Monte-Carlo
 Markov Chain (MCMC) algorithms. MCMC methods begin at a starting point
-within the convex polytope and ``wanders'' through the polytope according 
-to our algorithms. Every MCMC step depends only on the previous step and nothing
+within the polytope and ``wanders'' through the polytope.
+Every MCMC step depends only on the previous step and nothing
 else. To examine the quality of the samples, we first create multiple random walks
 from different starting points, which we call independent ``chains''. The ``mixing''
 of different chains is one way of examining the quality of the samples. Good mixing
-means that the different chains have thoroughly moved around the sample space and have 
+means that the different chains have well 
 overlapped with each other. Poor mixing means that the different chains have been stuck
 at their initial values. Although good mixing does not guarantee an ideal sample, 
-poor mixing suggests that more points must be sampled. 
+poor mixing suggests that more points must be sampled. %could be better
 
 The two MCMC algorithms implemented are hit-and-run and Dikin walk. Hit-and-run
 guarantees an uniform sample asymptotically, but mixes more slowly with 
-increasing columns of $A$. Dikin walk samples ``nearly'' uniformly, avoiding sampling
-points near edges of the polytope, but mixes much faster. 
+increasing columns of $A$. Dikin walk samples ``nearly'' uniformly, avoiding 
+points near edges of the polytope. However, Dikin mixes much faster than hit-and-run does. 
 
 The major problem with our current implementaton is that run-time becomes unwiedly 
 as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ -- below $50$, 
 hit-and-run and Dikin can both generate a well mixed sample within a few minutes. However,
 for dimensions near $500$, it takes Dikin a few hours to generate a well mixed sample,
-and it would take hit-and-run much longer. In applications, we recommend using 
+and it would take hit-and-run even longer. In applications, we recommend using 
 Dikin walk instead of hit-and-run for values of $N$ greater than 50. Further research
 is required for larger values of $N$. 
 
 One possible extension to \pkg{walkr} is parallelization. Especially for Dikin, 
 the majority of the run-time is spent on matrix multiplication and inversion. 
-Since matrix multiplication could be parallized, the run-time issue in higher dimensions
+Since matrix multiplication could be parallelized, the run-time issue in higher dimensions
 could be solved when multiple cores are used at the same time. Another extension
 would be to seek algorithmic improvements in rapid mixing, in the same way that Dikin walk is 
 biased towards the center of the sample space.
@@ -936,7 +938,7 @@ Mathematics and Physics\\
 Williams College \\
 3123 Paresky Center\\
 Williamstown, MA 01267\\
-United States}
+United States} \\
 \email{andy.yao17@gmail.com}
 
 \address{David Kane\\
@@ -945,7 +947,7 @@ IQSS\\
 1737 Cambridge Street\\
 CGIS Knafel Building, Room 350\\
 Cambridge, MA 02138\\
-United States}
+United States} \\
 \email{dave.kane@gmail.com}
 
 \bibliography{walkr}
