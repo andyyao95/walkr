@@ -44,12 +44,12 @@ where $A$ is $M \times N$, $x$ is $N \times 1$, and $b$ is $M \times 1$.
 The problem is interesting when there are more rows than columns  ($M < N$).
 In general, if $M = N$, then there is a single solution, and if $M > N$, then there are no solutions.
 If the rows of $A$ are linearly dependent, rows can be eliminated until they are linearly 
-independent without changing the solution space. Therefore, we assume that the rows of $A$ are 
+independent without changing the solution space. Assume that the rows of $A$ are 
 linearly independent going forward. 
 
-Geometrically, every row in $Ax=b$ describes a hyperplane in $\mathbb{R}^N$. Therefore, $Ax=b$ represents
+Geometrically, every row in $Ax=b$ describes a hyperplane in $\mathbb{R}^N$. $Ax=b$ represents
 the intersection of $M$ unbounded hyperplanes. We bound the sample space by also 
-requiring vector $x$ to be in the $N$-simplex, defined as: 
+requiring the vector $x$ to be in the $N$-simplex, defined as: 
 
 $$x_1 + x_2 + x_3 + ... + x_N = 1$$
 $$x_i \geq 0, \qquad \forall \quad i \in \text{\{$1, 2, ..., N$\}}$$ 
@@ -70,9 +70,9 @@ is a two dimensional equilateral triangle in three dimensional space (Figure~\re
 The intersection of the complete solution to $Ax=b$ and the $N$-simplex is a non-negative
 convex polytope. Sampling from such an object is a difficult problem, and the common approach is to 
 run Monte-Carlo Markov Chains (MCMC) (\cite{ravi}). MCMC methods begin at a starting point in
-the sample space (in our case, a non-negative convex polytope), and randomly ``wanders'' through
-the sample space according to an algorithm. An important feature of MCMC is that every step
-depends only on the previous step and nothing else. 
+the solution space and then randomly ``wander'' through
+the space according to an algorithm. An important feature of MCMC is that every step
+depends only on the current location and not on the steps taken previously. 
 
 MCMC sampling generally involve the creation
 of multiple random walks from different starting points, each of which is an independent ``chain''.
@@ -80,9 +80,8 @@ A key aspect of running multiple chains from different starting points is to exa
 ``mixing'' of the sample. Good mixing means that the different chains 
 (from different starting points) have overlapped with each 
 other, hinting that they have thoroughly moved around the sample space. 
-While good mixing does not guarantee a thorough sample of the space, poor mixing means 
-unthorough sampling, so the random walks need to be run longer to cover more regions. 
-\pkg{walkr} examines the quality of MCMC samples.
+While good mixing does not guarantee a thorough sampling of the space, poor mixing means 
+poor sampling. \pkg{walkr} examines the quality of MCMC samples.
 
 \pkg{walkr} includes two MCMC algorithms: hit-and-run and Dikin walk.
 Hit-and-run guarantees uniform sampling asympotically, but mixes more slowly
