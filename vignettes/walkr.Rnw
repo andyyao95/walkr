@@ -680,22 +680,23 @@ the larger the norm.
 \begin{enumerate}
                 
   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope and 
-        not on the edge of polytope $K$. If $x_0$ is on the boundary, then $a_ix_0=b_i$ 
+        not on its edge. If $x_0$ is on the boundary, then $a_ix_0=b_i$ 
         for some $i$,
         and consequently, the log-barrier and its Hessian would be infinity. 
-        $x_0$ must be in the interior of $K$.} 
+        In other words, $x_0$ must be in the interior of $K$.} 
   \item{Construct $D_{x_0}$, the Dikin ellipsoid centered at $x_0$.}                  
-  \item{Pick a random point $y$ from $D_{x_0}$.}          
-  \item{If $x_0 \notin D_{y}$, then reject $y$. In words, 
+  \item{Pick a random point $y$ from $D_{x_0}$.}
+  \item{Construct $D_{y}$, the Dikin ellipsoid centered at $y$.}
+  \item{If $x_0 \notin D_{y}$, then reject $y$. That is, 
         if the current point $x_0$ is not in the Dikin ellipsoid of the 
         potential point $y$, then we reject the point $y$.
-        The purpose of this step is to avoid making a step that is too extreme.} 
+        The purpose of this check is to avoid making a step that is too large.} 
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$.
         $\sqrt{\frac{det(H_{y})}{det(H_{x_0})}}$ is equal to $\frac{\text{volume of } D_{x_0}}
         {\text{volume of } D_y}$. 
         Recall that the volume of a Dikin ellipsoid reflects how close to the boundary its center is. 
         The closer its center is to the boundary, the smaller its volume. 
-        This transition probability is crucial because it avoids the algorithm from concentrating 
+        This transition probability is crucial because it prevents algorithm from concentrating 
         in the ``central region'' of the polytope. Because we already 
         know that $x_0 \in D_{y}$, the step from $x_0$ to $y$ is within the allowed threshold, or in other words,
         not too extreme. If the point $y$ is closer to the boundary than $x_0$ is 
