@@ -1,11 +1,11 @@
 Package: walkr
-Version: 0.3.2.9000
-Date:    2015-08-04
+Version: 0.3.2.9001
+Date:    2015-08-25
 Type:    Package
-Title:   Random Walks in the Intersection of the N-Simplex and Hyperplanes
+Title:   Random Walks in the Intersection of Hyperplanes and the N-Simplex 
 Author:  as.person(c(
-                "David Kane <dave.kane@gmail.com> [aut]",
-                "Andy Yao <andy.yao17@gmail.com> [aut]"
+                "Andy Yao <andy.yao17@gmail.com> [aut]",
+                "David Kane <dave.kane@gmail.com> [aut]"                
               ))
 Maintainer:  Andy Yao <andy.yao17@gmail.com>
 Depends:     R (>= 3.1), ggplot2
@@ -16,7 +16,7 @@ Imports:     hitandrun,
              Rcpp (>= 0.11.6),
              shinystan
 Description: Consider the intersection of two spaces: the complete solution space
-             to Ax = b and the N-Simplex. The intersection of these two spaces is 
+             to Ax = b and the N-simplex. The intersection of these two spaces is 
              a non-negative convex polytope. The package walkr samples from this 
              intersection using two Monte-Carlo Markov Chain (MCMC) methods: 
              hit-and-run and Dikin walk. walkr also provide tools to examine sample 
