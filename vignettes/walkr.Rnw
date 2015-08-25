@@ -888,7 +888,7 @@ random walks by calling the \code{explore\_walkr} function, which launches a \co
 from \pkg{shinystan}. Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
 from \code{walkr} must be \code{"list"}, because the individual chains must be separated out.
 
-%include screenshot? Or at least a reference for shinystan
+%include screenshot? Or at least a reference for shinystan.
 
 \section{Conclusion}
 
@@ -900,37 +900,33 @@ $x_1 + x_2 + x_3 + ... + x_N = 1$ and $x_i \geq 0$. This intersection of the
 two spaces is a non-negative convex polytope. 
 
 \pkg{walkr} samples from a non-negative convex polytope using Monte-Carlo
-Markov Chain (MCMC) algorithms. MCMC methods begin at a starting point
-within the polytope and ``wanders'' through the polytope.
-Every MCMC step depends only on the previous step and nothing
-else. To examine the quality of the samples, we first create multiple random walks
-from different starting points, which we call independent ``chains''. The ``mixing''
-of different chains is one way of examining the quality of the samples. Good mixing
-means that the different chains have well 
-overlapped with each other. Poor mixing means that the different chains have been stuck
-at their initial values. Although good mixing does not guarantee an ideal sample, 
-poor mixing suggests that more points must be sampled. 
-
-The two MCMC algorithms implemented are hit-and-run and Dikin walk. Hit-and-run
+Markov Chain (MCMC) algorithms. The two algorithms implemented \
+are hit-and-run and Dikin walk. Hit-and-run
 guarantees an uniform sample asymptotically, but mixes more slowly with 
 increasing columns of $A$. Dikin walk samples ``nearly uniformly'', avoiding 
-points near edges of the polytope. However, Dikin mixes much faster than hit-and-run does, 
+points near edges of the polytope. 
+
+MCMC methods begin at a starting point
+within the polytope and ``wander'' through the polytope.
+Every MCMC step depends only on the current location. 
+To examine the quality of the samples, we create multiple chains, each from a
+different starting point. The ``mixing''
+of different chains is one way of examining the quality of the samples. 
+Dikin mixes much faster than hit-and-run does, 
 especially in higher dimensions.
 
 The major problem with our current implementaton is that run-time becomes unwiedly 
-as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ -- below $50$, 
-hit-and-run and Dikin can both generate a well mixed sample within a few minutes. However,
-for dimensions near $500$, it takes Dikin a few hours to generate a well mixed sample,
-and it would take hit-and-run even longer. In applications, we recommend using 
-Dikin walk instead of hit-and-run for values of $N$ greater than 50. Further research
-is required for larger values of $N$. 
+as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ (below $50$) 
+hit-and-run and Dikin can both generate a well-mixed sample within a few minutes. However,
+for dimensions near $500$, it takes Dikin a few hours to generate a good sample,
+and hit-and-run much longer. In applications, we recommend using 
+Dikin walk instead of hit-and-run for values of $N$ greater than 50, assuming that a bias
+against the edges of the polytope is acceptable.
 
-One possible extension to \pkg{walkr} is parallelization. Especially for Dikin, 
+One possible extension to \pkg{walkr} involves parallelization. Especially for Dikin, 
 the majority of the run-time is spent on matrix multiplication and inversion. 
-Since matrix multiplication could be parallelized, the run-time issue in higher dimensions
-could be solved when multiple cores are used at the same time. Another extension
-would be to seek algorithmic improvements in rapid mixing, in the same way that Dikin walk is 
-biased towards the center of the sample space.
+Since matrix multiplication can be parallelized, the run-time issue in higher dimensions
+could be mitigated by extending the code to allow for the use of multiple cores.
 
 \section{Authors}
 
