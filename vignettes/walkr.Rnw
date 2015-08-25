@@ -614,11 +614,11 @@ the number of points we need to sample to ensure adequate mixing increases expon
 
 A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.
 A Dikin walk begins from a random starting point within the convex polytope $K$ 
-and then creates a Dikin ellipsoid centered at the current point. It then moves around the space
-by sampling from such Dikin ellipsoids, whose shape and size are determined by both the 
+and then creates a Dikin ellipsoid centered at the current point. It then samples 
+a random point from that ellipsoid, one whose shape and size are determined by both the 
 current point and the shape of $K$. 
 
-Unlike hit-and-run, the Dikin walk does not sample uniformly throughout $K$. Instead,
+Unlike hit-and-run, the Dikin walk does not sample uniformly over $K$. Instead,
 it is biased towards points that are way from the edges and corners of $K$ (\cite{kannan}). 
 This bias allows the chains to mix more quickly than hit-and-run, and therefore, 
 to work better in higher dimensions. 
