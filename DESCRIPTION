@@ -1,5 +1,5 @@
 Package: walkr
-Version: 0.3.2.9001
+Version: 0.3.2.9002
 Date:    2015-08-25
 Type:    Package
 Title:   Random Walks in the Intersection of Hyperplanes and the N-Simplex 
@@ -9,7 +9,7 @@ Author:  as.person(c(
               ))
 Maintainer:  Andy Yao <andy.yao17@gmail.com>
 Depends:     R (>= 3.1), ggplot2
-Suggests:    testthat, knitr, scatterplot3d
+Suggests:    testthat, knitr
 Imports:     hitandrun, 
              limSolve, 
              MASS,

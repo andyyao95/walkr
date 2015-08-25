@@ -836,14 +836,6 @@ sampled_points <- walkr(A = A, b = b, points = 1000,
                         method = "hit-and-run", chains = 5, ret.format = "matrix")
 @
 
-We can take a look at the sampled points with a $3$D plot. 
-
-<<example2, eval = TRUE, fig.height = 5, fig.width = 5, cache = TRUE>>=
-library(scatterplot3d)
-scatterplot3d(x = sampled_points[1,], y = sampled_points[2,], z = sampled_points[3,], 
-              scale.y = 0.5, xlab = "x1", ylab = "x2", zlab = "x3", pch = 19)
-@
-
 Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
 $Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
 In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
