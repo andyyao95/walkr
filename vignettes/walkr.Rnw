@@ -750,14 +750,18 @@ the larger the norm.
 See Figure~\ref{fig:figure}. Dikin mixes much faster than hit-and-run does, 
 especially in higher dimensions. This is because 
 the mixing of Dikin is independent of the geometry of polytope $K$, whereas hit-and-run
-mixes slower in ``skinny'' regions of $K$, tending to get stuck in corners (\cite{kannan}).
-Dikin's quick mixing comes with a cost of non-uniform sampling, as it generates a 
-``nearly uniform'' sample. Because tthe log-barrier function and Hessian prevents Dikin
-walk from reaching points that are very close to the boundary of $K$, the Dikin walk is concentrated
-at regions that are away from the boundary of $K$. For an illustration, consider the following example. 
+mixes slower in ``skinny'' regions of $K$ (\cite{kannan}).
+Dikin's quick mixing comes at the cost of non-uniform sampling, as it generates a 
+``nearly uniform'' sample. Because the log-barrier function and Hessian prevent the Dikin
+walk from reaching points that are very close to the boundary of $K$, the resulting sample is concentrated
+in regions that are away from the boundary. 
 
-We sample from the $2$D-simplex, which is a line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see
-in the histograms, hit-and-run samples uniformly across the line segment, with 
+%% The previous paragaph should end with, See Figure~/ref{blah} for an illustration. And that
+%% the below text, with more detail, should go into the figure caption for the new figure.
+
+We sample from the $2$D-simplex, which is a 
+line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see in the histograms, 
+hit-and-run samples uniformly across the line segment, with 
 values uniformly distributed amongst [$0,1$]. On the other hand, Dikin concentrates in 
 sampling from regions far away from the edges. 
 
