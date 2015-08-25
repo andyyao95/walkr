@@ -566,7 +566,7 @@ and take an average of those points, which generates one starting point $x_0$.
         with the edges of $K$. Because $K$ is convex, the chord $S$ will only 
         intersect it at two points. Parametrize the chord $S$ by $s_1 + t(s_2-s_1)$, 
         where $t \in [0,1]$.}
-  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from \texttt{Uniform[0,1]}.}
+  \item{Pick a random point $x_1$ along the chord $S$ by generating $t$ from $U[0,1]$.}
   \item{Set $x_1$ as current point.}
   \item{Repeat algorithm until number of desired points sampled.}
         
@@ -756,8 +756,16 @@ Dikin's quick mixing comes at the cost of non-uniform sampling, as it generates 
 walk from reaching points that are very close to the boundary of $K$, the resulting sample is concentrated
 in regions that are away from the boundary. 
 
-%% The previous paragaph should end with, See Figure~/ref{blah} for an illustration. And that
-%% the below text, with more detail, should go into the figure caption for the new figure.
+%% The previous paragaph should end with, See Figure~/ref{blah} for an illustration. 
+
+%% The below plots should be: 
+%% side-by-side
+%% With a better x-axis labels
+%% With a single title covering both plots, probably something like: "Two Sampling Methods"
+%% With titles covering each sub-plot, probably mentioning the specific algorithm
+%% "2D-simplex" is a poor and confusing phrase to include in a title.
+%% And the below text, with more detail, should go into the figure caption for the new figure,
+%% explaining exactly where the points from and what they mean. 
 
 We sample from the $2$D-simplex, which is a 
 line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see in the histograms, 
@@ -779,27 +787,25 @@ qplot(sample_dikin[1,], xlab = "x1", main = "Dikin walk: 2D-simplex")
 @
 
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
-to implement Dikin walk for faster matrix multiplication, inversion, and determinant calculation,
-because most of Dikin walk's run-time cost incurs in matrix operations. This improvement in 
-run-time speed is especially important when sampling from $A$ with many columns, corresponding to polytopes in 
-higher dimensions. In such cases, a larger number of points need to be sampled in order
-to obtain a well mixed sample. 
+to implement Dikin walk because of their support for faster matrix multiplication, inversion, and 
+determinant calculation. This improvement in 
+speed is especially important when sampling from $A$ with many columns, corresponding to polytopes
+in higher dimensions. 
 
-To improve the mixing of a sample, there are in general two techniques. First, is to ``thin'' 
-the sample -- every thin\textsuperscript{th} sample is stored. Thinning helps with the mixing of the sample because
-as the dimensions of the polytope increases, the rate at which the individual parameters change, in 
-general, becomes slower. Thinning is equivalent to sampling more points
-in total. Second, is to add a ``burn-in'' parameter -- for example, a ``burn-in'' of 50\% means that 
-the first 50\% of the total sample is deleted. This is an effective technique when the starting 
+%% This paragraph could be improved, citing the Stan manual and giving a sentence or two of 
+%% background. Specific parameter values for walkr should not be mentioned.
+
+To improve the mixing of a sample, there are two main techniques: thinning and burn-in. 
+First, to ``thin,'' we only save each thin\textsuperscript{th} sample. Second, the ``burn-in'' is 
+the portion of the total sample that is discarded. This is an effective technique when the starting 
 point is in a corner or narrow region in the polytope. We must give time for the random walk
-to escape the corner and reach other parts of the sample space. \pkg{walkr}'s default
-parameters are 1 for thinning and 50\% for burn-in. 
+to escape the corner and reach other parts of the sample space. 
 
-To quantitatively examine the mixing, we can use the Gelman-Rubin diagnostic on multiple chains 
-from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain
-($W$) and the variance between the chains ($B$). If the variance between the chains is 
+To quantitatively examine the mixing, we use the Gelman-Rubin diagnostic on multiple chains 
+from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain and the variance between the chains. If the variance between the chains is 
 substantially larger than the variance within each chain, then the Gelman-Rubin diagnostic
-($\hat{R}$) indicates that the mixing is not well enough and thus, the chains should run for longer iterations.
+($\hat{R}$) indicates that the mixing is poor and that, therefore, the chains should be longer. That is,
+poor mixing means that we need larger samples.
 
 %% a good link --> http://www.people.fas.harvard.edu/~plam/teaching/
                   %% methods/convergence/convergence_print.pdf
@@ -844,7 +850,7 @@ sampled_points <- walkr(A = A, b = b, points = 1000,
 Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects 
 $Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$. 
 In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead, 
-it specializes in solving a special kind of convex polytope -- one created by the intersection of $Ax=b$
+it specializes in solving a special kind of convex polytope, one created by the intersection of $Ax=b$
 and the $N$-simplex. 
 
 <<example3, eval = TRUE, cache = TRUE>>=
@@ -871,18 +877,18 @@ sampled_points <- walkr(A = A, b = b, points = 1000, chains = 5, thin = 10,
                         method = "dikin", ret.format = "list")
 @
 
-Dikin walk only required \code{thin} to be \code{10}. If we ran hit-and-run 
-with a \code{thin} of \code{10}, \code{100}, or even \code{250}, that code would've produced
-a warning. This is a sign of Dikin mixing faster than hit-and-run. For higher
-dimensions of $A$, Dikin requires much fewer points (or equivalently, lower \code{thin}) 
-to pass the $\hat{R}$ test than hit-and-run. 
+Dikin walk only required \code{thin} to be \code{10}. Running hit-and-run 
+with a \code{thin} of \code{10}, \code{100}, or even \code{250} would have produced
+a warning. This is evidence of Dikin mixing faster than hit-and-run. For higher
+dimensions of $A$, Dikin requires fewer points (or equivalently, a lower value for \code{thin}) 
+to pass satisfy $\hat{R}$ than hit-and-run does. 
 
 Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
 random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
 from \pkg{shinystan}. Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
 from \code{walkr} must be \code{"list"}, because the individual chains must be separated out.
 
-%include screenshot?
+%include screenshot? Or at least a reference for shinystan
 
 \section{Conclusion}
 
