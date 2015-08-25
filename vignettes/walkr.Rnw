@@ -555,7 +555,7 @@ and take an average of those points, which generates one starting point $x_0$.
 
 \section{Hit-and-run} 
 
-\cite{vempala} provides an overview of the hit-and-run algorithm, as follows:
+\cite{vempala} provides an overview of the hit-and-run algorithm:
 
 \begin{enumerate}
   
@@ -599,16 +599,16 @@ and take an average of those points, which generates one starting point $x_0$.
 \label{fig:hitandrun}
 \end{figure}
 
-\pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} package(\cite{hitandrun})
+See Figure~\ref{fig:hitandrun}. \pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} 
+package (\cite{hitandrun})
 to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform
 sample in the convex polytope $K$. However, the mixing of hit-and-run becomes slower 
-with increasing dimensions of $K$. In practice, this slow mixing behavior of hit-and-run
-is observed when we run multiple chains from different starting points. Instead of 
-overlapping with each other, the individual chains stay at their initial
-values. This behavior corresponds to ``getting stuck in corners'' of a ``skinny''
-polytope. To solve this problem, we must let the individual chains run for longer (i.e. 
+with increasing dimensions in $K$. Slow mixing is observed when we run multiple chains 
+from different starting points. Instead of 
+overlapping with each other, the individual chains tend to stay near their initial
+values. To solve this problem, we must let the individual chains run for longer (i.e. 
 sample more points). However, as the dimensions of the polytope increase,
-the number of points we need to sample quickly become infeasible.  
+the number of points we need to sample to ensure adequate mixing increases exponentially.  
 
 \section{Dikin walk}
 
@@ -747,7 +747,8 @@ $||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to
 
 \newpage
 
-Dikin mixes much faster than hit-and-run does, especially in higher dimensions. This is because 
+See Figure~\ref{fig:figure}. Dikin mixes much faster than hit-and-run does, 
+especially in higher dimensions. This is because 
 the mixing of Dikin is independent of the geometry of polytope $K$, whereas hit-and-run
 mixes slower in ``skinny'' regions of $K$, tending to get stuck in corners (\cite{kannan}).
 Dikin's quick mixing comes with a cost of non-uniform sampling, as it generates a 
