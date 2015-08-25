@@ -816,7 +816,9 @@ To improve the mixing of a sample, there are two main techniques: thinning and b
 First, to ``thin,'' we only save each thin\textsuperscript{th} sample. Second, the ``burn-in'' is 
 the portion of the total sample that is discarded. This is an effective technique when the starting 
 point is in a corner or narrow region in the polytope. We must give time for the random walk
-to escape the corner and reach other parts of the sample space. \cite{stanmanual}
+to escape the corner and reach other parts of the sample space. The Stan Manual (\cite{stanmanual})
+provides a detailed explaination of techniques to improve MCMC sampling. Stan is a probabilistic 
+programming language that implements Bayesian inference models. 
 
 To quantitatively examine the mixing, we use the Gelman-Rubin diagnostic on multiple chains 
 from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain and the variance between the chains. If the variance between the chains is 
