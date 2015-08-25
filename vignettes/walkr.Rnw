@@ -143,7 +143,6 @@ Figure~\ref{fig:tetra2} shows the intersection of the $4$D-simplex with a
 hyperplane (1 equation, or 1 row in $Ax=b$). The resulting convex polytope is a 2D trapezoid in $4$D space. 
 Note that this convex polytope is $4-(1+1)=2$ dimensional. This is because we began with $4$ dimensions,
 and the constraint and the simplex each reduced the dimension of the solution space by 1. 
-In general, the resulting polytope will be $N-(M+1)$ dimensional.
 
 $$
 A = 
@@ -180,17 +179,17 @@ are commonly described by a generic $Ax \leq b$. In order to use the sampling al
 first re-express the sample space in the form $Ax \leq b$ (with different $A$, $x$ and $b$)
 \footnote{
 This is a total abuse of notation. The $A$ in $Ax=b$ is very different from the $A$ in
-$Ax \leq b$. $A$ is $N$ by $N-(M+1)$. $x$ and $b$ are also different.
+$Ax \leq b$. This new $A$ is $N$ by $N-(M+1)$. $x$ and $b$ are also different.
 The mathematical literature for linear equations uses $Ax = b$, and the litearture
 on convex polytopes uses $Ax \leq b$, so it seemed best to use the same notation in both places 
-in order to make the connections to existing litearture easier.
+in order to make the connections to existing litearture more clear.
 }. 
 
 Recall that our sample space is the intersection of the complete solution to $Ax=b$ and 
-the $N$-Simplex, which could be represented by three parts. First, the matrix equation 
-$Ax=b$. Second, the simplex equation $x_1+x_2+...+x_N=1$. Third, the simplex 
-non-negative inequalities, $x_i \geq 0$. In this section, we present a three step procedure
-to combine all three parts into one single inequality of the form $Ax \leq b$. 
+the $N$-simplex, which consists of three components: first, the matrix equation 
+$Ax=b$, second, the simplex constraint $x_1+x_2+...+x_N=1$ and, third, the non-negative 
+inequalities, $x_i \geq 0$. In this section, we present combine all three parts 
+into one single inequality of the form $Ax \leq b$. 
 
 \subsection{Step 1: combining the simplex equality with the original $Ax=b$}
 
@@ -238,11 +237,11 @@ spanned by $N-(M+1)$ basis vectors, because that is the dimension of the sample 
 (our polytope). Any vector formed by 
 a linear combination of the basis vectors will still be in the null space. 
 
-Once we have the null space, we add on a particular solution to the null space. 
-The null space we can think of as constructing a coordinate
-system for $A'x=0$', and the particular solution to $A'x=b'$ we can think of as an offset from the origin 
-to fit $A'x = b'$. For a review of the specifics of finding null spaces and particular solutions,
-one can refer to \cite{leon}.
+Once we have the null space, we add on a particular solution. Think of the null space as 
+as constructing a coordinate
+system for $A'x=0$' and of the particular solution as an offset from the origin 
+to fit $A'x = b'$. See \cite{leon} for a review of the specifics of finding null 
+spaces and particular solutions.
 
 The null space of $A'$ can be represented by $N-(M+1)$ basis vectors. Because we are in $\mathbb{R}^N$, 
 every basis vector, $v_i$, has $N$ components:
@@ -257,7 +256,7 @@ $$
 Once we have the null space basis vectors and a particular solution, $v_{particular}$, 
 we can express the set of all $x$'s that satisfy $A'x=b'$
 in terms of coefficients $\alpha_i$. The complete
-solution to $A'x=b'$ could be expressed as the set: 
+solution to $A'x=b'$ can be expressed as the set: 
 
 $$
 \Bigg\{ x = 
@@ -266,7 +265,7 @@ v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)
 \Bigg\}
 $$ 
 
-This space is now described in terms of $\alpha_i$'s, coefficients of the basis vectors. 
+This space is now described in terms of $\alpha_i$'s, the coefficients of the basis vectors. 
 We call this ``$\alpha$-space''.
 
 \subsection{Step 3: including the simplex inequalities}
