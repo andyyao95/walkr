@@ -905,7 +905,18 @@ to pass satisfy $\hat{R}$ than hit-and-run does.
 Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
 random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
 from \pkg{shinystan}. Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
-from \code{walkr} must be \code{"list"}, because the individual chains must be separated out.
+from \code{walkr} must be \code{"list"}, because the individual chains must be separated out. 
+Figure~\ref{fig:shinystan} shows a screenshot of a traceplot from the \pkg{shinystan} interface.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 5.5in, height = 2.5in]{img/traceplot.png}
+\caption[caption]{A screenshot from the \pkg{shinystan} interface called from \code{explore\_walkr}.
+                  The traceplot is a plot of the value of different chains against the iterations.
+                  It allows us to visualize the mixing of different chains. This particular
+                  sample came from the \code{sampled\_points} using Dikin walk.}
+\label{fig:shinystan} 
+\end{figure}
 
 %include screenshot? Or at least a reference for shinystan.
 
