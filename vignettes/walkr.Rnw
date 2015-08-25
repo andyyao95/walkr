@@ -331,11 +331,11 @@ $$
 $$
 
 Finally, our convex polytope is in the desired form $Ax \leq b$, which is 
-$-V\alpha \leq v_{particular}$. We sample $\alpha$'s.
+$-V\alpha \leq v_{particular}$. 
 
 \subsection{Four dimensional transformation example}
 
-Consider a four dimensional example drawn from Figure~\ref{fig:tetra2}. 
+Consider the four dimensional example from Figure~\ref{fig:tetra2}. 
 
 $$
 A = 
@@ -506,7 +506,7 @@ v_{particular}+V\alpha
 \end{bmatrix}
 $$
 
-Indeed, the mapped point satisfies the original $Ax=b$ and the $N$-simplex equation and inequalities. 
+Indeed, the mapped point satisfies the original $Ax=b$ and the $N$-simplex. 
 
 Recall that we began with the intersection
 of the complete solution to $Ax = b$ and the $N$-simplex, represented as three different parts. 
@@ -525,25 +525,19 @@ it seemed best to use the same notation in order to make connections to existing
 
 \section{Algorithms}
 
-\textbf{Important:} Before moving to sampling algorithms, we restate our problem.
-Define non-negative convex polytope $K$ to be the solution to $Ax \leq b$
-\footnote{
-Again, the $Ax \leq b$ is different from the $Ax = b$ we began with.
-For a detailed explaination on how we went from the intersection of $Ax = b$ and the $N$-simplex
-to $Ax \leq b$, with different $A$, $x$, $b$, see the previous section. 
-}. We are interested in sampling from $K$.
+
+Define non-negative convex polytope $K$ to be the solution to $Ax \leq b$. 
+We are interested in sampling uniformly from $K$.
 
 The two Monte-Carlo Markov Chain (MCMC) sampling methods we implement are hit-and-run
-and Dikin walk. MCMC methods begin at a starting point in $K$ and wanders through $K$
-according to our sampling algorithms. Every MCMC step depends only on the previous step and nothing else.
-Ideally, we want to thoroughly sample the polytope $K$.  
+and Dikin walk. MCMC methods begin at a starting point in $K$ and wander through $K$
+according to a specified algorithm. Every MCMC step depends only on the current location.  
 
-To examine the quality of our sample, we create multiple, independent ``chains'' from 
+To test the quality of our sample, we create multiple, independent ``chains'' from 
 different starting points in $K$ and observe their ``mixing''. The chains have mixed well 
 if their values have repeatedly overlapped with each other. If the chains have not mixed well, 
 then we need to run the chains for longer (i.e. sample more points). While good mixing does 
-not guarantee that the sample is perfect, poor mixing definitely points at a low
-quality, unthorough sample.
+not guarantee that the sample is perfect, poor mixing alone indicates a problem.
 
 \subsection{Starting point}
 
@@ -555,7 +549,7 @@ $$\text{minimizes} \quad |Cx-d|^2$$
 $$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
 
 We randomly generate matrix $C$ and vector $d$. Solving this system generates an $x$ 
-which will usually fall on the boundaries of polytope $K$. We repeat this process 30 times 
+which will usually falls on the boundary of polytope $K$. We repeat this process 30 times 
 and take an average of those points, which generates one starting point $x_0$. 
 
 
