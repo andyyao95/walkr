@@ -659,21 +659,20 @@ $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\
 
 The Hessian $H_{x_0}$ at $x_0$ is used as a local norm, which we call the ``Hessian norm''.
 The Dikin ellipsoid with radius $1$ is the collection of all the points around 
-$x_0$ whose difference with $x_0$ ($y-x_0$) is within the unit threshold (i.e. $r=1$)
-with respect to the Hessian norm. In the literature, this norm for vector $v$ is often denoted as 
-$||v||_{x_0}$, meaning the Hessian norm of vector $v$ with respect to $x_0$. 
+$x_0$ whose difference with $x_0$ ($y-x_0$) is within the unit threshold with 
+respect to the Hessian norm. 
 
 The closer the point $x_0$ is to the boundary of polytope $K$,
 the larger the value of the Hessian norm, and thus, the smaller the range of 
-allowed points given an unit threshold (i.e. $r=1$), 
-which leads to a smaller Dikin ellipsoid. On the other hand, the further 
-the point $x_0$ is to the boundary of polytope $K$, the Hessian norm is smaller and therefore
-the range for allowed points is larger -- a bigger Dikin ellipsoid. 
+allowed points given a unit threshold, 
+which leads to a smaller Dikin ellipsoid. The further 
+the point $x_0$ is from the boundary of polytope $K$, the smaller the Hessian norm and,
+therefore, the larger the Dikin ellipsoid. 
 
-To see why, consider the single variable case. Recall that the log barrier function is of the form 
+For intuition, consider the single variable case. Recall that the log barrier function is of the form 
 $-\log(z)$, where $z = a_i^Tx - b_i$. The Hessian is the generalized second derivative, and the second derivative of $-\log(z)$
-is $\frac{1}{z^2}$. Therefore, for vector $v$, Hessian norm at point $x$ would be 
-$||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to the boundary), the larger the norm. 
+is $\frac{1}{z^2}$. The closer $z$ is to zero (i.e., the closer $x$ is to the boundary), 
+the larger the norm. 
 
 
 \subsection{Algorithm}
