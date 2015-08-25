@@ -619,7 +619,7 @@ a random point from that ellipsoid, one whose shape and size are determined by b
 current point and the shape of $K$. 
 
 Unlike hit-and-run, the Dikin walk does not sample uniformly over $K$. Instead,
-it is biased towards points that are way from the edges and corners of $K$ (\cite{kannan}). 
+it is biased towards points that are way from the edges of $K$ (\cite{kannan}). 
 This bias allows the chains to mix more quickly than hit-and-run, and therefore, 
 to work better in higher dimensions. 
 
@@ -649,25 +649,25 @@ $H_x$ is a $n \times n$ linear operator. $D$ is a $m \times m$ diagonal matrix.
 The Hessian matrix ($H_x$) contains the second derivatives of the function $\phi(x)$ with respect 
 to the vector $x$. The Hessian describes the shape of the local landscape at $x$.
 
-\noindent \textbf{Dikin Ellipsoid $D_{x_0}^r$} \\
+\noindent \textbf{Dikin ellipsoid $D_{x_0}^r$} \\
 
-Define the Dikin Ellipsoid centered at $x_0$ with radius $r$ as: 
+Define the Dikin ellipsoid centered at $x_0$ with radius $r$ as: 
 
 \begin{center}
 $D_{x_0}^r \quad = \quad $\{$y \quad | \quad (y-x_0)^T H_{x_0}(y-x_0) \leq r^2$\} 
 \end{center}
 
-In this context, the Hessian $H_{x_0}$ at $x_0$ is used as a local norm, which we call the ``Hessian norm''.
-The Dikin Ellipsoid with radius $1$ is the collection of all the points around 
+The Hessian $H_{x_0}$ at $x_0$ is used as a local norm, which we call the ``Hessian norm''.
+The Dikin ellipsoid with radius $1$ is the collection of all the points around 
 $x_0$ whose difference with $x_0$ ($y-x_0$) is within the unit threshold (i.e. $r=1$)
-with respect to the ``Hessian norm''. In the literature, this norm for vector $v$ is often denoted as 
-$||v||_{x_0}$, meaning the ``Hessian norm'' of vector $v$ with respect to $x_0$. 
+with respect to the Hessian norm. In the literature, this norm for vector $v$ is often denoted as 
+$||v||_{x_0}$, meaning the Hessian norm of vector $v$ with respect to $x_0$. 
 
 The closer the point $x_0$ is to the boundary of polytope $K$,
-the larger the value of the ``Hessian norm'', and thus, the smaller the range of 
+the larger the value of the Hessian norm, and thus, the smaller the range of 
 allowed points given an unit threshold (i.e. $r=1$), 
 which leads to a smaller Dikin ellipsoid. On the other hand, the further 
-the point $x_0$ is to the boundary of polytope $K$, the ``Hessian norm'' is smaller and therefore
+the point $x_0$ is to the boundary of polytope $K$, the Hessian norm is smaller and therefore
 the range for allowed points is larger -- a bigger Dikin ellipsoid. 
 
 To see why, consider the single variable case. Recall that the log barrier function is of the form 
@@ -685,10 +685,10 @@ $||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to
         for some $i$,
         and consequently, the log-barrier and its Hessian would be infinity. 
         $x_0$ must be in the interior of $K$.} 
-  \item{Construct $D_{x_0}$, the Dikin Ellipsoid centered at $x_0$.}                  
+  \item{Construct $D_{x_0}$, the Dikin ellipsoid centered at $x_0$.}                  
   \item{Pick a random point $y$ from $D_{x_0}$.}          
   \item{If $x_0 \notin D_{y}$, then reject $y$. In words, 
-        if the current point $x_0$ is not in the Dikin Ellipsoid of the 
+        if the current point $x_0$ is not in the Dikin ellipsoid of the 
         potential point $y$, then we reject the point $y$.
         The purpose of this step is to avoid making a step that is too extreme.} 
   \item{If $x_0 \in D_{y}$, then accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$.
@@ -732,12 +732,12 @@ $||v||^2_{x} = \frac{v^2}{z^2}$. The closer $z$ is to zero (the closer $x$ is to
 \subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
 \label{fig:subfigure6}}
-\caption{(a) The Dikin Walk begins by constructing the Dikin Ellipsoid at the starting point $x_0$. 
+\caption{(a) The Dikin walk begins by constructing the Dikin ellipsoid at the starting point $x_0$. 
          This point cannot be on the boundary of the polytope, otherwise the log-barrier and 
          its Hessian would both be infinity. 
-         (b) An uniformly random point $y$ is generated in the Dikin Ellipsoid centered at $x_0$. 
-         (c) If point $x_0$ is not in the Dikin Ellipsoid centered at $y$, then reject $y$. 
-         (d) If point $x_0$ is contained in the Dikin Ellipsoid centered at $y$, then 
+         (b) An uniformly random point $y$ is generated in the Dikin ellipsoid centered at $x_0$. 
+         (c) If point $x_0$ is not in the Dikin ellipsoid centered at $y$, then reject $y$. 
+         (d) If point $x_0$ is contained in the Dikin ellipsoid centered at $y$, then 
          accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$. 
          (e) Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$.  
          (f) The algorithm is repeated to sample many points.} 
