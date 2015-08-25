@@ -575,21 +575,21 @@ and take an average of those points, which generates one starting point $x_0$.
 \begin{figure}[ht]
 \centering
 \subfigure[ ]{
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_trapezoid1.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_trapezoid1.png}
 \label{fig:subfigure1}}
 \subfigure[ ]{
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun2.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_hitandrun2.png}
 \label{fig:subfigure1}}
 \quad
 \subfigure[ ]{
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun3.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_hitandrun3.png}
 \label{fig:subfigure2}}
 \subfigure[ ]{
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun4.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_hitandrun4.png}
 \label{fig:subfigure3}}
 \quad
 \subfigure[ ]{
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_hitandrun5.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_hitandrun5.png}
 \label{fig:subfigure4}}
 %
 \caption{(a) The hit-and-run algorithm begins with an interior point $x_0$. (b) A random direction  
@@ -713,24 +713,24 @@ the larger the norm.
 \begin{figure}[ht]
 \centering
 \subfigure[ ]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin2.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin2.png}
 \label{fig:subfigure1}}
 \subfigure[ ]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin3.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin3.png}
 \label{fig:subfigure2}}
 \quad % construct Dikin ellipsoid -- done
 \subfigure[ ]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin41.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin41.png}
 \label{fig:subfigure3}}
 \subfigure[ ]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin42.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin42.png}
 \label{fig:subfigure4}}
 \quad
 \subfigure[ ]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin5.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin5.png}
 \label{fig:subfigure5}}
 \subfigure[ ]{%
-\includegraphics[width = 1.95in, height = 1.5in]{img/pics/exp_dikin6.png}
+\includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin6.png}
 \label{fig:subfigure6}}
 \caption{(a) The Dikin walk begins by constructing the Dikin ellipsoid at the starting point $x_0$. 
          This point cannot be on the boundary of the polytope, otherwise the log-barrier and 
@@ -773,7 +773,7 @@ hit-and-run samples uniformly across the line segment, with
 values uniformly distributed amongst [$0,1$]. On the other hand, Dikin concentrates in 
 sampling from regions far away from the edges. 
 
-<<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE, echo = FALSE, message=FALSE>>=
+<<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE, echo = FALSE, message=FALSE, fig.show='hold'>>=
 library(walkr)
 A <- matrix(1, ncol = 2)
 b <- 1 
