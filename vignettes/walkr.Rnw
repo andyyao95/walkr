@@ -670,7 +670,8 @@ the point $x_0$ is from the boundary of polytope $K$, the smaller the Hessian no
 therefore, the larger the Dikin ellipsoid. 
 
 For intuition, consider the single variable case. Recall that the log barrier function is of the form 
-$-\log(z)$, where $z = a_i^Tx - b_i$. The Hessian is the generalized second derivative, and the second derivative of $-\log(z)$
+$-\log(z)$, where $z = a_i^Tx - b_i$. The Hessian is the generalized second derivative, 
+and the second derivative of $-\log(z)$
 is $\frac{1}{z^2}$. The closer $z$ is to zero (i.e., the closer $x$ is to the boundary), 
 the larger the norm. 
 
@@ -702,7 +703,7 @@ the larger the norm.
         not too extreme. If the point $y$ is closer to the boundary than $x_0$ is 
         (the ratio of volumes is greater than 1), we prefer this, so we move there with probability $1$. 
         If $x_0$ is closer to the boundary than $y$ (ratio smaller than 1), then
-        we accept $y$ depending on the ellipsoids' volumes.  % maybe add this as footnote
+        we accept $y$ depending on the ellipsoids' volumes.  
         \footnote{We need not worry about the accepted point $y$
         not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
         will be fully contained in $K$ (see \cite{kannan} section 2.1.4)}}
@@ -718,7 +719,7 @@ the larger the norm.
 \subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin3.png}
 \label{fig:subfigure2}}
-\quad % construct Dikin ellipsoid -- done
+\quad 
 \subfigure[ ]{%
 \includegraphics[width = 1.95in, height = 1.5in]{img/exp_dikin41.png}
 \label{fig:subfigure3}}
@@ -742,49 +743,65 @@ the larger the norm.
          (e) Once we've successfully accepted $y$, we set $y$ as our new point, $x_1$.  
          (f) The algorithm is repeated to sample many points.} 
          
-\label{fig:figure}
+\label{fig:figuredikin}
 \end{figure}
 
 \newpage
 
-See Figure~\ref{fig:figure}. Dikin mixes much faster than hit-and-run does, 
+See Figure~\ref{fig:figuredikin}. Dikin mixes much faster than hit-and-run does, 
 especially in higher dimensions. This is because 
 the mixing of Dikin is independent of the geometry of polytope $K$, whereas hit-and-run
 mixes slower in ``skinny'' regions of $K$ (\cite{kannan}).
 Dikin's quick mixing comes at the cost of non-uniform sampling, as it generates a 
 ``nearly uniform'' sample. Because the log-barrier function and Hessian prevent the Dikin
 walk from reaching points that are very close to the boundary of $K$, the resulting sample is concentrated
-in regions that are away from the boundary. 
-
-%% The previous paragaph should end with, See Figure~/ref{blah} for an illustration. 
+in regions that are away from the boundary. See Figure~\ref{fig:2dsimplex} for an illustration.
 
 %% The below plots should be: 
-%% side-by-side
-%% With a better x-axis labels
-%% With a single title covering both plots, probably something like: "Two Sampling Methods"
-%% With titles covering each sub-plot, probably mentioning the specific algorithm
-%% "2D-simplex" is a poor and confusing phrase to include in a title.
-%% And the below text, with more detail, should go into the figure caption for the new figure,
-%% explaining exactly where the points from and what they mean. 
+%% side-by-side -- done 
+%% With a better x-axis labels -- done 
+%% With a single title covering both plots, probably something like: "Two Sampling Methods" -- take care of in caption
+%% With titles covering each sub-plot, probably mentioning the specific algorithm -- done
+%% "2D-simplex" is a poor and confusing phrase to include in a title. -- done
+%% And the below text, with more detail, should go into the figure caption for the new figure, -- done
+%% explaining exactly where the points come from and what they mean. -- done
 
-We sample from the $2$D-simplex, which is a 
+In Figure~\ref{fig:2dsimplex}, the points are sampled from the $2$D-simplex, which is a 
 line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see in the histograms, 
 hit-and-run samples uniformly across the line segment, with 
 values uniformly distributed amongst [$0,1$]. On the other hand, Dikin concentrates in 
 sampling from regions far away from the edges. 
 
-<<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE, echo = FALSE, message=FALSE, fig.show='hold'>>=
-library(walkr)
-A <- matrix(1, ncol = 2)
-b <- 1 
-set.seed(314)
-sample_har <- walkr(A = A, b = b, points = 10000, method = "hit-and-run")
-sample_dikin <- walkr(A = A, b = b, points = 10000, method = "dikin")
+\begin{figure}[ht]
+\centering
+\subfigure[Hit-and-run samples uniformly]{%
+\includegraphics[width = 2.5in, height = 2.5in]{img/harhist.png}
+\label{fig:subfigure1}}
+\subfigure[Dikin concentrates in regions far away from edges]{%
+\includegraphics[width = 2.5in, height = 2.5in]{img/dikinhist.png}
+\label{fig:subfigure2}}
+\caption{Two sampling methods: hit-and-run and Dikin walk. Here we sample from 
+         the 2D-simplex, which is defined as $x_1+x_2=1$ and $x_1, x_2 \geq 0$.
+         The 2D-simplex is a line-segment. From the histograms, we can see that 
+         hit-and-run samples uniformly, as the value of $x_1$ is uniformly distributed
+         across $[0,1]$. On the other hand, Dikin walk concentrates on regions 
+         away from the boundaries, thereby the non-uniformity.} 
+         
+\label{fig:2dsimplex}
+\end{figure}
 
-qplot(sample_har[1,], xlab = "x1", main = "Hit-and-run: 2D-simplex")
-qplot(sample_dikin[1,], xlab = "x1", main = "Dikin walk: 2D-simplex")
 
-@
+%<<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE, echo = FALSE, message=FALSE, fig.show='hold'>>=
+% library(walkr)
+% A <- matrix(1, ncol = 2)
+% b <- 1 
+% set.seed(314)
+% sample_har <- walkr(A = A, b = b, points = 10000, method = "hit-and-run")
+% sample_dikin <- walkr(A = A, b = b, points = 10000, method = "dikin")
+% 
+% qplot(sample_har[1,], xlab = "Value of the first parameter, x1", main = "Hit-and-run")
+% qplot(sample_dikin[1,], xlab = "Value of the first parameter, x1", main = "Dikin walk")
+%@
 
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
 to implement Dikin walk because of their support for faster matrix multiplication, inversion, and 
@@ -799,7 +816,7 @@ To improve the mixing of a sample, there are two main techniques: thinning and b
 First, to ``thin,'' we only save each thin\textsuperscript{th} sample. Second, the ``burn-in'' is 
 the portion of the total sample that is discarded. This is an effective technique when the starting 
 point is in a corner or narrow region in the polytope. We must give time for the random walk
-to escape the corner and reach other parts of the sample space. 
+to escape the corner and reach other parts of the sample space. \cite{stanmanual}
 
 To quantitatively examine the mixing, we use the Gelman-Rubin diagnostic on multiple chains 
 from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain and the variance between the chains. If the variance between the chains is 
