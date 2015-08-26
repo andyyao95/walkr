@@ -271,7 +271,7 @@ We call this ``$\alpha$-space''.
 \subsection{Step 3: Include the simplex inequalities}
 
 We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be 
-greater equal to $0$: 
+greater than or equal to $0$: 
 
 $$x = v_{particular} + \alpha_1v_1 + \alpha_2v_2 + \alpha_3v_3 + ... + \alpha_{N-(M+1)}v_{N-(M+1)}
 \quad \geq
