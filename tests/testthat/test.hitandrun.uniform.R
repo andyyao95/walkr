@@ -34,20 +34,23 @@ test_that("Testing hit-and-run uniformity", {
   A <- matrix(1, ncol = 5)
   b <- 1 
   
-  z <- walkr(A = A, b = b, points = 5000, method = "hit-and-run")
+  ## the thinning is needed
   
-  ## should expect that the sum of x_1, x_2 be roughly the same as x_4, x_5
+  z <- walkr(A = A, b = b, points = 10000, thin = 100, method = "hit-and-run")
   
-  sum1 <- sum(z[1,]) + sum(z[2,])
-  sum2 <- sum(z[4,]) + sum(z[5,])
+  ## should expect that the mean of x_1, x_2 be roughly the same as the mean of x_4, x_5
+  
+  s1 <- z[1,] + z[2,]
+  s2 <- z[4,] + z[5,]
+  standard.dev <- sd(s1-s2)
   
   ## expected value of their difference is zero
   ## normal approximation applicable here
   ## 99% confidence interval
   
-  conf_interval.99 <- qnorm(p = c(0.01, 0.99), mean = 0, sd = sqrt(5000*0.5*0.5))
+  conf_interval.99 <- qnorm(p = c(0.01, 0.99), mean = 0, sd = standard.dev / sqrt(10000))
   
-  expect_true(sum1-sum2 >= conf_interval.99[1])
-  expect_true(sum1-sum2 <= conf_interval.99[2])
+  expect_true(mean(s1-s2) >= conf_interval.99[1])
+  expect_true(mean(s1-s2) <= conf_interval.99[2])
    
 })

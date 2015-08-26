@@ -809,16 +809,15 @@ determinant calculation. This improvement in
 speed is especially important when sampling from $A$ with many columns, corresponding to polytopes
 in higher dimensions. 
 
-%% This paragraph could be improved, citing the Stan manual and giving a sentence or two of 
-%% background. Specific parameter values for walkr should not be mentioned.
+%% improve this paragraph, and cite shinystan -- done
 
 To improve the mixing of a sample, there are two main techniques: thinning and burn-in. 
 First, to ``thin,'' we only save each thin\textsuperscript{th} sample. Second, the ``burn-in'' is 
 the portion of the total sample that is discarded. This is an effective technique when the starting 
 point is in a corner or narrow region in the polytope. We must give time for the random walk
-to escape the corner and reach other parts of the sample space. The Stan Manual (\cite{stanmanual})
-provides a detailed explaination of techniques to improve MCMC sampling. Stan is a probabilistic 
-programming language that implements Bayesian inference models. 
+to escape the corner and reach other parts of the sample space. For a detailed explaination on techniques
+to improve MCMC sampling, see the manual of Stan (\cite{stanmanual}), a probabilistic programming language that 
+implements Bayesian inference models.
 
 To quantitatively examine the mixing, we use the Gelman-Rubin diagnostic on multiple chains 
 from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain and the variance between the chains. If the variance between the chains is 
@@ -906,7 +905,7 @@ Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MC
 random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
 from \pkg{shinystan}. Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
 from \code{walkr} must be \code{"list"}, because the individual chains must be separated out. 
-Figure~\ref{fig:shinystan} shows a screenshot of a traceplot from the \pkg{shinystan} interface.
+Figure~\ref{fig:shinystan} shows a traceplot from the \pkg{shinystan} interface.
 
 \begin{figure}[H]
 \centering
@@ -918,7 +917,7 @@ Figure~\ref{fig:shinystan} shows a screenshot of a traceplot from the \pkg{shiny
 \label{fig:shinystan} 
 \end{figure}
 
-%include screenshot? Or at least a reference for shinystan.
+%include screenshot? Or at least a reference for shinystan. -- done
 
 \section{Conclusion}
 
