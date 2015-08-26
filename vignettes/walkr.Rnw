@@ -768,9 +768,9 @@ in regions that are away from the boundary. See Figure~\ref{fig:2dsimplex} for a
 %% explaining exactly where the points come from and what they mean. -- done
 
 In Figure~\ref{fig:2dsimplex}, the points are sampled from the $2$D-simplex, which is a 
-line segment ($x_1+x_2=1$, $x_i \geq 0$). As we can see in the histograms, 
+line segment ($x_1+x_2=1$, $x_i \geq 0$). As in the histograms, 
 hit-and-run samples uniformly across the line segment, with 
-values uniformly distributed amongst [$0,1$]. On the other hand, Dikin concentrates in 
+values uniformly distributed in [$0,1$]. On the other hand, Dikin concentrates in 
 sampling from regions far away from the edges. 
 
 \begin{figure}[ht]
