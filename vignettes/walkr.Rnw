@@ -188,7 +188,7 @@ in order to make the connections to existing litearture more clear.
 Recall that our sample space is the intersection of the complete solution to $Ax=b$ and 
 the $N$-simplex, which consists of three components: first, the matrix equation 
 $Ax=b$, second, the simplex constraint $x_1+x_2+...+x_N=1$ and, third, the non-negative 
-inequalities, $x_i \geq 0$. In this section, we present combine all three parts 
+inequalities, $x_i \geq 0$. In this section, we combine all three parts 
 into one single inequality of the form $Ax \leq b$. 
 
 \subsection{Step 1: combining the simplex equality with the original $Ax=b$}
@@ -237,7 +237,7 @@ spanned by $N-(M+1)$ basis vectors, because that is the dimension of the sample 
 (our polytope). Any vector formed by 
 a linear combination of the basis vectors will still be in the null space. 
 
-Once we have the null space, we add on a particular solution. Think of the null space as 
+Once we have the null space, we add on a particular solution. Think of the null space
 as constructing a coordinate
 system for $A'x=0$' and of the particular solution as an offset from the origin 
 to fit $A'x = b'$. See \cite{leon} for a review of the specifics of finding null 
@@ -944,7 +944,7 @@ of different chains is one way of examining the quality of the samples.
 Dikin mixes much faster than hit-and-run does, 
 especially in higher dimensions.
 
-The major problem with our current implementaton is that run-time becomes unwiedly 
+The major problem with our current implementaton is that run-time becomes unwieldy 
 as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ (below $50$) 
 hit-and-run and Dikin can both generate a well-mixed sample within a few minutes. However,
 for dimensions near $500$, it takes Dikin a few hours to generate a good sample,
