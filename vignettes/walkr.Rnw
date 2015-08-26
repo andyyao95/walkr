@@ -923,20 +923,20 @@ Figure~\ref{fig:shinystan} shows a traceplot from the \pkg{shinystan} interface.
 
 The \pkg{walkr} package samples from the intersection of two spaces. 
 The first space is all possible vectors $x$ that satisfy matrix equation $Ax=b$
-($A$ is $M \times N$, with $M < N$), which describes $M$ unbounded hyperplanes
+($A$ is $M \times N$, with $M < N$), which defines $M$ unbounded hyperplanes
 in $\mathbb{R}^N$. The second space is the $N$-simplex, defined as 
-$x_1 + x_2 + x_3 + ... + x_N = 1$ and $x_i \geq 0$. This intersection of the 
+$x_1 + x_2 + x_3 + ... + x_N = 1$ and $x_i \geq 0$. The intersection of these 
 two spaces is a non-negative convex polytope. 
 
-\pkg{walkr} samples from a non-negative convex polytope using Monte-Carlo
-Markov Chain (MCMC) algorithms. The two algorithms implemented \
-are hit-and-run and Dikin walk. Hit-and-run
-guarantees an uniform sample asymptotically, but mixes more slowly with 
-increasing columns of $A$. Dikin walk samples ``nearly uniformly'', avoiding 
-points near edges of the polytope. 
+\pkg{walkr} samples from a non-negative convex polytope using two Monte-Carlo
+Markov Chain (MCMC) algorithms: hit-and-run and Dikin walk. 
+Hit-and-run
+guarantees a uniform sample asymptotically, but mixes more slowly. 
+Dikin walk samples ``nearly uniformly'', avoiding 
+points near the boundary of the polytope. 
 
 MCMC methods begin at a starting point
-within the polytope and ``wander'' through the polytope.
+within the polytope and ``wander'' through the solution space.
 Every MCMC step depends only on the current location. 
 To examine the quality of the samples, we create multiple chains, each from a
 different starting point. The ``mixing''
