@@ -697,16 +697,17 @@ the larger the norm.
         {\text{volume of } D_y}$. 
         Recall that the volume of a Dikin ellipsoid reflects how close to the boundary its center is. 
         The closer its center is to the boundary, the smaller its volume. 
-        This transition probability is crucial because it prevents algorithm from concentrating 
+        This transition probability prevents Dikin walk from concentrating 
         in the ``central region'' of the polytope. Because we already 
-        know that $x_0 \in D_{y}$, the step from $x_0$ to $y$ is within the allowed threshold, or in other words,
-        not too extreme. If the point $y$ is closer to the boundary than $x_0$ is 
-        (the ratio of volumes is greater than 1), we prefer this, so we move there with probability $1$. 
-        If $x_0$ is closer to the boundary than $y$ (ratio smaller than 1), then
-        we accept $y$ depending on the ellipsoids' volumes.  
+        know that $x_0 \in D_{y}$, the step is 
+        not too extreme. If the ratio of the volumes is greater than $1$, 
+        that means the potential point $y$ is closer to the boundary than $x_0$ is. 
+        In this case, we accept $y$ with probability $1$. If the ratio is smaller 
+        than $1$, then $x_0$ is closer to the boundary than $y$ is. In this case,
+        we accept $y$ depending on the ratio of their ellipsoids' volumes
         \footnote{We need not worry about the accepted point $y$
         not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
-        will be fully contained in $K$ (see \cite{kannan} section 2.1.4)}}
+        will be fully contained in $K$ (see \cite{kannan} section 2.1.4)}.}
   \item{Repeat until obtained number of desired points.} 
 
 \end{enumerate}
@@ -791,7 +792,6 @@ sampling from regions far away from the edges.
 \end{figure}
 
 
-%<<example0, eval = T, fig.width = 3, fig.height = 3, cache = TRUE, echo = FALSE, message=FALSE, fig.show='hold'>>=
 % library(walkr)
 % A <- matrix(1, ncol = 2)
 % b <- 1 
@@ -801,7 +801,6 @@ sampling from regions far away from the edges.
 % 
 % qplot(sample_har[1,], xlab = "Value of the first parameter, x1", main = "Hit-and-run")
 % qplot(sample_dikin[1,], xlab = "Value of the first parameter, x1", main = "Dikin walk")
-%@
 
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
 to implement Dikin walk because of their support for faster matrix multiplication, inversion, and 
@@ -858,6 +857,7 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
 Consider the 3D simplex: 
 
 <<example1, eval = TRUE, cache = TRUE>>=
+library(walkr)
 A <- matrix(1, ncol = 3)
 b <- 1
 set.seed(314)
@@ -903,7 +903,7 @@ to pass satisfy $\hat{R}$ than hit-and-run does.
 
 Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
 random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
-from \pkg{shinystan}. Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
+from \pkg{shinystan} (\cite{shinystan}). Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
 from \code{walkr} must be \code{"list"}, because the individual chains must be separated out. 
 Figure~\ref{fig:shinystan} shows a traceplot from the \pkg{shinystan} interface.
 
