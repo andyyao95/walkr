@@ -182,7 +182,7 @@ This is a total abuse of notation. The $A$ in $Ax=b$ is very different from the 
 $Ax \leq b$. This new $A$ is $N$ by $N-(M+1)$. $x$ and $b$ are also different.
 The mathematical literature for linear equations uses $Ax = b$, and the litearture
 on convex polytopes uses $Ax \leq b$, so it seemed best to use the same notation in both places 
-in order to make the connections to existing litearture more clear.
+in order to make connections to the existing literature clearer.
 }. 
 
 Recall that our sample space is the intersection of the complete solution to $Ax=b$ and 
@@ -231,13 +231,13 @@ $$
 
 \subsection{Step 2: Solve for the null space and transform to $\alpha$-space}
 
-Find $x$'s that satisfy $A'x = b'$. First, solve for the null space of $A'$, 
+Find $x$ that satisfies $A'x = b'$. First, solve for the null space of $A'$, 
 defined as all $x$ that satisfy $A'x=0$. The null space is 
 spanned by $N-(M+1)$ basis vectors, because that is the dimension of the sample space
 (our polytope). Any vector formed by 
 a linear combination of the basis vectors will still be in the null space. 
 
-Once we have the null space, we add on a particular solution. Think of the null space
+Second, find a particular solution. Think of the null space
 as constructing a coordinate
 system for $A'x=0$' and of the particular solution as an offset from the origin 
 to fit $A'x = b'$. See \cite{leon} for a review of the specifics of finding null 
