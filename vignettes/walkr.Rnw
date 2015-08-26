@@ -79,8 +79,8 @@ of multiple random walks from different starting points, each of which is an ind
 A key aspect of running multiple chains from different starting points is to examine the 
 ``mixing'' of the sample. Good mixing means that the different chains 
 (from different starting points) have overlapped with each 
-other, hinting that they have thoroughly moved around the sample space. 
-While good mixing does not guarantee a thorough sampling of the space, poor mixing means 
+other, suggesting that they have thoroughly moved around the sample space. 
+While good mixing does not guarantee a correct sample of the polytope, poor mixing means 
 poor sampling. \pkg{walkr} examines the quality of MCMC samples.
 
 \pkg{walkr} includes two MCMC algorithms: hit-and-run and Dikin walk.
@@ -191,7 +191,7 @@ $Ax=b$, second, the simplex constraint $x_1+x_2+...+x_N=1$ and, third, the non-n
 inequalities, $x_i \geq 0$. In this section, we combine all three parts 
 into one single inequality of the form $Ax \leq b$. 
 
-\subsection{Step 1: combining the simplex equality with the original $Ax=b$}
+\subsection{Step 1: Combine the simplex equality with the original $Ax=b$}
 
 Recall that $A$ in $Ax=b$ is $M \times N$: 
 
@@ -229,7 +229,7 @@ b' =
   \end{bmatrix}
 $$
 
-\subsection{Step 2: solving for the null space -- transforming to $\alpha$-space}
+\subsection{Step 2: Solve for the null space and transform to $\alpha$-space}
 
 Find $x$'s that satisfy $A'x = b'$. First, solve for the null space of $A'$, 
 defined as all $x$ that satisfy $A'x=0$. The null space is 
@@ -268,7 +268,7 @@ $$
 This space is now described in terms of $\alpha_i$'s, the coefficients of the basis vectors. 
 We call this ``$\alpha$-space''.
 
-\subsection{Step 3: including the simplex inequalities}
+\subsection{Step 3: Include the simplex inequalities}
 
 We add the inequality constraints from the $N$-simplex, requiring every element of vector $x$ to be 
 greater equal to $0$: 
