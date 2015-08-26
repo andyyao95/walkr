@@ -757,6 +757,9 @@ Dikin's quick mixing comes at the cost of non-uniform sampling, as it generates 
 walk from reaching points that are very close to the boundary of $K$, the resulting sample is concentrated
 in regions that are away from the boundary. See Figure~\ref{fig:2dsimplex} for an illustration.
 
+%% This ought to be generated on the fly. Isn't the sampling in such a simple case
+%% instantaneous? And then the figure (with two panels --- learn about par(mfrow)).
+
 \begin{figure}[ht]
 \centering
 \subfigure[Hit-and-run samples uniformly]{
@@ -765,26 +768,21 @@ in regions that are away from the boundary. See Figure~\ref{fig:2dsimplex} for a
 \subfigure[Dikin concentrates in regions far away from edges]{%
 \includegraphics[width = 2.5in, height = 2.5in]{img/dikinhist.png}
 \label{fig:subfigure2}}
-\caption{Two sampling methods: hit-and-run and Dikin walk. Here we sample from 
-         the 2D-simplex, which is defined as $x_1+x_2=1$ and $x_1, x_2 \geq 0$.
-         The 2D-simplex is a line-segment. From the histograms, we can see that 
-         hit-and-run samples uniformly, as the value of $x_1$ is uniformly distributed
-         across $[0,1]$. On the other hand, Dikin walk concentrates on regions 
-         away from the boundaries, thereby the non-uniformity.} 
+\caption{Consider the 2D-simplex, defined as $x_1+x_2=1$ and $x_1, x_2 \geq 0$.
+         The 2D-simplex is a line-segment. The left panel shows . . .} 
+         
+%% This caption should be a full paragraph. Tells us what you did. Like how many points are 
+%% sampled. Explain that you are just showing a cross-section of x_1. 
+
+%% Might even be handy to have four panels. The two panels you have and then, below that, two panels
+%% which also show x_1, but this time sampled from the 10D-simplex. Wouldn't that be interesting?
+%% This hit-and-run should look like, what? And then how about Dikin? Would the comparison between
+%% the 2D and 10D case help to highlight what ``nearly uniform'' means? Maybe have 3 rows, showing 2D, 5D
+%% and then 10D so we can see the progression. I bet (guess?) that the portion not sampled in Dikin
+%% shrinks.
          
 \label{fig:2dsimplex}
 \end{figure}
-
-
-% library(walkr)
-% A <- matrix(1, ncol = 2)
-% b <- 1 
-% set.seed(314)
-% sample_har <- walkr(A = A, b = b, points = 10000, method = "hit-and-run")
-% sample_dikin <- walkr(A = A, b = b, points = 10000, method = "dikin")
-% 
-% qplot(sample_har[1,], xlab = "Value of the first parameter, x1", main = "Hit-and-run")
-% qplot(sample_dikin[1,], xlab = "Value of the first parameter, x1", main = "Dikin walk")
 
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
 to implement Dikin walk because of their support for faster matrix multiplication, inversion, and 
@@ -792,15 +790,12 @@ determinant calculation. This improvement in
 speed is especially important when sampling from $A$ with many columns, corresponding to polytopes
 in higher dimensions. 
 
-%% improve this paragraph, and cite shinystan -- done
-
 To improve the mixing of a sample, there are two main techniques: thinning and burn-in. 
 First, to ``thin,'' we only save each thin\textsuperscript{th} sample. Second, the ``burn-in'' is 
 the portion of the total sample that is discarded. This is an effective technique when the starting 
 point is in a corner or narrow region in the polytope. We must give time for the random walk
-to escape the corner and reach other parts of the sample space. For a detailed explaination on techniques
-to improve MCMC sampling, see the manual of Stan (\cite{stanmanual}), a probabilistic programming language that 
-implements Bayesian inference models.
+to escape the corner and reach other parts of the sample space. For a discussion about techniques
+to improve MCMC sampling, see \cite{stanmanual}.
 
 To quantitatively examine the mixing, we use the Gelman-Rubin diagnostic on multiple chains 
 from diverse starting points (\cite{gelmanrubin}). The general idea is that we measure the variance within each chain and the variance between the chains. If the variance between the chains is 
@@ -883,7 +878,7 @@ Dikin walk only required \code{thin} to be \code{10}. Running hit-and-run
 with a \code{thin} of \code{10}, \code{100}, or even \code{250} would have produced
 a warning. This is evidence of Dikin mixing faster than hit-and-run. For higher
 dimensions of $A$, Dikin requires fewer points (or equivalently, a lower value for \code{thin}) 
-to pass satisfy $\hat{R}$ than hit-and-run does. 
+to satisfy $\hat{R}$ than hit-and-run does. 
 
 Now, \code{sampled\_points} contain 1000 sampled points. We can visualize the MCMC 
 random walks by calling the \code{explore\_walkr} function, which launches a \code{shiny} interface 
@@ -895,9 +890,10 @@ Figure~\ref{fig:shinystan} shows a traceplot from the \pkg{shinystan} interface.
 \centering
 \includegraphics[width = 5.5in, height = 2.5in]{img/traceplot.png}
 \caption[caption]{A screenshot from the \pkg{shinystan} interface called from \code{explore\_walkr}.
-                  The traceplot is a plot of the value of different chains against the iterations.
+                  The traceplot is a plot of the value of different chains against the iteration 
+                  number.
                   It allows us to visualize the mixing of different chains. This particular
-                  sample came from the \code{sampled\_points} using Dikin walk.}
+                  sample comes from the \code{sampled\_points} using the Dikin walk.}
 \label{fig:shinystan} 
 \end{figure}
 
