@@ -549,8 +549,8 @@ $$\text{minimizes} \quad |Cx-d|^2$$
 $$\text{subject to} \quad Ax \leq b, \quad \text{this is our polytope $K$}$$
 
 We randomly generate matrix $C$ and vector $d$. Solving this system generates an $x$ 
-which will usually falls on the boundary of polytope $K$. We repeat this process 30 times 
-and take an average of those points, which generates one starting point $x_0$. 
+which will usually fall on the boundary of polytope $K$. We repeat this process 30 times 
+and take an average of those points, thereby generating one starting point $x_0$. 
 
 
 \section{Hit-and-run} 
@@ -633,7 +633,7 @@ of $A$ in $Ax=b$, the original problem statement.
 $$\phi(x) = \sum {- \log(b_i - a_i^Tx)}$$
 
 The log-barrier function of $Ax \leq b$ measures how extreme or ``close-to-the-boundary'' a point 
-$x \in K$ is, because the negative $\log$ function tends to infinity as its argument tends to zero.
+$x \in K$ is, because the negative $\log$ tends to infinity as its argument goes to zero.
 Since $Ax \leq b$, for every row in $Ax \leq b$, $b_i > a_i^Tx$. Therefore, 
 as $x$ approaches the boundary of $K$ (as $a_i^Tx$ approaches $b_i$), the value of $\phi$
 approaches infinity. Hence, this is a barrier function. 
@@ -683,8 +683,7 @@ the larger the norm.
   \item{Begin with a point $x_0 \in K$. This starting point must be in the polytope and 
         not on its edge. If $x_0$ is on the boundary, then $a_ix_0=b_i$ 
         for some $i$,
-        and consequently, the log-barrier and its Hessian would be infinity. 
-        In other words, $x_0$ must be in the interior of $K$.} 
+        and consequently, the log-barrier and its Hessian would be infinity.} 
   \item{Construct $D_{x_0}$, the Dikin ellipsoid centered at $x_0$.}                  
   \item{Pick a random point $y$ from $D_{x_0}$.}
   \item{Construct $D_{y}$, the Dikin ellipsoid centered at $y$.}
@@ -697,7 +696,7 @@ the larger the norm.
         {\text{volume of } D_y}$. 
         Recall that the volume of a Dikin ellipsoid reflects how close to the boundary its center is. 
         The closer its center is to the boundary, the smaller its volume. 
-        This transition probability prevents Dikin walk from concentrating 
+        This transition probability prevents the Dikin walk from concentrating 
         in the ``central region'' of the polytope. Because we already 
         know that $x_0 \in D_{y}$, the step is 
         not too extreme. If the ratio of the volumes is greater than $1$, 
@@ -705,8 +704,8 @@ the larger the norm.
         In this case, we accept $y$ with probability $1$. If the ratio is smaller 
         than $1$, then $x_0$ is closer to the boundary than $y$ is. In this case,
         we accept $y$ depending on the ratio of their ellipsoids' volumes
-        \footnote{We need not worry about the accepted point $y$
-        not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
+        \footnote{We do not need to worry that the accepted point $y$
+        is not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
         will be fully contained in $K$ (see \cite{kannan} section 2.1.4)}.}
   \item{Repeat until obtained number of desired points.} 
 
@@ -758,24 +757,9 @@ Dikin's quick mixing comes at the cost of non-uniform sampling, as it generates 
 walk from reaching points that are very close to the boundary of $K$, the resulting sample is concentrated
 in regions that are away from the boundary. See Figure~\ref{fig:2dsimplex} for an illustration.
 
-%% The below plots should be: 
-%% side-by-side -- done 
-%% With a better x-axis labels -- done 
-%% With a single title covering both plots, probably something like: "Two Sampling Methods" -- take care of in caption
-%% With titles covering each sub-plot, probably mentioning the specific algorithm -- done
-%% "2D-simplex" is a poor and confusing phrase to include in a title. -- done
-%% And the below text, with more detail, should go into the figure caption for the new figure, -- done
-%% explaining exactly where the points come from and what they mean. -- done
-
-In Figure~\ref{fig:2dsimplex}, the points are sampled from the $2$D-simplex, which is a 
-line segment ($x_1+x_2=1$, $x_i \geq 0$). As in the histograms, 
-hit-and-run samples uniformly across the line segment, with 
-values uniformly distributed in [$0,1$]. On the other hand, Dikin concentrates in 
-sampling from regions far away from the edges. 
-
 \begin{figure}[ht]
 \centering
-\subfigure[Hit-and-run samples uniformly]{%
+\subfigure[Hit-and-run samples uniformly]{
 \includegraphics[width = 2.5in, height = 2.5in]{img/harhist.png}
 \label{fig:subfigure1}}
 \subfigure[Dikin concentrates in regions far away from edges]{%
@@ -917,7 +901,6 @@ Figure~\ref{fig:shinystan} shows a traceplot from the \pkg{shinystan} interface.
 \label{fig:shinystan} 
 \end{figure}
 
-%include screenshot? Or at least a reference for shinystan. -- done
 
 \section{Conclusion}
 
