@@ -8,11 +8,11 @@ quality.
 
 # Getting Started
 
-* Install from CRAN:
+* Install from CRAN(released version):
 
   `install.packages("walkr")`
   
-* Install from GitHub:  
+* Install from GitHub (development version):  
 
   `devtools::install_github("andyyao95/walkr")`  
 
