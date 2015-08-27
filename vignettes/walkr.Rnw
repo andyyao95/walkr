@@ -44,8 +44,8 @@ where $A$ is $M \times N$, $x$ is $N \times 1$, and $b$ is $M \times 1$.
 The problem is interesting when there are more rows than columns  ($M < N$).
 In general, if $M = N$, then there is a single solution, and if $M > N$, then there are no solutions.
 If the rows of $A$ are linearly dependent, rows can be eliminated until they are linearly 
-independent without changing the solution space. Assume that the rows of $A$ are 
-linearly independent going forward. 
+independent without changing the solution space. We assume that the rows of $A$ are 
+linearly independent. 
 
 Geometrically, every row in $Ax=b$ describes a hyperplane in $\mathbb{R}^N$. $Ax=b$ represents
 the intersection of $M$ unbounded hyperplanes. We bound the sample space by also 
@@ -68,7 +68,7 @@ is a two dimensional equilateral triangle in three dimensional space (Figure~\re
 \end{figure} 
 
 The intersection of the complete solution to $Ax=b$ and the $N$-simplex is a non-negative
-convex polytope. Sampling from such an object is a difficult problem, and the common approach is to 
+convex polytope. Sampling from such an object is a difficult problem, and the most common approach is to 
 run Monte-Carlo Markov Chains (MCMC) (\cite{ravi}). MCMC methods begin at a starting point in
 the solution space and then randomly ``wander'' through
 the space according to an algorithm. An important feature of MCMC is that every step
@@ -778,7 +778,7 @@ in regions that are away from the boundary. See Figure~\ref{fig:example0} for an
 % again concentrates in regions away from the edges."
 
 
-<<example0, eval = TRUE, echo = FALSE, fig.cap = "We use hit-and-run and Dikin walk to sample from the 2D, 5D, and 10D-simplex. We show histograms for the first parameter, $x_1$, because the distribution of all other parameters will be the same (there is nothing special about $x_1$). Every histogram contains 10000 sampled points. The 2D-simplex is the line segment $x_1+x_2=1$, $x_i$ greater equal to $0$. For the 2D-simplex, hit-and-run samples uniformly across [0,1], while Dikin walk concentrates in regions away from the edges. To understand the distribution of $x_1$ in higher dimensions (5D and 10D-simplex), consider the 3D-simplex analogy. The 3D-simplex (Figure 1) is a triangle in three dimensional space. The distribution for $x_1$ is obtained by projecting points on this triangle onto the $x_1$ axis. As the sample is drawn uniformly from the 3D-simplex, there are more points near $0$ than near $1$. Therefore, we see this downward sloping distribution. In the 5D and 10D-simplex cases, we see that hit-and-run samples uniformly, while Dikin again concentrates in regions away from the edges.", message= FALSE, cache = TRUE, fig.show = 'hold', out.width = '1\\linewidth', out.height = '12cm', fig.align = 'center'>>=
+<<example0, eval = TRUE, echo = FALSE, fig.cap = "We use hit-and-run and Dikin walk to sample from the 2D, 5D, and 10D-simplex. We show histograms for the first parameter, $x_1$, because the distribution of all other parameters will be the same (there is nothing special about $x_1$). Every histogram contains 10,000 sampled points. The 2D-simplex is the line segment $x_1+x_2=1$, $x_i$ greater than or equal to $0$. For the 2D-simplex, hit-and-run samples uniformly across [0,1], while Dikin walk concentrates in regions away from the edges. To understand the distribution of $x_1$ in higher dimensions (5D and 10D-simplex), consider the 3D-simplex analogy. The 3D-simplex (Figure 1) is a triangle in three dimensional space. The distribution for $x_1$ is obtained by projecting points on this triangle onto the $x_1$ axis. As the sample is drawn uniformly from the 3D-simplex, there are more points near $0$ than near $1$. Therefore, we see this downward sloping distribution. In the 5D and 10D-simplex cases, we see that hit-and-run samples uniformly, while Dikin again concentrates in regions away from the edges.", message= FALSE, cache = TRUE, fig.show = 'hold', out.width = '1\\linewidth', out.height = '12cm', fig.align = 'center'>>=
 
 library(walkr)
 
@@ -853,17 +853,6 @@ m6 <- m6+ geom_histogram(binwidth = 0.02, colour = "darkgreen", fill = "black") 
 grid.arrange(m1,m2,m3,m4,m5,m6, ncol = 2)
 
 @
-
-
-%% This caption should be a full paragraph. Tells us what you did. Like how many points are 
-%% sampled. Explain that you are just showing a cross-section of x_1. -- done
-
-%% Might even be handy to have four panels. The two panels you have and then, below that, two panels
-%% which also show x_1, but this time sampled from the 10D-simplex. Wouldn't that be interesting?
-%% This hit-and-run should look like, what? And then how about Dikin? Would the comparison between
-%% the 2D and 10D case help to highlight what ``nearly uniform'' means? Maybe have 3 rows, showing 2D, 5D
-%% and then 10D so we can see the progression. I bet (guess?) that the portion not sampled in Dikin
-%% shrinks. -- done
          
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen}) 
 to implement Dikin walk because of their support for faster matrix multiplication, inversion, and 
@@ -987,7 +976,7 @@ in $\mathbb{R}^N$. The second space is the $N$-simplex, defined as
 $x_1 + x_2 + x_3 + ... + x_N = 1$ and $x_i \geq 0$. The intersection of these 
 two spaces is a non-negative convex polytope. 
 
-\pkg{walkr} samples from a non-negative convex polytope using two Monte-Carlo
+\pkg{walkr} samples from this polytope using two Monte-Carlo
 Markov Chain (MCMC) algorithms: hit-and-run and Dikin walk. 
 Hit-and-run
 guarantees a uniform sample asymptotically, but mixes more slowly. 
@@ -1003,7 +992,7 @@ of different chains is one way of examining the quality of the samples.
 Dikin mixes much faster than hit-and-run does, 
 especially in higher dimensions.
 
-The major problem with our current implementation is that run-time becomes unwieldy 
+The major problem with our current implementation is that the run-time becomes unwieldy 
 as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ (below $50$) 
 hit-and-run and Dikin can both generate a well-mixed sample within a few minutes. However,
 for dimensions near $500$, it takes Dikin a few hours to generate a good sample,
