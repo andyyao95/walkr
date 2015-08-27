@@ -21,7 +21,8 @@ quality.
   library(walkr)  
   A <- matrix(1, ncol = 3)  
   b <- 1    
-  sampled_points <- walkr(A = A, b = b, points = 1000, method = "dikin")   
+  sampled_points <- walkr(A = A, b = b, points = 1000, 
+                          method = "dikin", ret.format = "list")   
 ```
 # Visualizing the Sampled Points  
 
