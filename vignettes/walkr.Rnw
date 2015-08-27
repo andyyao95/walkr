@@ -84,7 +84,7 @@ While good mixing does not guarantee a correct sample of the polytope, poor mixi
 poor sampling. \pkg{walkr} examines the quality of MCMC samples.
 
 \pkg{walkr} includes two MCMC algorithms: hit-and-run and Dikin walk.
-Hit-and-run guarantees uniform sampling asympotically, but mixes more slowly
+Hit-and-run guarantees uniform sampling asymptotically, but mixes more slowly
 as the number of columns in $A$ increase (\cite{vempala}). Dikin walk generates a non-uniform
 sample --- favoring points away from the edges of the polytope --- but exhibits much faster mixing (\cite{kannan}). 
 
@@ -128,7 +128,7 @@ Figure~\ref{fig:3dcase} shows the intersection of the $3$D-simplex with $Ax=b$.
 Just as the $3$D-simplex is a $2$D surface, the $4$D-simplex 
 (i.e. $x_1+x_2+x_3+x_4=1$, $x_i \geq 0$) can be viewed as a $3$D object, as in Figure~\ref{fig:tetra1}. 
 Specifically, the $4$D-simplex is a tetradhedron when viewed from $3$D space, with 
-verticies $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.
+vertices $(1,0,0,0)$, $(0,1,0,0)$, $(0,0,1,0)$, and $(0,0,0,1)$.
 
 \begin{figure}[H]
 \centering
@@ -180,7 +180,7 @@ first re-express the sample space in the form $Ax \leq b$ (with different $A$, $
 \footnote{
 This is a total abuse of notation. The $A$ in $Ax=b$ is very different from the $A$ in
 $Ax \leq b$. This new $A$ is $N$ by $N-(M+1)$. $x$ and $b$ are also different.
-The mathematical literature for linear equations uses $Ax = b$, and the litearture
+The mathematical literature for linear equations uses $Ax = b$, and the literature 
 on convex polytopes uses $Ax \leq b$, so it seemed best to use the same notation in both places 
 in order to make connections to the existing literature clearer.
 }. 
@@ -411,7 +411,7 @@ v_{particular} + \alpha_1 v_1 + \alpha_2 v_2
 \end{bmatrix}
 $$
 
-Finally, we re-express the inequalities as $-V\alpha \leq v_{particular}$, which is of the form $Ax \leq b$
+Finally, we re-express the inequalities as $-V\alpha \leq v_{particular}$, which is of the form $Ax \leq b$.
 
 $$
 V = 
@@ -601,7 +601,7 @@ and take an average of those points, thereby generating one starting point $x_0$
 
 See Figure~\ref{fig:hitandrun}. \pkg{walkr} uses the \code{har} function from the \pkg{hitandrun} 
 package (\cite{hitandrun})
-to implement hit-and-run. The hit-and-run algorithm asymptotically generates an uniform
+to implement hit-and-run. The hit-and-run algorithm asymptotically generates a uniform
 sample in the convex polytope $K$. However, the mixing of hit-and-run becomes slower 
 with increasing dimensions in $K$. Slow mixing is observed when we run multiple chains 
 from different starting points. Instead of 
@@ -706,7 +706,7 @@ the larger the norm.
         we accept $y$ depending on the ratio of their ellipsoids' volumes
         \footnote{We do not need to worry that the accepted point $y$
         is not in $K$, because when we set $r=1$, any Dikin ellipsoid centered at $x_0 \in K$ ($x_0$ not on the boundary)
-        will be fully contained in $K$ (see \cite{kannan} section 2.1.4)}.}
+        will be fully contained in $K$ (see \cite{kannan} section 2.1.4).}.}
   \item{Repeat until obtained number of desired points.} 
 
 \end{enumerate}
@@ -736,7 +736,7 @@ the larger the norm.
 \caption{(a) The Dikin walk begins by constructing the Dikin ellipsoid at the starting point $x_0$. 
          This point cannot be on the boundary of the polytope, otherwise the log-barrier and 
          its Hessian would both be infinity. 
-         (b) An uniformly random point $y$ is generated in the Dikin ellipsoid centered at $x_0$. 
+         (b) A uniformly random point $y$ is generated in the Dikin ellipsoid centered at $x_0$. 
          (c) If point $x_0$ is not in the Dikin ellipsoid centered at $y$, then reject $y$. 
          (d) If point $x_0$ is contained in the Dikin ellipsoid centered at $y$, then 
          accept $y$ with probability $\min(1, \sqrt{\frac{det(H_{y})}{det(H_{x_0})}})$. 
@@ -778,7 +778,7 @@ in regions that are away from the boundary. See Figure~\ref{fig:example0} for an
 % again concentrates in regions away from the edges."
 
 
-<<example0, eval = TRUE, echo = FALSE, fig.cap = "We use the two sampling algorithms, hit-and-run and Dikin walk, on the 2D, 5D, and 10D-simplex. We show the histograms for the first parameter, $x_1$, because the distribution for every parameter should be the same (there is nothing special about $x_1$). Every histogram contains 10000 sampled points. The 2D-simplex is the line segment described by $x_1+x_2=1$ and $x_i$ greater equal to $0$. For the 2D-simplex, we see that hit-and-run samples uniformly across [0,1], while Dikin walk concentrates in regions away from the center. For higher dimensions (5D and 10D histograms), consider the 3D-simplex analogy. The 3D-simplex (Figure 1) is a triangle in three dimensional space. If we look at the distribution for $x_1$, that is equivalent to projecting this triangle onto the $x_1$ axis. As the samples are drawn uniformly from the 3D-simplex, there are more points near $0$ than near $1$. Therefore, we see this downward sloping distribution. In the 5D and 10D-simplex cases, we see that hit-and-run samples uniformly, while Dikin again concentrates in regions away from the edges.", message= FALSE, cache = TRUE, fig.show = 'hold', out.width = '1\\linewidth', out.height = '12cm', fig.align = 'center'>>=
+<<example0, eval = TRUE, echo = FALSE, fig.cap = "We use hit-and-run and Dikin walk to sample from the 2D, 5D, and 10D-simplex. We show histograms for the first parameter, $x_1$, because the distribution of all other parameters will be the same (there is nothing special about $x_1$). Every histogram contains 10000 sampled points. The 2D-simplex is the line segment $x_1+x_2=1$, $x_i$ greater equal to $0$. For the 2D-simplex, hit-and-run samples uniformly across [0,1], while Dikin walk concentrates in regions away from the edges. To understand the distribution of $x_1$ in higher dimensions (5D and 10D-simplex), consider the 3D-simplex analogy. The 3D-simplex (Figure 1) is a triangle in three dimensional space. The distribution for $x_1$ is obtained by projecting points on this triangle onto the $x_1$ axis. As the sample is drawn uniformly from the 3D-simplex, there are more points near $0$ than near $1$. Therefore, we see this downward sloping distribution. In the 5D and 10D-simplex cases, we see that hit-and-run samples uniformly, while Dikin again concentrates in regions away from the edges.", message= FALSE, cache = TRUE, fig.show = 'hold', out.width = '1\\linewidth', out.height = '12cm', fig.align = 'center'>>=
 
 library(walkr)
 
@@ -905,7 +905,7 @@ The \pkg{walkr} package has one main function \code{walkr} which samples points.
           point is returned. Default is \code{1}.} % stan is 1 
   \item{ \code{burn} is the burn-in parameter (as a percentage).  
         The first \code{burn} points are deleted from the final sample. Default is \code{0.5}, for 50\%.}  
-  \item{ \code{chains} is the number of indepedent random walks we create, each
+  \item{ \code{chains} is the number of independent random walks we create, each
           from a different starting point. By default, walkr returns a matrix 
           which consists of the individual chains combined together. Every column is a sampled point.}
   \item{ \code{ret.format} is the return format of the sampled points. If \code{"matrix"} (the default), 
@@ -1003,7 +1003,7 @@ of different chains is one way of examining the quality of the samples.
 Dikin mixes much faster than hit-and-run does, 
 especially in higher dimensions.
 
-The major problem with our current implementaton is that run-time becomes unwieldy 
+The major problem with our current implementation is that run-time becomes unwieldy 
 as the number of columns $N$ in $A$ increases. For lower dimensions of $A$ (below $50$) 
 hit-and-run and Dikin can both generate a well-mixed sample within a few minutes. However,
 for dimensions near $500$, it takes Dikin a few hours to generate a good sample,
