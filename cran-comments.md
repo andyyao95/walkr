@@ -1,6 +1,6 @@
 ## Submission summary
 
-This is my first submission!
+This submission of walkr improves the vignette and adds a package citation.
 
 ## Test environments
 * local OS X install, R 3.2.1
