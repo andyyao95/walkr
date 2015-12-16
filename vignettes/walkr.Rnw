@@ -619,7 +619,7 @@ a random point from that ellipsoid, one whose shape and size are determined by b
 current point and the shape of $K$. 
 
 Unlike hit-and-run, the Dikin walk does not sample uniformly over $K$. Instead,
-it is biased towards points that are way from the edges of $K$ (\cite{kannan}). 
+it is biased towards points that are away from the edges of $K$ (\cite{kannan}). 
 This bias allows the chains to mix more quickly than hit-and-run, and therefore, 
 to work better in higher dimensions. 
 
