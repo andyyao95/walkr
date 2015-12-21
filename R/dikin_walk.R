@@ -33,42 +33,7 @@ dikin_walk <- function(A,
                        thin = 1,
                        burn = 0,
                        chains = 1) {
-  
-  
-  
-  
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   stopifnot(points %% chains == 0)
   stopifnot(is.list(x0))
   #############################
@@ -156,11 +121,10 @@ dikin_walk <- function(A,
     ## because burn-in is a percentage, we must take the CEILING function
     ## to sample more than we need (in the case where dividing by 1-burn
     ## does not return an integer)
-    answer[[j]] <- Dikin_single_chain(total.points, A, b, x0[[j]],
-                                      r, A_b, burn, chains, points, thin)
+    
+    answer[[j]] <- Dikin_single_chain(total.points, A, b, x0[[j]], r, A_b, burn, chains, points, thin)
     
     ## initializing the return matrix 
-    
     
     ## appending on 1 chain onto the result
     
