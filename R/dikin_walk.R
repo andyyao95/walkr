@@ -135,9 +135,11 @@ dikin_walk <- function(A,
       ## 2. Check whether x_0 is in Ellip(y)
       ## 3. Keep on trying y until condition satisfied
       
-      bool <- TRUE
+      bool <- FALSE
       
-      while(bool || !ellipsoid(current.point, y)) {
+      ## will always go into the while-loop for the first time, due to lazy evaluation
+      
+      while(!bool || !ellipsoid(current.point, y)) {
         
         ## exact same set of procedures as above
         
@@ -155,10 +157,6 @@ dikin_walk <- function(A,
           ## det(A)/det(B) = det(B^-1 A)
           ## acceptance rate according to probability formula. see paper for detail
           
-          #################################################################################
-          ####### WRONG: THIS IF-CONTROL DOESN'T REALIZE INTENDED CONSEQUENCES ############
-          #################################################################################
-          
           probability <- min(1, sqrt(rcppeigen_fdet(rcppeigen_fprod(inverseTemp, H_x(y)))))
           
           bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1 - probability))
@@ -169,7 +167,6 @@ dikin_walk <- function(A,
       
       result[ , i] <- y
       current.point <- y
-      
       
     }
     
