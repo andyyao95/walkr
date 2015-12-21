@@ -34,6 +34,41 @@ dikin_walk <- function(A,
                        burn = 0,
                        chains = 1) {
   
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   stopifnot(points %% chains == 0)
   stopifnot(is.list(x0))
   #############################
@@ -121,86 +156,14 @@ dikin_walk <- function(A,
     ## because burn-in is a percentage, we must take the CEILING function
     ## to sample more than we need (in the case where dividing by 1-burn
     ## does not return an integer)
-    
+    answer[[j]] <- Dikin_single_chain(total.points, A, b, x0[[j]],
+                                      r, A_b, burn, chains, points, thin)
     
     ## initializing the return matrix 
     
-    result <- matrix(ncol = total.points, nrow = ncol(A))
-    result[ , 1] <- x0[[j]]
-    current.point <- x0[[j]]
-    this.length <- length(b)
-    
-    for (i in 2:total.points) {
-      
-      ## 2. Check whether x_0 is in Ellip(y)
-      ## 3. Keep on trying y until condition satisfied
-      
-      bool <- FALSE
-      
-      ## will always go into the while-loop for the first time, due to lazy evaluation
-      
-      while(!bool || !ellipsoid(current.point, y)) {
-        
-        ## exact same set of procedures as above
-        
-        zeta <- stats::rnorm(this.length, 0, 1)
-        zeta <- r * zeta / sqrt(sum(zeta * zeta))
-        rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
-        
-        # declare a new variable to save one computation later
-        inverseTemp <- rcppeigen_fsolve(H_x(current.point))
-        
-        y <- rcppeigen_fprod(inverseTemp, rhs) + current.point 
-        
-        if(ellipsoid(current.point, y)) {
-          
-          ## det(A)/det(B) = det(B^-1 A)
-          ## acceptance rate according to probability formula. see paper for detail
-          
-          probability <- min(1, sqrt(rcppeigen_fdet(rcppeigen_fprod(inverseTemp, H_x(y)))))
-          
-          bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1 - probability))
-        }
-      }
-      
-      ## appending on the result
-      
-      result[ , i] <- y
-      current.point <- y
-      
-    }
-    
-    ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
-  
-    if(dim(result)[1] == 1) {
-      
-      ## first, delete out the number of points that we want to burn
-      ## second, only take every thin-th point
-      
-      ## we take the floor function because we took the ceiling above
-      ## so in the case that multiplying by burn doesn't result in an integer
-      ## we returning the correct number of points
-      
-      result <- matrix(result[, (floor(burn*total.points)+1) : total.points], nrow = 1)
-      result <- matrix(result[ , (1:(points/chains))*thin], nrow = 1)
-    }
-    
-    else {
-      
-      
-      ## first, delete out the number of points that we want to burn
-      ## second, only take every thin-th point
-      
-      ## same as above
-      
-      result <- result[, (floor(burn*total.points)+1) : total.points]
-    
-      result <- result[ , (1:(points/chains))*thin]
-    }
     
     ## appending on 1 chain onto the result
     
-    answer[[j]] <- result
   }
   
   return(answer)
