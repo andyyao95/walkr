@@ -113,6 +113,8 @@ dikin_walk <- function(A,
   
   ##total points for each indiv chain
   
+  total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
+  
   for (j in 1:chains) {
   
     ## total points is : points * thin * 1/(1-burn) / chains 
@@ -120,7 +122,6 @@ dikin_walk <- function(A,
     ## to sample more than we need (in the case where dividing by 1-burn
     ## does not return an integer)
     
-    total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
     
     ## initializing the return matrix 
     
@@ -160,17 +161,24 @@ dikin_walk <- function(A,
         zeta <- stats::rnorm(this.length, 0, 1)
         zeta <- r * zeta / sqrt(sum(zeta * zeta))
         rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
-        y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
+        
+        # declare a new variable to save one computation later
+        inverseTemp <- rcppeigen_fsolve(H_x(current.point))
+        
+        y <- rcppeigen_fprod(inverseTemp, rhs) + current.point 
         
         if(ellipsoid(current.point, y)) {
           
           ## det(A)/det(B) = det(B^-1 A)
           ## acceptance rate according to probability formula. see paper for detail
           
-          probability <- min(1, sqrt (rcppeigen_fdet( rcppeigen_fprod(
-            rcppeigen_fsolve(H_x(current.point)),H_x(y)))))
+          #################################################################################
+          ####### WRONG: THIS IF-CONTROL DOESN'T REALIZE INTENDED CONSEQUENCES ############
+          #################################################################################
           
-          bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
+          probability <- min(1, sqrt(rcppeigen_fdet(rcppeigen_fprod(inverseTemp, H_x(y)))))
+          
+          bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1 - probability))
           
           if(bool) {
             
