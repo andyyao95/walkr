@@ -161,13 +161,9 @@ walkr <- function(A,
   new_A <- -homogeneous
   new_b <- particular
   
-  
-  ## 2. Find starting point within convex polytope
-  x0 <- list()
-  
-  for (q in 1:chains) {
-    x0[[q]] <- start_point(A = new_A, b = new_b, n = 1, average = 20)    
-  }
+  # create a list of staring points
+  starting <- as.matrix(start_point(A = new_A, b = new_b, n = chains, average = 20))
+  x0 <- split(starting, rep(1:ncol(starting), each = nrow(starting)))
   
   ## 3. The sampling
   
