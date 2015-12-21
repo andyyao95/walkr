@@ -132,29 +132,12 @@ dikin_walk <- function(A,
     
     for (i in 2:total.points) {
       
-      ## 1. Generate random point y in Ellip(x)
-      ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, RUNIF IS NOT UNIFORM AFTER TRANSFORMATION
-      ## see vignette for details
-      
-      zeta <- stats::rnorm(this.length, 0, 1)
-      
-      ## normalise to be on the m- unit sphere
-      ## and then compute lhs as a m-vector
-      
-      ## essentially: Hd = t(A) %*% D^2 %*% zeta
-      ## solving for d gives us a uniformly random vector in the ellipsoid centered at x 
-      ## the y = x_0 + d is the new point 
-      
-      zeta <- r * zeta / sqrt(as.numeric(rcppeigen_fcrossprod(zeta,zeta)))
-      rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
-      
-      y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
-      
-  
       ## 2. Check whether x_0 is in Ellip(y)
       ## 3. Keep on trying y until condition satisfied
       
-      while(!ellipsoid(current.point, y)) {
+      bool <- TRUE
+      
+      while(bool || !ellipsoid(current.point, y)) {
         
         ## exact same set of procedures as above
         
@@ -179,14 +162,6 @@ dikin_walk <- function(A,
           probability <- min(1, sqrt(rcppeigen_fdet(rcppeigen_fprod(inverseTemp, H_x(y)))))
           
           bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1 - probability))
-          
-          if(bool) {
-            
-            ## perhaps, there is a better way to handle break here?
-            
-            break
-          } 
-          
         }
       }
       
