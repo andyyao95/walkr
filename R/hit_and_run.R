@@ -46,14 +46,14 @@ hit_and_run <- function(A,
   
   answer <- list()
   
+  total.points <- ceiling( (points / chains)  * thin * (1/(1-burn)))
+  
   for (j in 1:chains) {
     
     ## total points is : points * thin * 1/(1-burn) / chains 
     ## because burn-in is a percentage, we must take the CEILING function
     ## to sample more than we need (in the case where dividing by 1-burn
     ## does not return an integer)
-    
-    total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
     
     result <- t(hitandrun::har(x0[[j]], constr, N = total.points, 
                                thin = 1)$samples)
