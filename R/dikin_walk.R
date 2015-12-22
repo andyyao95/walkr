@@ -105,30 +105,25 @@ dikin_walk <- function(A,
   } 
   
   ###### THE LINES ABOVE FINISH DEFINING THE ELLIPSOID
-  ## now the sampling
+  ## total points is : points * thin * 1/(1-burn) / chains 
+  ## because burn-in is a percentage, we must take the CEILING function
+  ## to sample more than we need (in the case where dividing by 1-burn
+  ## does not return an integer)
   
   total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
   
+  # check how many cores the machine has
   numCores <- detectCores()
+  
+  # use one less number of cores to be sensible
   cl <- makeCluster(numCores - 1)
-
   
   for (j in 1:chains) {
-  
-    ## total points is : points * thin * 1/(1-burn) / chains 
-    ## because burn-in is a percentage, we must take the CEILING function
-    ## to sample more than we need (in the case where dividing by 1-burn
-    ## does not return an integer)
+    # parallel by using parLapply
     answer <- parLapply(cl, x0, Dikin_single_chain, total.points, A, b, r, A_b, burn, chains, points, thin) 
-
-    # answer[[j]] <- Dikin_single_chain(x0[[j]], total.points, A, b, r, A_b, burn, chains, points, thin)
-    
-    ## initializing the return matrix 
-    
-    ## appending on 1 chain onto the result
-    
   }
   
+  # stop the cluster after the parallel
   stopCluster(cl) 
   
   return(answer)

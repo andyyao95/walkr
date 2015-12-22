@@ -139,4 +139,4 @@ Dikin_single_chain <- function(x0,
   
   return(result)
 
-  }
+}
