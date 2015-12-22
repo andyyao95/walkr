@@ -107,13 +107,11 @@ dikin_walk <- function(A,
   ###### THE LINES ABOVE FINISH DEFINING THE ELLIPSOID
   ## now the sampling
   
-  ## initialize return matrix
-  ## set the starting point as the current point
-  answer <- list()
-  
-  ##total points for each indiv chain
-  
   total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
+  
+  numCores <- detectCores()
+  cl <- makeCluster(numCores - 1)
+
   
   for (j in 1:chains) {
   
@@ -121,14 +119,17 @@ dikin_walk <- function(A,
     ## because burn-in is a percentage, we must take the CEILING function
     ## to sample more than we need (in the case where dividing by 1-burn
     ## does not return an integer)
-    
-    answer[[j]] <- Dikin_single_chain(total.points, A, b, x0[[j]], r, A_b, burn, chains, points, thin)
+    answer <- parLapply(cl, x0, Dikin_single_chain, total.points, A, b, r, A_b, burn, chains, points, thin) 
+
+    # answer[[j]] <- Dikin_single_chain(x0[[j]], total.points, A, b, r, A_b, burn, chains, points, thin)
     
     ## initializing the return matrix 
     
     ## appending on 1 chain onto the result
     
   }
+  
+  stopCluster(cl) 
   
   return(answer)
 }
