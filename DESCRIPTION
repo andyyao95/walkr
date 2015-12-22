@@ -14,7 +14,8 @@ Imports:     hitandrun,
              limSolve, 
              MASS,
              Rcpp (>= 0.11.6),
-             shinystan
+             shinystan,
+             parallel
 Description: Consider the intersection of two spaces: the complete solution space
              to Ax = b and the N-simplex. The intersection of these two spaces is 
              a non-negative convex polytope. The package walkr samples from this 

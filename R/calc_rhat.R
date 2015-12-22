@@ -72,6 +72,4 @@ calc_rhat <- function(x) {
   
   return(rhats)
   
-  
-  
 }

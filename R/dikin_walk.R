@@ -120,7 +120,8 @@ dikin_walk <- function(A,
   
   for (j in 1:chains) {
     # parallel by using parLapply
-    answer <- parLapply(cl, x0, Dikin_single_chain, total.points, A, b, r, A_b, burn, chains, points, thin) 
+    answer <- parLapply(cl, x0, Dikin_single_chain, total.points,
+                        A, b, r, A_b, burn, chains, points, thin) 
   }
   
   # stop the cluster after the parallel
