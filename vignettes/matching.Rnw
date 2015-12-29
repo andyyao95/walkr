@@ -97,22 +97,22 @@ treated[tsubjects] <- TRUE
 
 # force dati (with treated removed) to be numeric for regression purpose
 dati.num <- dati
-for(i in 1:dim(dati)[2]) dati.num[,i] <- as.numeric(dati[,i])
+for(i in 1:dim(dati)[2]) dati.num[, i] <- as.numeric(dati[, i])
 @
 
 Now we want to set a vector of probabilities for the assignment of treatment to each of the $445$ subjects.
 
 <<replicate3, eval=FALSE>>=
 # use glm for a logistic regression
-propensity  <- glm(treated~ I(age^2) + I(education^2) + black +
+propensity  <- glm(treated ~ I(age^2) + I(education^2) + black +
                      hispanic + married + nodegree + I(re74^2) + I(re75^2) +
                      u74 + u75, family = binomial(link = "logit"), data = dati)
 M <- cbind(rep(1, n),
            propensity$linear.pred,
            I(log(dati$age)^2),
            I(log(dati$education)^2),
-           I(log(dati$re74+0.01)^2),
-           I(log(dati$re75+0.01)^2))
+           I(log(dati$re74 + 0.01)^2),
+           I(log(dati$re75 + 0.01)^2))
 
 # misspecified weights for: Intercept, linear.pred, age, educ, I(re74^2), and I(re75^2)
 propensity.coeffs <- as.matrix(c(1.00, 0.5, 0.01, -0.3, -0.01, 0.01))
@@ -121,9 +121,9 @@ propensity.coeffs <- as.matrix(c(1.00, 0.5, 0.01, -0.3, -0.01, 0.01))
 mu = M %*% propensity.coeffs
 
 # Tr.pred: actual probability, through the logit transformation
-Tr.pred <- exp(mu)/(1+exp(mu))
+Tr.pred <- exp(mu)/(1 + exp(mu))
 TreatmentEffect <- 1000
-TreatmentReal <- matrix(nrow=n, ncol=1)
+TreatmentReal <- matrix(nrow = n, ncol = 1)
 @
 
 Then set up a series of containers for SATT, running times, sizes, L1 metrics and breaks.
