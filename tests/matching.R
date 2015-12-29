@@ -94,12 +94,14 @@ age.ct <- dati1$age[cem.ct]
 df <- as.data.frame(t(rbind(age.ct, age.tr[seq(age.ct)])))
 
 # name the data frame
-names(df) <- c("age.ct", "age.tr")
+names(df) <- c("control", "treat")
 
 # a joined histogram
 ggplot(melt(df, na.rm = TRUE, id.vars = NULL),
        aes(value, fill = variable)) +
-  geom_histogram(position = "dodge", bins = 30)
+  geom_histogram(position = "dodge", bins = 30) +
+  xlab("Age - CEM") +
+  ylab("Count")
 
 
 
@@ -122,8 +124,9 @@ weight <- walkr(rbind(matrix(control$age, ncol = nc), rep(1, nc)),
                 points = 20)
 
 # take the mean and scale up
-weight.ct <- rowMeans(weight) * nt
 age.ct <- control$age
+weight.ct <- rowMeans(weight) * nt
+
 
 age.tr <- treat$age
 weight.tr <- rep(1, nt)
@@ -144,11 +147,13 @@ weight.tr <- rep(1, nt)
 
 dat <- data.frame(x = c(age.tr, age.ct),
                   freq = c(weight.tr, weight.ct),
-                  grp = c(rep("age.tr", length(age.tr)),
-                          rep("age.ct", length(age.ct))))
+                  grp = c(rep("Treat", length(age.tr)),
+                          rep("Control", length(age.ct))))
 
 ggplot(dat,aes(x = x,weight = freq,fill = grp)) + 
-  geom_histogram(position = "dodge", bins = 30)
+  geom_histogram(position = "dodge", bins = 30)  +
+  xlab("Age - Walkr 1") +
+  ylab("Count")
 
 TE <- t(treat$outcome)%*%wt - t(control$outcome)%*%weight.ct/nt
 
@@ -175,7 +180,7 @@ b <- c(t(wt)%*%treat$age,
        1)
 
 # match on age, and MSQ of age
-weight <- walkr(A, b, points = 10)
+weight <- walkr(A, b, points = 20)
 
 # take the mean and scale up
 age.ct <- control$age
@@ -200,10 +205,12 @@ weight.tr <- rep(1, nt)
 
 dat <- data.frame(x = c(age.tr, age.ct),
                   freq = c(weight.tr, weight.ct),
-                  grp = c(rep("age.tr", length(age.tr)), 
-                          rep("age.ct", length(age.ct))))
+                  grp = c(rep("Treat", length(age.tr)), 
+                          rep("Control", length(age.ct))))
 
 ggplot(dat, aes(x = x, weight = freq, fill = grp)) + 
-  geom_histogram(position = "dodge", bins = 30)
+  geom_histogram(position = "dodge", bins = 30) + 
+  xlab("Age - Walkr 2") +
+  ylab("Count")
 
 TE <- t(treat$outcome)%*%wt - t(control$outcome)%*%weight.ct/nt
