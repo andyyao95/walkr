@@ -4,6 +4,13 @@ export(explore_walkr)
 export(walkr)
 exportPattern("^[[:alpha:]]+")
 import(ggplot2)
+
+# cem related packages
+import(cem)
+import(MatchIt)
+import(Matching)
+
+
 importFrom(MASS,Null)
 importFrom(Rcpp,evalCpp)
 importFrom(hitandrun,har)
