@@ -2,6 +2,11 @@
 
 generate.data <- function(){
   
+  require(cem)
+  require(MatchIt)
+  require(Matching)
+  data(DW)
+  
   tsubjects <- which(DW$treated == 1)
   csubjects <- which(DW$treated == 0)
   
