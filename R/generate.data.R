@@ -1,3 +1,5 @@
+# usage: dati1 <- generate.data()
+
 generate.data <- function(){
   
   tsubjects <- which(DW$treated == 1)
