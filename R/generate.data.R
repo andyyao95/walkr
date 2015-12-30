@@ -1,6 +1,4 @@
-generate.data <- function(df){
-  
-  fdasfaf <- DW$treated
+generate.data <- function(){
   
   tsubjects <- which(DW$treated == 1)
   csubjects <- which(DW$treated == 0)
