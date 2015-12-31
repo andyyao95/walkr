@@ -1,13 +1,13 @@
 walkr.match <- function(data,
-                       treat  = "treat",
-                       match.var,
-                       Y.var  = "outcome",
-                       method = "MEAN",
-                       size = 10,
-                       chains = 1,
-                       thin   = 1,
-                       burn   = .5,
-                       breaks = NULL){
+                        treat  = "treat",
+                        match.var,
+                        Y.var  = "outcome",
+                        method = "MEAN",
+                        size = 10,
+                        chains = 1,
+                        thin   = 1,
+                        burn   = .5,
+                        breaks = NULL){
   
   # also need to do multiple match.var cases
   
@@ -32,7 +32,7 @@ walkr.match <- function(data,
                     chains = chains,
                     thin = thin,
                     burn = burn)
-    weight <- rowMeans(weight)
+    
   } else if(method == "MSQ"){
     
     A <- rbind(matrix(cgroup[[match.var]], ncol = nc),
