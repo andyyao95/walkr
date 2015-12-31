@@ -34,7 +34,21 @@ walkr.match <- function(data,
                     burn = burn)
     weight <- rowMeans(weight)
   } else if(method == "MSQ"){
-    # to be done
+    
+    A <- rbind(matrix(cgroup[[match.var]], ncol = nc),
+               matrix(cgroup[[match.var]]^2, ncol = nc),
+               rep(1, nc))
+
+    b <- c(t(wt)%*%tgroup[[match.var]],
+           t(wt)%*%(tgroup[[match.var]]^2),
+           1)
+    
+    weight <- walkr(A,
+                    b,
+                    points = size,
+                    chains = chains,
+                    thin = thin,
+                    burn = burn)
   }
   
   # take the mean and scale up
