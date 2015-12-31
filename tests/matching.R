@@ -1,3 +1,86 @@
+######################################################################
+############################## START #################################
+######################################################################
+
+# set simulation size
+run <- 100
+
+data <- generate.data()
+
+# set up containers
+CEM <- data.frame(matrix(NA, ncol = 2, nrow = run))
+names(CEM) <- c("L1", "TE")
+
+WALKR <- data.frame(matrix(NA, ncol = 2, nrow = run))
+names(WALKR) <- c("L1", "TE")
+
+
+for(i in 1:run){
+  
+  ######################### generate data ############################
+  
+  data <- generate.data()
+  
+  breaks <- list(re74 = hist(data$re74, plot = FALSE)$breaks, 
+                 re75 = hist(data$re75, plot = FALSE)$breaks,
+                 age = hist(data$age, plot = FALSE)$breaks,
+                 education = hist(data$education, plot = FALSE)$breaks)
+  
+  ############################# CEM ##################################
+  
+  name <- names(data)
+  
+  # take out age
+  name <- name[- which(name == "age")]
+  
+  # match only the age
+  cem.mat <- cem("treat", data, drop = name)
+  
+  # indices of matched treated
+  cem.tr <- which(cem.mat$groups == "1" & cem.mat$matched == TRUE)
+  
+  # indices of matched control
+  cem.ct <- which(cem.mat$groups == "0" & cem.mat$matched == TRUE)
+  
+  # matched indices
+  cem.idx <- unique(c(cem.tr, cem.ct))
+  
+  # calculate L1 balance
+  CEM$L1[i] <- L1.meas(data$treat[cem.idx],
+                       data[cem.idx, -c(1, 12)],
+                       breaks = breaks)$L1
+  
+  # calculate treatment effect
+  CEM$TE[i] <- mean(data$outcome[cem.tr]) - mean(data$outcome[cem.ct])
+  
+  ############################ WALKR #################################
+  
+  # run walkr match
+  a <- walkr.match(data = data,
+                   method = "MEAN",
+                   match.var = "age",
+                   size = 10,
+                   breaks = breaks)
+  
+  group <- c(rep(1, nrow(a$tgroup)), rep(0, nrow(a$cgroup)))
+  
+  # get L1 balance
+  WALKR$L1[i] <- a$L1
+  
+  # get treatment effect
+  WALKR$TE[i] <- a$TE
+}
+
+######################################################################
+############################### END ##################################
+######################################################################
+
+
+
+######################################################################
+############################# MANUAL #################################
+######################################################################
+
 dati1 <- generateData(DW)
 
 ####################### CEM: AGE ONLY ##############################
