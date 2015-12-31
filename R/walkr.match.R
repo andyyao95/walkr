@@ -52,7 +52,7 @@ walkr.match <- function(data,
   }
   
   # take the mean and scale up
-  cweight <- weight * nt; tweight <- rep(1, nt)
+  cweight <- rowMeans(weight) * nt; tweight <- rep(1, nt)
   
   L1 <- L1.meas(group = c(rep(1, nt), rep(0, nc)),
                 # data is a hack, need L1 var of some sort
