@@ -32,7 +32,8 @@ dikin_walk <- function(A,
                        r = 1,
                        thin = 1,
                        burn = 0,
-                       chains = 1) {
+                       chains = 1,
+                       c) {
 
   stopifnot(points %% chains == 0)
   stopifnot(is.list(x0))
@@ -51,15 +52,26 @@ dikin_walk <- function(A,
   ## H(x) is the Hessian of the Log-barrier function of Ax <= b
   ## for more details, just google Dikin Walk
   
-  H_x <- function(x) {
+  H_extra <- function (c, x) {
+    
+    x <- as.vector(x)
+    
+    # function returns Hessian of exp(X-C)
+    distance <- sum((x - c)^2)
+    return(4*exp(distance)*(x - c) %*% t(x - c) +
+             2*exp(distance)*diag(length(x)))  
+  }
+  
+  H_x <- function(x, c) {
     
     ## making the D^2 matrix
-
+    
     D <- as.vector(1/(A_b[,1] - rcppeigen_fprod(A_b[,-1], x)))
-
+    
     ## t(A) %*% (D^2 %*% A)
     
-    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)))
+    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)) + 
+             H_extra(c, x))
     
   } 
   
@@ -100,7 +112,7 @@ dikin_walk <- function(A,
 #     2) should move these 3 functions into separate files with documentation...
 #     
     
-    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x), (z-x)))) <= r^2)
+    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x, c), (z-x)))) <= r^2)
     
   } 
   
@@ -121,7 +133,7 @@ dikin_walk <- function(A,
   for (j in 1:chains) {
     # parallel by using parLapply
     answer <- parLapply(cl, x0, Dikin_single_chain, total.points,
-                        A, b, r, A_b, burn, chains, points, thin) 
+                        A, b, r, A_b, burn, chains, points, thin, c) 
   }
   
   # stop the cluster after the parallel

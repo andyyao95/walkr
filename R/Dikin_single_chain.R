@@ -7,18 +7,28 @@ Dikin_single_chain <- function(x0,
                                burn,
                                chains,
                                points,
-                               thin){
+                               thin,
+                               c){
   
   
-  H_x <- function(x) {
+  H_extra <- function (c, x) {
+    # function returns Hessian of exp(X-C)
+    x <- as.vector(x)
+    distance <- sum((x - c)^2)
+    return(4*exp(distance)*(x - c) %*% t(x - c) +
+             2*exp(distance)*diag(length(x)))  
+  }
+  
+  H_x <- function(x, c) {
     
     ## making the D^2 matrix
     
     D <- as.vector(1/(A_b[,1] - rcppeigen_fprod(A_b[,-1], x)))
     
     ## t(A) %*% (D^2 %*% A)
-    
-    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)))
+      
+    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)) + 
+             H_extra(c, x))
     
   } 
   
@@ -59,7 +69,7 @@ Dikin_single_chain <- function(x0,
     #     2) should move these 3 functions into separate files with documentation...
     #     
     
-    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x), (z-x)))) <= r^2)
+    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x, c), (z-x)))) <= r^2)
     
   } 
   
@@ -87,7 +97,7 @@ Dikin_single_chain <- function(x0,
       rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
       
       # declare a new variable to save one computation later
-      inverseTemp <- rcppeigen_fsolve(H_x(current.point))
+      inverseTemp <- rcppeigen_fsolve(H_x(current.point, c))
       
       y <- rcppeigen_fprod(inverseTemp, rhs) + current.point 
       
@@ -96,7 +106,7 @@ Dikin_single_chain <- function(x0,
         ## det(A)/det(B) = det(B^-1 A)
         ## acceptance rate according to probability formula. see paper for detail
         
-        probability <- min(1, sqrt(rcppeigen_fdet(rcppeigen_fprod(inverseTemp, H_x(y)))))
+        probability <- min(1, sqrt(rcppeigen_fdet(rcppeigen_fprod(inverseTemp, H_x(y, c)))))
         
         bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1 - probability))
       }

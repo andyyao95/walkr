@@ -61,7 +61,8 @@ walkr <- function(A,
                   thin = 1,
                   burn = 0.5,
                   chains = 1,
-                  ret.format = "matrix") {
+                  ret.format = "matrix",
+                  c) {
   
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
@@ -173,7 +174,8 @@ walkr <- function(A,
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
       
     alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, 
-                         x0 = x0, thin = thin, burn = burn, chains = chains)
+                         x0 = x0, thin = thin, burn = burn, chains = chains,
+                         c = c)
     
     ## <convert back into x-space> there are two lambda functions here 1)
     ## mapping is the function to be applied to the individual columns of each
