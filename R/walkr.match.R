@@ -1,3 +1,4 @@
+
 walkr.match <- function(data,
                         treat  = "treat",
                         match.var,
@@ -24,42 +25,58 @@ walkr.match <- function(data,
   # preliminary weights from the treatment group (all equal)
   wt <- rep(1/nt, nt)
   
+  
+  #drop the control group subjects that lie outside the convex hull
+  library(WhatIf)
+  my.result <- whatif(data = matrix(tgroup[[match.var]], ncol = 1),
+                      cfact = matrix(cgroup[[match.var]], ncol = 1))
+  
+  
+
+  
   # run Walkr to sample weights
   if(method == "MEAN"){
-    weight <- walkr(rbind(matrix(cgroup[[match.var]], ncol = nc), rep(1, nc)),
-                    c(t(wt)%*%tgroup[[match.var]], 1),
-                    points = size,
-                    chains = chains,
-                    thin = thin,
-                    burn = burn)
+    
+    A <- t(matrix(cgroup[[match.var]][my.result$in.hull]))
+    b <- mean(tgroup[[match.var]])
+    cweight <- rep(0, nc)
+    cweight[my.result$in.hull] <- nrow(tgroup)*rowMeans(walkr(A = A, b = b, points = size, 
+                                                              chains = chains, thin = thin, 
+                                                              burn = burn))
+
+   
     
   } else if(method == "MSQ"){
     
-    A <- rbind(matrix(cgroup[[match.var]], ncol = nc),
-               matrix(cgroup[[match.var]]^2, ncol = nc),
-               rep(1, nc))
+    
+    A <- rbind(matrix(cgroup[[match.var]][my.result$in.hull], ncol = nc),
+               matrix(cgroup[[match.var]][my.result$in.hull]^2, ncol = nc),
+                 rep(1, nc))
 
-    b <- c(t(wt)%*%tgroup[[match.var]],
-           t(wt)%*%(tgroup[[match.var]]^2),
+    b <- c(mean(tgroup[[match.var]]), 
+           mean(tgroup[[match.var]]^2),
            1)
     
-    weight <- walkr(A,
-                    b,
-                    points = size,
-                    chains = chains,
-                    thin = thin,
-                    burn = burn)
+      
+    cweight[my.result$in.hull] <- nrow(tgroup)*rowMeans(walkr(A = A, b = b, points = size, 
+                                                              chains = chains, thin = thin, 
+                                                              burn = burn))
+    
   }
   
-  # take the mean and scale up
-  cweight <- rowMeans(weight) * nt; tweight <- rep(1, nt)
+  # weight of treated subjects are all 1
+  tweight <- rep(1, nt)
   
+  # calculating L1 score
   L1 <- L1.meas(group = c(rep(1, nt), rep(0, nc)),
                 # data is a hack, need L1 var of some sort
                 data = data[, -c(1, 12)],
                 breaks = breaks,
                 weights = c(tweight, cweight))$L1
   
+  #Setting up return objects
+  
+  # ??
   if(length(match.var) == 1){
     dat <- data.frame(X = c(tgroup[[match.var]], cgroup[[match.var]]),
                       Weight = c(tweight, cweight),
