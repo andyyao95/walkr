@@ -155,6 +155,8 @@ walkr <- function(A,
   ## need the particular and homogeneous because in the end 
   ## we want to transform back in to "x-space"
   
+  z$particular <- c
+  
   particular  <- z$particular
   homogeneous <- z$homogeneous
   
@@ -172,10 +174,12 @@ walkr <- function(A,
     
     ## sampling in alpha space
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
-      
+    
+    c_L <- rep(0, ncol(new_A))
+  
     alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, 
                          x0 = x0, thin = thin, burn = burn, chains = chains,
-                         c = c)
+                         c = c_L)
     
     ## <convert back into x-space> there are two lambda functions here 1)
     ## mapping is the function to be applied to the individual columns of each

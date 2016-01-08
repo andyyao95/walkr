@@ -112,7 +112,7 @@ dikin_walk <- function(A,
 #     2) should move these 3 functions into separate files with documentation...
 #     
     
-    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x, c), (z-x)))) <= r^2)
+    return(as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x, c), (z-x)))) <= r^2)
     
   } 
   
