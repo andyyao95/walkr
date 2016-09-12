@@ -155,7 +155,7 @@ walkr <- function(A,
   ## need the particular and homogeneous because in the end 
   ## we want to transform back in to "x-space"
   
-  z$particular <- c
+  # z$particular <- c
   
   particular  <- z$particular
   homogeneous <- z$homogeneous
