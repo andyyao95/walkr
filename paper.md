@@ -21,11 +21,11 @@ Consider the intersection of two spaces: the complete solution space
 to Ax = b and the N-simplex. The intersection of these two spaces is 
 a non-negative convex polytope. The R package walkr samples from this 
 intersection using two Monte-Carlo Markov Chain (MCMC) methods: 
-hit-and-run and Dikin walk. Walkr also provide tools to examine sample 
-quality. 
+hit-and-run [@kannan] and Dikin walk [@vempala]. Walkr also provide tools to examine sample 
+quality [@shinystan]. 
 
 MCMC sampling is of great interest in applied statistics, as it is a common approach to sample
-data drawn from a theoretical distribution. In application, walkr will be a powerful tool for estimating
+data drawn from a theoretical distribution [@gelman]. In application, walkr will be a powerful tool for estimating
 expectations for Bayesian statistics. The walkr package will also be found useful by users who are
 interested in generating random weight vectors in high dimensions given specific constraints. 
 
