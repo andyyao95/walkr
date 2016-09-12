@@ -62,7 +62,8 @@ walkr <- function(A,
                   burn = 0.5,
                   chains = 1,
                   ret.format = "matrix",
-                  c) {
+                  #c) {
+                  ) {
   
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
