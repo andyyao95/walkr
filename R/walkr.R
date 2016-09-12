@@ -61,8 +61,7 @@ walkr <- function(A,
                   thin = 1,
                   burn = 0.5,
                   chains = 1,
-                  ret.format = "matrix",
-                  #c) {
+                  ret.format = "matrix"
                   ) {
   
   ## 0. Doing some checking here
