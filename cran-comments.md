@@ -1,14 +1,17 @@
-## Submission summary
+This is an updated version to fix the previous WARNING on CRAN check.
 
-This submission of walkr improves the vignette and adds a package citation.
+---
 
 ## Test environments
-* local OS X install, R 3.2.2
-* Linux (GNU Gnome), R 3.2.0
+* OS X, R 3.3.2
+* Ubuntu 14.04, R 3.3.2
 * win-builder (devel and release)
 
 ## R CMD check results
-There were no ERRORs or WARNINGs or NOTES.    
 
-## Downstream dependencies
-None
+No ERRORS and WARNINGS. 
+1 NOTE on win-builder:
+
+New submission
+
+Package was archived on CRAN

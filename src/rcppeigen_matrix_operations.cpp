@@ -1,5 +1,7 @@
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-
+#ifdef __GLIBC__
+# define _POSIX_C_SOURCE 200809L
+#endif
 #include <RcppEigen.h>
 #include <Rcpp.h>
 
