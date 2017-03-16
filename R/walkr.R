@@ -61,8 +61,7 @@ walkr <- function(A,
                   thin = 1,
                   burn = 0.5,
                   chains = 1,
-                  ret.format = "matrix"
-                  ) {
+                  ret.format = "matrix") {
   
   ## 0. Doing some checking here
   if(!is.matrix(A)) {
@@ -155,8 +154,6 @@ walkr <- function(A,
   ## need the particular and homogeneous because in the end 
   ## we want to transform back in to "x-space"
   
-  # z$particular <- c
-  
   particular  <- z$particular
   homogeneous <- z$homogeneous
   
@@ -164,9 +161,13 @@ walkr <- function(A,
   new_A <- -homogeneous
   new_b <- particular
   
-  # create a list of staring points
-  starting <- as.matrix(start_point(A = new_A, b = new_b, n = chains, average = 20))
-  x0 <- split(starting, rep(1:ncol(starting), each = nrow(starting)))
+  
+  ## 2. Find starting point within convex polytope
+  x0 <- list()
+  
+  for (q in 1:chains) {
+    x0[[q]] <- start_point(A = new_A, b = new_b, n = 1, average = 20)    
+  }
   
   ## 3. The sampling
   
@@ -174,12 +175,9 @@ walkr <- function(A,
     
     ## sampling in alpha space
     ## n = n - 1 because dikin takes starting point as the 1st sampled point
-    
-    c_L <- rep(0, ncol(new_A))
-  
+      
     alphas <- dikin_walk(A = new_A, b = new_b, points = points, r = 1, 
-                         x0 = x0, thin = thin, burn = burn, chains = chains,
-                         c = c_L)
+                         x0 = x0, thin = thin, burn = burn, chains = chains)
     
     ## <convert back into x-space> there are two lambda functions here 1)
     ## mapping is the function to be applied to the individual columns of each

@@ -32,9 +32,8 @@ dikin_walk <- function(A,
                        r = 1,
                        thin = 1,
                        burn = 0,
-                       chains = 1,
-                       c) {
-
+                       chains = 1) {
+  
   stopifnot(points %% chains == 0)
   stopifnot(is.list(x0))
   #############################
@@ -52,26 +51,15 @@ dikin_walk <- function(A,
   ## H(x) is the Hessian of the Log-barrier function of Ax <= b
   ## for more details, just google Dikin Walk
   
-  H_extra <- function (c, x) {
-    
-    x <- as.vector(x)
-    
-    # function returns Hessian of exp(X-C)
-    distance <- sum((x - c)^2)
-    return(4*exp(distance)*(x - c) %*% t(x - c) +
-             2*exp(distance)*diag(length(x)))  
-  }
-  
-  H_x <- function(x, c) {
+  H_x <- function(x) {
     
     ## making the D^2 matrix
-    
+
     D <- as.vector(1/(A_b[,1] - rcppeigen_fprod(A_b[,-1], x)))
-    
+
     ## t(A) %*% (D^2 %*% A)
     
-    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)) + 
-             H_extra(c, x))
+    return(rcppeigen_fcrossprod(A, rcppeigen_fprod(diag(D^2), A)))
     
   } 
   
@@ -112,32 +100,128 @@ dikin_walk <- function(A,
 #     2) should move these 3 functions into separate files with documentation...
 #     
     
-    return(as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x, c), (z-x)))) <= r^2)
+    return( as.numeric(rcppeigen_fcrossprod(z-x, rcppeigen_fprod(H_x(x), (z-x)))) <= r^2)
     
   } 
   
   ###### THE LINES ABOVE FINISH DEFINING THE ELLIPSOID
-  ## total points is : points * thin * 1/(1-burn) / chains 
-  ## because burn-in is a percentage, we must take the CEILING function
-  ## to sample more than we need (in the case where dividing by 1-burn
-  ## does not return an integer)
+  ## now the sampling
   
-  total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
+  ## initialize return matrix
+  ## set the starting point as the current point
+  answer <- list()
   
-  # check how many cores the machine has
-  numCores <- detectCores()
-  
-  # use one less number of cores to be sensible
-  cl <- makeCluster(numCores - 1)
+  ##total points for each indiv chain
   
   for (j in 1:chains) {
-    # parallel by using parLapply
-    answer <- parLapply(cl, x0, Dikin_single_chain, total.points,
-                        A, b, r, A_b, burn, chains, points, thin, c) 
-  }
   
-  # stop the cluster after the parallel
-  stopCluster(cl) 
+    ## total points is : points * thin * 1/(1-burn) / chains 
+    ## because burn-in is a percentage, we must take the CEILING function
+    ## to sample more than we need (in the case where dividing by 1-burn
+    ## does not return an integer)
+    
+    total.points <- ceiling( (points / chains)  * thin * (1/(1-burn))) 
+    
+    ## initializing the return matrix 
+    
+    result <- matrix(ncol = total.points, nrow = ncol(A))
+    result[ , 1] <- x0[[j]]
+    current.point <- x0[[j]]
+    this.length <- length(b)
+    
+    for (i in 2:total.points) {
+      
+      ## 1. Generate random point y in Ellip(x)
+      ## KEY: MUST USE STANDARD NORMAL FUNCTION HERE, RUNIF IS NOT UNIFORM AFTER TRANSFORMATION
+      ## see vignette for details
+      
+      zeta <- stats::rnorm(this.length, 0, 1)
+      
+      ## normalise to be on the m- unit sphere
+      ## and then compute lhs as a m-vector
+      
+      ## essentially: Hd = t(A) %*% D^2 %*% zeta
+      ## solving for d gives us a uniformly random vector in the ellipsoid centered at x 
+      ## the y = x_0 + d is the new point 
+      
+      zeta <- r * zeta / sqrt(as.numeric(rcppeigen_fcrossprod(zeta,zeta)))
+      rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
+      
+      y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
+      
+  
+      ## 2. Check whether x_0 is in Ellip(y)
+      ## 3. Keep on trying y until condition satisfied
+      
+      while(!ellipsoid(current.point, y)) {
+        
+        ## exact same set of procedures as above
+        
+        zeta <- stats::rnorm(this.length, 0, 1)
+        zeta <- r * zeta / sqrt(sum(zeta * zeta))
+        rhs <- rcppeigen_fcrossprod(A, rcppeigen_fprod(D_x(current.point), zeta))
+        y <- rcppeigen_fprod(rcppeigen_fsolve(H_x(current.point)), rhs) + current.point 
+        
+        if(ellipsoid(current.point, y)) {
+          
+          ## det(A)/det(B) = det(B^-1 A)
+          ## acceptance rate according to probability formula. see paper for detail
+          
+          probability <- min(1, sqrt (rcppeigen_fdet( rcppeigen_fprod(
+            rcppeigen_fsolve(H_x(current.point)),H_x(y)))))
+          
+          bool <- sample(c(TRUE, FALSE), 1, prob = c(probability, 1-probability))
+          
+          if(bool) {
+            
+            ## perhaps, there is a better way to handle break here?
+            
+            break
+          } 
+          
+        }
+      }
+      
+      ## appending on the result
+      
+      result[ , i] <- y
+      current.point <- y
+      
+      
+    }
+    
+    ## NEED TO HANDLE THE CASE WHEN ALPHA IS JUST 1 DIMENSIONAL
+  
+    if(dim(result)[1] == 1) {
+      
+      ## first, delete out the number of points that we want to burn
+      ## second, only take every thin-th point
+      
+      ## we take the floor function because we took the ceiling above
+      ## so in the case that multiplying by burn doesn't result in an integer
+      ## we returning the correct number of points
+      
+      result <- matrix(result[, (floor(burn*total.points)+1) : total.points], nrow = 1)
+      result <- matrix(result[ , (1:(points/chains))*thin], nrow = 1)
+    }
+    
+    else {
+      
+      
+      ## first, delete out the number of points that we want to burn
+      ## second, only take every thin-th point
+      
+      ## same as above
+      
+      result <- result[, (floor(burn*total.points)+1) : total.points]
+    
+      result <- result[ , (1:(points/chains))*thin]
+    }
+    
+    ## appending on 1 chain onto the result
+    
+    answer[[j]] <- result
+  }
   
   return(answer)
 }
