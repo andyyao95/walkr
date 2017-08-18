@@ -39,7 +39,7 @@ also provides tools to examine sample quality.
 
 Consider all possible vectors $x$ that satisfy the matrix equation $Ax=b$,
 where $A$ is $M \times N$, $x$ is $N \times 1$, and $b$ is $M \times 1$. 
-The problem is interesting when there are more rows than columns  ($M < N$).
+The problem is interesting when there are more columns than rows  ($M < N$).
 In general, if $M = N$, then there is a single solution, and if $M > N$, then there are no solutions.
 If the rows of $A$ are linearly dependent, rows can be eliminated until they are linearly 
 independent without changing the solution space. Assume that the rows of $A$ are 
@@ -472,7 +472,7 @@ $$
 \end{bmatrix}
 $$
 
-Apply the map to $\alpha$, obtaining $x$ in the original problem statement. 
+Apply the map to $\alpha$, thereby obtaining $x$ from the original problem statement. 
 
 $$
 x = 
@@ -608,6 +608,8 @@ values. To solve this problem, we must let the individual chains run for longer 
 sample more points). However, as the dimensions of the polytope increase,
 the number of points we need to sample to ensure adequate mixing increases exponentially.  
 
+% Add more detail for the above claim?
+
 \section{Dikin walk}
 
 A Dikin walk is the second of two MCMC methods implemented in the \pkg{walkr} package.
@@ -635,7 +637,7 @@ $x \in K$ is, because the negative $\log$ tends to infinity as its argument goes
 Since $Ax \leq b$, for every row in $Ax \leq b$, $b_i > a_i^Tx$. Therefore, 
 as $x$ approaches the boundary of $K$ (as $a_i^Tx$ approaches $b_i$), the value of $\phi$
 approaches infinity. Hence, this is a barrier function. 
-It is also exactly because of this that the starting point cannot on the boundary of $K$, 
+It is also exactly because of this that the starting point cannot be on the boundary of $K$, 
 where $b_i = a_i^Tx$, but must be in the interior of $K$. 
 
 \noindent \textbf{Hessian of Log Barrier $H_x$:} 
@@ -754,6 +756,14 @@ walk from reaching points that are very close to the boundary of $K$, the result
 in regions that are away from the boundary. See Figure~\ref{fig:example0} for an illustration.
 \newpage
 
+
+% I think we should change this figure in several ways. First, let's sample 
+% thousands of points so that the histograms are smoother, perhaps using smaller
+% bin widths. Second, let's arrange things as overlapping histograms so that we 
+% can more easily see the different distributions. Third, we ought to add a 
+% higher dimensional example, maybe 50 dimensions. This will highlight that most
+% of the true mass (as found by hit-and-run) is on the edges of the space.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width = 3.5in, height = 4.5in]{img/fig1.png}
@@ -774,7 +784,9 @@ again concentrates in regions away from the edges.}
 \label{fig:example0}  
 \end{figure} 
 
-\begin{verbatim}
+% Save the code for creating this image here.
+
+<<r, eval=FALSE, echo=FALSE>>=
 library(walkr)
 set.seed(314)
 ## initialize matrix
@@ -831,6 +843,11 @@ m6 <- m6+ geom_histogram(binwidth = 0.02, colour = "darkgreen", fill = "black") 
 
 ## plot it 3 by 2
 grid.arrange(m1,m2,m3,m4,m5,m6, ncol = 2)
+@
+
+
+\begin{verbatim}
+
 \end{verbatim}
 
 The \pkg{walkr} package uses \pkg{Rcpp} and \pkg{RcppEigen} (\cite{rcpp}, \cite{rcppeigen})
@@ -895,7 +912,7 @@ sampled_points <- walkr(A = A, b = b, points = 1000,
 Sampling from higher dimensions follows the same syntax. Note that \code{walkr} automatically intersects
 $Ax=b$ with the $N$-simplex, so that the user does not have to include the simplex constraint in $Ax=b$.
 In this way, \pkg{walkr} is not a general tool for sampling from convex polytopes. Instead,
-it specializes in solving a special kind of convex polytope, one created by the intersection of $Ax=b$
+it specializes in solving a specific kind of convex polytope, one created by the intersection of $Ax=b$
 and the $N$-simplex.
 
 \begin{verbatim}
@@ -933,6 +950,9 @@ random walks by calling the \code{explore\_walkr} function, which launches a \co
 from \pkg{shinystan} (\cite{shinystan}). Note that when calling \code{explore\_walkr}, the \code{"ret.format"} argument
 from \code{walkr} must be \code{"list"}, because the individual chains must be separated out. 
 Figure~\ref{fig:shinystan} shows a traceplot from the \pkg{shinystan} interface.
+
+
+% Need to update this Shiny Stan figure.
 
 \begin{figure}[H]
 \centering
