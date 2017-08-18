@@ -18,3 +18,4 @@ vignettes/cache/*
 .o
 .so
 src/*o
+src/*dll
