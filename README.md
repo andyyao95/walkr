@@ -1,4 +1,9 @@
 # walkr
+
+[![CRAN status](https://www.r-pkg.org/badges/version/walkr)](https://cran.r-project.org/package=walkr)
+[![Build status](https://travis-ci.org/jeffreyenos/walkr.svg?branch=master)](https://travis-ci.org/jeffreyenos/walkr)
+[![Codecov test coverage](https://codecov.io/gh/jeffreyenos/walkr/branch/master/graph/badge.svg)](https://codecov.io/gh/jeffreyenos/walkr?branch=master)
+
 Consider the intersection of two spaces: the complete solution space
 to Ax = b and the N-Simplex. The intersection of these two spaces is 
 a convex polytope. **walkr** samples from this 
