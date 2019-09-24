@@ -24,4 +24,4 @@ BugReports: https://github.com/andyyao95/walkr/issues
 LinkingTo: Rcpp, RcppEigen
 NeedsCompilation: yes
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

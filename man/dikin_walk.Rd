@@ -39,6 +39,6 @@ Theorems online)
 ## note that this Ax <= b is different from Ax=b that the 
 ## user specifies for walkr (see transformation section in vignette) 
 dikin_walk(A = A, b = b, x0, points = 100, 
-           r = 1thin = 1, burn = 0, chains = 1) 
+           r = 1, thin = 1, burn = 0, chains = 1) 
 } 
 }
