@@ -14,8 +14,8 @@
 #' \code{walkr} transforms back into the original coordinate system 
 #' and returns the result. This transformation is affine, so the uniformity 
 #' and mixing properties of the MCMC algorithms are not affected. 
-#' The current MCMC sampling methods supported are "hit-and-run", 
-#' "dikin" and "optimized-dikin" (a Rcpp boosted version for speed). 
+#' The current MCMC sampling methods supported are "hit-and-run" and 
+#' "dikin". 
 #' 
 #' 1) Hit-and-run is computationally less expensive and also 
 #' guarantees uniformity asympotically with complexity of O(n^3)
@@ -34,8 +34,7 @@
 #' @param A is the lhs of the matrix equation A
 #' @param b is the rhs of the matrix equation b
 #' @param points is the number of points we want to sample
-#' @param method is the MCMC sampling method. Please enter "hit-and-run", "dikin", or "
-#'        optimized-dikin"
+#' @param method is the MCMC sampling method. Please enter "hit-and-run" or "dikin"
 #' @param thin every thin-th point is stored
 #' @param burn the first burn points are deleted
 #' @param chains is the number of chains we run
