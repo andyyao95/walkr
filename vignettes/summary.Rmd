@@ -19,8 +19,6 @@ affiliations:
 bibliography: summary.bib
 ---
 
-# Summary
-
 Consider the intersection of two spaces: the complete solution space
 to Ax = b and the N-simplex. The intersection of these two spaces is
 a non-negative convex polytope. The R package walkr samples from this
@@ -39,5 +37,5 @@ solution spaces obtained empirically from mass spectrometry analysis of proteins
 insight into the biological systems of interest.
 Finally, walkr is one of the first open-sourced softwares to implement the Dikin walk.
 
-# References
+## References
 
