@@ -22,7 +22,7 @@ reference:
       - rcppeigen_ftcrossprod
       - rcppeigen_ftrans
 navbar:
-  title: drake
+  title: walkr
   type: default
   left:
   - text: Reference
