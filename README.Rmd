@@ -21,7 +21,7 @@ quality.
 
 # Getting Started
 
-* Install from CRAN(released version):
+* Install from CRAN (released version):
 
 ```{r, eval=FALSE}
   install.packages("walkr")

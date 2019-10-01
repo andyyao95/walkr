@@ -9,7 +9,7 @@ Consider the intersection of two spaces: the complete solution space to Ax = b a
 Getting Started
 ===============
 
--   Install from CRAN(released version):
+-   Install from CRAN (released version):
 
 ``` r
   install.packages("walkr")

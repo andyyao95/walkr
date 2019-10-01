@@ -21,3 +21,16 @@ reference:
       - rcppeigen_fsolve
       - rcppeigen_ftcrossprod
       - rcppeigen_ftrans
+navbar:
+  title: drake
+  type: default
+  left:
+  - text: Reference
+    href: reference/index.html
+  - text: Articles
+    menu:
+    - text: Package Summary
+      href: articles/summary.html
+    - text: Full Paper
+      href: articles/walkr.pdf
+      
