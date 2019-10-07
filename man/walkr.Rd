@@ -4,11 +4,10 @@
 \name{walkr}
 \alias{walkr}
 \alias{walkr-package}
-\alias{walkr}
 \title{The walkr package.}
 \usage{
-walkr(A, b, points, method = "dikin", thin = 1, burn = 0.5, chains = 1,
-  ret.format = "matrix")
+walkr(A, b, points, method = "dikin", thin = 1, burn = 0.5,
+  chains = 1, ret.format = "matrix")
 }
 \arguments{
 \item{A}{is the lhs of the matrix equation A}

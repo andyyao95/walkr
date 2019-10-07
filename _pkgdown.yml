@@ -1,0 +1,36 @@
+reference:
+  - title: "Core Functions"
+    contents: 
+      - walkr
+      - explore_walkr
+  - title: "Available Methods"
+    contents:
+      - dikin_walk
+      - hit_and_run
+  - title: "Helper Functions"
+    contents:
+      - calc_rhat
+      - complete_solution
+      - start_point
+  - title: "Matrix Calculations"
+    desc: "These functions boost the computational speed of the 'dikin' method."
+    contents:
+      - rcppeigen_fcrossprod
+      - rcppeigen_fdet
+      - rcppeigen_fprod
+      - rcppeigen_fsolve
+      - rcppeigen_ftcrossprod
+      - rcppeigen_ftrans
+navbar:
+  title: walkr
+  type: default
+  left:
+  - text: Reference
+    href: reference/index.html
+  - text: Articles
+    menu:
+    - text: Package Summary
+      href: articles/summary.html
+    - text: Full Paper
+      href: articles/walkr.pdf
+      
